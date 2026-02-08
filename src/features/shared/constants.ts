@@ -6,3 +6,9 @@ export enum HTTP_STATUS_CODES {
     NOT_FOUND_404 = 404,
     UNAUTHORIZED_401 = 401,
 }
+
+export const ROUTES = {
+    BLOGS: '/blogs',
+    POSTS: '/posts',
+    TESTING: '/testing/all-data',
+};

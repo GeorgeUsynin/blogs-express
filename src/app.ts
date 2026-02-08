@@ -1,8 +1,7 @@
 import cors from 'cors';
 import express, { type Request, type Response } from 'express';
 import { BlogsRouter, PostsRouter, TestRouter } from './features';
-import { HTTP_STATUS_CODES } from './features/share/constants';
-import { SETTINGS } from './core/settings';
+import { HTTP_STATUS_CODES, ROUTES } from './features/shared/constants';
 import { setupSwagger } from './swagger/swagger-setup';
 
 export const app = express();
@@ -15,9 +14,9 @@ app.use(express.json());
 // allowing requests from different origins (domains)
 app.use(cors());
 
-app.use(SETTINGS.PATH.BLOGS, BlogsRouter);
-app.use(SETTINGS.PATH.POSTS, PostsRouter);
-app.use(SETTINGS.PATH.TESTING, TestRouter);
+app.use(ROUTES.BLOGS, BlogsRouter);
+app.use(ROUTES.POSTS, PostsRouter);
+app.use(ROUTES.TESTING, TestRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.status(HTTP_STATUS_CODES.OK_200).json({ version: '1.0' });

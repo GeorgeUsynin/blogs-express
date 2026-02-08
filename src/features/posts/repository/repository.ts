@@ -1,6 +1,6 @@
 import { db, type TPost } from '../../../db';
 import { CreateUpdatePostInputModel } from '../models';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 export const postsRepository = {
     findAll(): TPost[] {
@@ -22,7 +22,7 @@ export const postsRepository = {
 
     create(blogName: string, postPayload: CreateUpdatePostInputModel): TPost {
         const post: TPost = {
-            id: uuidv4(),
+            id: randomUUID(),
             blogName,
             ...postPayload,
         };

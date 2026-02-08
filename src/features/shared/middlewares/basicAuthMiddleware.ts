@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { HTTP_STATUS_CODES } from '../constants';
+import { SETTINGS } from '../../../core';
 
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_USERNAME = SETTINGS.CREDENTIALS.LOGIN;
+const ADMIN_PASSWORD = SETTINGS.CREDENTIALS.PASSWORD;
 
 export const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const auth = req.headers['authorization'] as string;

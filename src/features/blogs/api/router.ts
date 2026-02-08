@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { checkSchema } from 'express-validator';
 import * as RequestHandlers from './requestHandlers';
-import { basicAuthMiddleware, errorMiddleware } from '../../share/middlewares';
+import { basicAuthMiddleware, errorMiddleware } from '../../shared/middlewares';
 import { createUpdateBlogValidationSchema } from '../validation';
 
 const createUpdateBlogValidators = [

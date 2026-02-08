@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
 import { URIParamsPostModel, PostViewModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../share/constants';
+import { HTTP_STATUS_CODES } from '../../../shared/constants';
 import { postsRepository } from '../../repository';
 
 export const getPostByIdHandler = (req: Request<URIParamsPostModel>, res: Response<PostViewModel>) => {

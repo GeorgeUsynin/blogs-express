@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { HTTP_STATUS_CODES } from '../../../share/constants';
+import { HTTP_STATUS_CODES } from '../../../shared/constants';
 import { db } from '../../../../db';
 
 export const deleteAllData = (req: Request, res: Response) => {

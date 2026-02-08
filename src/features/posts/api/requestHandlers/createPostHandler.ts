@@ -1,7 +1,7 @@
 import { type Response } from 'express';
-import { type RequestWithBody } from '../../../share/types';
+import { type RequestWithBody } from '../../../shared/types';
 import { CreateUpdatePostInputModel, PostViewModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../share/constants';
+import { HTTP_STATUS_CODES } from '../../../shared/constants';
 import { postsRepository } from '../../repository';
 import { blogsRepository } from '../../../blogs/repository';
 

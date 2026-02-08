@@ -1,7 +1,7 @@
 import { type Response } from 'express';
-import { RequestWithParamsAndBody } from '../../../share/types';
+import { RequestWithParamsAndBody } from '../../../shared/types';
 import { CreateUpdatePostInputModel, PostViewModel, URIParamsPostModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../share/constants';
+import { HTTP_STATUS_CODES } from '../../../shared/constants';
 import { postsRepository } from '../../repository';
 
 export const updatePostByIdHandler = (

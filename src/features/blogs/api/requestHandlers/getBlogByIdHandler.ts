@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
 import { URIParamsBlogModel, BlogViewModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../share/constants';
+import { HTTP_STATUS_CODES } from '../../../shared/constants';
 import { blogsRepository } from '../../repository';
 
 export const getBlogByIdHandler = (req: Request<URIParamsBlogModel>, res: Response<BlogViewModel>) => {

@@ -1,6 +1,6 @@
 import { db, type TBlog } from '../../../db';
 import { CreateUpdateBlogInputModel } from '../models';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 export const blogsRepository = {
     findAll(): TBlog[] {
@@ -22,7 +22,7 @@ export const blogsRepository = {
 
     create(blogPayload: CreateUpdateBlogInputModel): TBlog {
         const blog: TBlog = {
-            id: uuidv4(),
+            id: randomUUID(),
             ...blogPayload,
         };
 
