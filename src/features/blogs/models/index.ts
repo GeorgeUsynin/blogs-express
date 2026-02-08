@@ -1,5 +1,5 @@
 import { BlogViewModel } from './BlogViewModel';
-import { CreateUpdateErrorViewModel } from '../../share/models/CreateUpdateErrorViewModel';
+import { CreateUpdateBlogInputModel } from './CreateUpdateBlogInputModel';
 import { URIParamsBlogModel } from './URIParamsBlogModel';
 
-export { BlogViewModel, CreateUpdateErrorViewModel, URIParamsBlogModel };
+export { BlogViewModel, CreateUpdateBlogInputModel, URIParamsBlogModel };

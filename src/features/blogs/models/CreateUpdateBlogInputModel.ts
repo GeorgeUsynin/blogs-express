@@ -1,4 +1,4 @@
-export type CreateBlogInputModel = {
+export type CreateUpdateBlogInputModel = {
     /**
      * Blog name
      */
