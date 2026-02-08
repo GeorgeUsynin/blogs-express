@@ -1,8 +1,8 @@
 import cors from 'cors';
 import express, { type Request, type Response } from 'express';
 import { VideosRouter, TestRouter } from './routers';
-import { HTTP_STATUS_CODES } from './constants';
-import { SETTINGS } from './settings';
+import { HTTP_STATUS_CODES } from './core/constants';
+import { SETTINGS } from './core/settings';
 import { setupSwagger } from './swagger/swagger-setup';
 
 export const app = express();
