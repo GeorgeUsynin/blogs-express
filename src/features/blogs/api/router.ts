@@ -1,5 +1,14 @@
 import { Router } from 'express';
+import { checkSchema } from 'express-validator';
 import * as RequestHandlers from './requestHandlers';
+import { basicAuthMiddleware, errorMiddleware } from '../../share/middlewares';
+import { createUpdateBlogValidationSchema } from '../validation';
+
+const createUpdateBlogValidators = [
+    basicAuthMiddleware,
+    checkSchema(createUpdateBlogValidationSchema, ['body']),
+    errorMiddleware,
+];
 
 export const BlogsRouter = Router();
 
@@ -13,6 +22,6 @@ const BlogsController = {
 
 BlogsRouter.get('/', BlogsController.getAllBlogs);
 BlogsRouter.get('/:id', BlogsController.getBlogById);
-BlogsRouter.post('/', BlogsController.createBlog);
-BlogsRouter.put('/:id', BlogsController.updateBlogById);
-BlogsRouter.delete('/:id', BlogsController.deleteBlogById);
+BlogsRouter.post('/', ...createUpdateBlogValidators, BlogsController.createBlog);
+BlogsRouter.put('/:id', ...createUpdateBlogValidators, BlogsController.updateBlogById);
+BlogsRouter.delete('/:id', basicAuthMiddleware, BlogsController.deleteBlogById);
