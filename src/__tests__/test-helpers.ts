@@ -1,4 +1,4 @@
-import { app } from '../app';
+import { app } from '../setup-app';
 import { agent } from 'supertest';
 import { CreateUpdateErrorViewModel } from '../features/shared/models';
 import { capitalizeFirstLetter } from '../helpers';

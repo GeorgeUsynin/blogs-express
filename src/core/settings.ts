@@ -6,4 +6,10 @@ export const SETTINGS = {
         LOGIN: process.env.ADMIN_USERNAME,
         PASSWORD: process.env.ADMIN_PASSWORD,
     },
+    DB_NAME: 'BloggerPlatformReborn',
+    COLLECTIONS: {
+        BLOGS: 'Blogs',
+        POSTS: 'Posts',
+    },
+    MONGO_URL: process.env.MONGO_URL,
 };
