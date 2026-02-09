@@ -267,6 +267,8 @@ components:
         - name
         - description
         - websiteUrl
+        - isMembership
+        - createdAt
       properties:
         id:
           type: string
@@ -284,6 +286,13 @@ components:
           maxLength: 100
           format: uri
           example: https://techtrends.io
+        isMembership:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-02-09T10:15:30.000Z'
 
     CreateUpdateBlogInputModel:
       type: object
@@ -315,6 +324,7 @@ components:
         - content
         - blogId
         - blogName
+        - createdAt
       properties:
         id:
           type: string
@@ -337,6 +347,10 @@ components:
         blogName:
           type: string
           example: Tech Trends
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-02-09T10:15:30.000Z'
 
     CreateUpdatePostInputModel:
       type: object
