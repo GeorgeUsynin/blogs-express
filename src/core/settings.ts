@@ -11,8 +11,8 @@ export const SETTINGS = {
         TEST: 'TestBloggerPlatform',
     },
     COLLECTIONS: {
-        BLOGS: 'Blogs',
-        POSTS: 'Posts',
+        BLOGS: 'blogs',
+        POSTS: 'posts',
     },
     MONGO_URL: process.env.MONGO_URL,
 };
