@@ -1,11 +1,6 @@
 import { Router } from 'express';
-import { checkSchema } from 'express-validator';
 import * as RequestHandlers from './requestHandlers';
-import { basicAuthMiddleware, errorMiddleware } from '../../shared/middlewares';
-import { createUpdatePostValidationSchema } from '../validation';
-import { objectIdValidation } from '../../shared/validation';
-
-const postBodyValidator = checkSchema(createUpdatePostValidationSchema, ['body']);
+import * as Validators from './groupedValidators';
 
 export const PostsRouter = Router();
 
@@ -18,14 +13,7 @@ const PostsController = {
 };
 
 PostsRouter.get('/', PostsController.getAllPosts);
-PostsRouter.get('/:id', objectIdValidation, errorMiddleware, PostsController.getPostById);
-PostsRouter.post('/', basicAuthMiddleware, postBodyValidator, errorMiddleware, PostsController.createPost);
-PostsRouter.put(
-    '/:id',
-    basicAuthMiddleware,
-    objectIdValidation,
-    postBodyValidator,
-    errorMiddleware,
-    PostsController.updatePostById
-);
-PostsRouter.delete('/:id', basicAuthMiddleware, objectIdValidation, errorMiddleware, PostsController.deletePostById);
+PostsRouter.get('/:id', ...Validators.getByIdValidators, PostsController.getPostById);
+PostsRouter.post('/', ...Validators.postValidators, PostsController.createPost);
+PostsRouter.put('/:id', ...Validators.updateValidators, PostsController.updatePostById);
+PostsRouter.delete('/:id', ...Validators.deleteValidators, PostsController.deletePostById);

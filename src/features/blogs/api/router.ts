@@ -1,11 +1,6 @@
 import { Router } from 'express';
-import { checkSchema } from 'express-validator';
 import * as RequestHandlers from './requestHandlers';
-import { basicAuthMiddleware, errorMiddleware } from '../../shared/middlewares';
-import { createUpdateBlogValidationSchema } from '../validation';
-import { objectIdValidation } from '../../shared/validation';
-
-const blogBodyValidator = checkSchema(createUpdateBlogValidationSchema, ['body']);
+import * as Validators from './groupedValidators';
 
 export const BlogsRouter = Router();
 
@@ -18,14 +13,7 @@ const BlogsController = {
 };
 
 BlogsRouter.get('/', BlogsController.getAllBlogs);
-BlogsRouter.get('/:id', objectIdValidation, errorMiddleware, BlogsController.getBlogById);
-BlogsRouter.post('/', basicAuthMiddleware, blogBodyValidator, errorMiddleware, BlogsController.createBlog);
-BlogsRouter.put(
-    '/:id',
-    basicAuthMiddleware,
-    objectIdValidation,
-    blogBodyValidator,
-    errorMiddleware,
-    BlogsController.updateBlogById
-);
-BlogsRouter.delete('/:id', basicAuthMiddleware, objectIdValidation, errorMiddleware, BlogsController.deleteBlogById);
+BlogsRouter.get('/:id', ...Validators.getByIdValidators, BlogsController.getBlogById);
+BlogsRouter.post('/', ...Validators.postValidators, BlogsController.createBlog);
+BlogsRouter.put('/:id', ...Validators.updateValidators, BlogsController.updateBlogById);
+BlogsRouter.delete('/:id', ...Validators.deleteValidators, BlogsController.deleteBlogById);
