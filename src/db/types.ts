@@ -1,7 +1,4 @@
-import { ObjectId } from 'mongodb';
-
 export type TBlog = {
-    id: ObjectId;
     name: string;
     description: string;
     websiteUrl: string;
@@ -10,7 +7,6 @@ export type TBlog = {
 };
 
 export type TPost = {
-    id: ObjectId;
     title: string;
     shortDescription: string;
     content: string;

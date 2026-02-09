@@ -1,17 +1,25 @@
+import { ObjectId } from 'mongodb';
 import { type Request, type Response } from 'express';
 import { URIParamsBlogModel, BlogViewModel } from '../../models';
 import { HTTP_STATUS_CODES } from '../../../shared/constants';
 import { blogsRepository } from '../../repository';
+import { mapToBlogViewModel } from '../mappers';
 
-export const getBlogByIdHandler = (req: Request<URIParamsBlogModel>, res: Response<BlogViewModel>) => {
-    const id = req.params.id;
+export const getBlogByIdHandler = async (req: Request<URIParamsBlogModel>, res: Response<BlogViewModel>) => {
+    try {
+        const id = new ObjectId(req.params.id);
 
-    const foundBlog = blogsRepository.findById(id);
+        const foundBlog = await blogsRepository.findById(id);
 
-    if (!foundBlog) {
-        res.sendStatus(HTTP_STATUS_CODES.NOT_FOUND_404);
-        return;
+        if (!foundBlog) {
+            res.sendStatus(HTTP_STATUS_CODES.NOT_FOUND_404);
+            return;
+        }
+
+        const mappedBlog = mapToBlogViewModel(foundBlog);
+
+        res.status(HTTP_STATUS_CODES.OK_200).send(mappedBlog);
+    } catch (e: unknown) {
+        res.sendStatus(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR_500);
     }
-
-    res.status(HTTP_STATUS_CODES.OK_200).send(foundBlog);
 };

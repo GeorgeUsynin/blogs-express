@@ -1,24 +1,29 @@
+import { ObjectId } from 'mongodb';
 import { type Response } from 'express';
 import { RequestWithParamsAndBody } from '../../../shared/types';
 import { CreateUpdateBlogInputModel, BlogViewModel, URIParamsBlogModel } from '../../models';
 import { HTTP_STATUS_CODES } from '../../../shared/constants';
 import { blogsRepository } from '../../repository';
 
-export const updateBlogByIdHandler = (
+export const updateBlogByIdHandler = async (
     req: RequestWithParamsAndBody<URIParamsBlogModel, CreateUpdateBlogInputModel>,
     res: Response<BlogViewModel>
 ) => {
-    const id = req.params.id;
-    const payload = req.body;
+    try {
+        const id = new ObjectId(req.params.id);
+        const payload = req.body;
 
-    const foundBlog = blogsRepository.findById(id);
+        const foundBlog = await blogsRepository.findById(id);
 
-    if (!foundBlog) {
-        res.sendStatus(HTTP_STATUS_CODES.NOT_FOUND_404);
-        return;
+        if (!foundBlog) {
+            res.sendStatus(HTTP_STATUS_CODES.NOT_FOUND_404);
+            return;
+        }
+
+        await blogsRepository.updateById(id, payload);
+
+        res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
+    } catch (e: unknown) {
+        res.sendStatus(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR_500);
     }
-
-    blogsRepository.update(id, payload);
-
-    res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
 };

@@ -28,4 +28,9 @@ export type PostViewModel = {
      * Related blog name
      */
     blogName: string;
+
+    /**
+     * Post creation date and time (ISO string)
+     */
+    createdAt: string;
 };

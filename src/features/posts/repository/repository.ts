@@ -1,43 +1,51 @@
-import { db, type TPost } from '../../../db';
+import { ObjectId, WithId } from 'mongodb';
+import { postsCollection, TPost } from '../../../db';
 import { CreateUpdatePostInputModel } from '../models';
-import { randomUUID } from 'crypto';
 
 export const postsRepository = {
-    findAll(): TPost[] {
-        return db.posts;
+    async findAll(): Promise<WithId<TPost>[]> {
+        return postsCollection.find().toArray();
     },
 
-    findById(id: string): TPost | undefined {
-        return db.posts.find(post => post.id === id);
+    async findById(_id: ObjectId): Promise<WithId<TPost> | null> {
+        return postsCollection.findOne({ _id });
     },
 
-    removeById(id: string) {
-        for (let i = 0; i < db.posts.length; i++) {
-            if (db.posts[i].id === id) {
-                db.posts.splice(i, 1);
-                break;
-            }
-        }
-    },
-
-    create(blogName: string, postPayload: CreateUpdatePostInputModel): TPost {
+    async create(blogName: string, postPayload: CreateUpdatePostInputModel): Promise<WithId<TPost>> {
         const post: TPost = {
-            id: randomUUID(),
             blogName,
+            createdAt: new Date().toISOString(),
             ...postPayload,
         };
 
-        db.posts.push(post);
+        const { insertedId } = await postsCollection.insertOne(post);
 
-        return post;
+        return { ...post, _id: insertedId };
     },
 
-    update(id: string, postPayload: CreateUpdatePostInputModel) {
-        for (let i = 0; i < db.posts.length; i++) {
-            if (db.posts[i].id === id) {
-                db.posts.splice(i, 1, { ...db.posts[i], ...postPayload });
-                break;
+    async updateById(_id: ObjectId, postPayload: CreateUpdatePostInputModel): Promise<void> {
+        const { matchedCount } = await postsCollection.updateOne(
+            { _id },
+            {
+                $set: {
+                    title: postPayload.title,
+                    shortDescription: postPayload.shortDescription,
+                    content: postPayload.content,
+                    blogId: postPayload.blogId,
+                },
             }
+        );
+
+        if (matchedCount < 1) {
+            throw new Error("Post doesn't exist");
+        }
+    },
+
+    async removeById(_id: ObjectId): Promise<void> {
+        const { deletedCount } = await postsCollection.deleteOne({ _id });
+
+        if (deletedCount < 1) {
+            throw new Error("Post doesn't exist");
         }
     },
 };

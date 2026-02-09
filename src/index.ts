@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { setupApp } from './setup-app';
 import { SETTINGS } from './core';
-import { runDB } from './db/mongo.db';
+import { runDB } from './db/db';
 
 const PORT = SETTINGS.PORT;
 const MONGO_URL = SETTINGS.MONGO_URL!;

@@ -1,42 +1,50 @@
-import { db, type TBlog } from '../../../db';
+import { ObjectId, WithId } from 'mongodb';
+import { blogsCollection, TBlog } from '../../../db';
 import { CreateUpdateBlogInputModel } from '../models';
-import { randomUUID } from 'crypto';
 
 export const blogsRepository = {
-    findAll(): TBlog[] {
-        return db.blogs;
+    async findAll(): Promise<WithId<TBlog>[]> {
+        return blogsCollection.find().toArray();
     },
 
-    findById(id: string): TBlog | undefined {
-        return db.blogs.find(blog => blog.id === id);
+    async findById(_id: ObjectId): Promise<WithId<TBlog> | null> {
+        return blogsCollection.findOne({ _id });
     },
 
-    removeById(id: string) {
-        for (let i = 0; i < db.blogs.length; i++) {
-            if (db.blogs[i].id === id) {
-                db.blogs.splice(i, 1);
-                break;
-            }
-        }
-    },
-
-    create(blogPayload: CreateUpdateBlogInputModel): TBlog {
+    async create(blogPayload: CreateUpdateBlogInputModel): Promise<WithId<TBlog>> {
         const blog: TBlog = {
-            id: randomUUID(),
+            isMembership: false,
+            createdAt: new Date().toISOString(),
             ...blogPayload,
         };
 
-        db.blogs.push(blog);
+        const { insertedId } = await blogsCollection.insertOne(blog);
 
-        return blog;
+        return { ...blog, _id: insertedId };
     },
 
-    update(id: string, blogPayload: CreateUpdateBlogInputModel) {
-        for (let i = 0; i < db.blogs.length; i++) {
-            if (db.blogs[i].id === id) {
-                db.blogs.splice(i, 1, { ...db.blogs[i], ...blogPayload });
-                break;
+    async updateById(_id: ObjectId, blogPayload: CreateUpdateBlogInputModel): Promise<void> {
+        const { matchedCount } = await blogsCollection.updateOne(
+            { _id },
+            {
+                $set: {
+                    name: blogPayload.name,
+                    description: blogPayload.description,
+                    websiteUrl: blogPayload.websiteUrl,
+                },
             }
+        );
+
+        if (matchedCount < 1) {
+            throw new Error("Blog doesn't exist");
+        }
+    },
+
+    async removeById(_id: ObjectId): Promise<void> {
+        const { deletedCount } = await blogsCollection.deleteOne({ _id });
+
+        if (deletedCount < 1) {
+            throw new Error("Blog doesn't exist");
         }
     },
 };
