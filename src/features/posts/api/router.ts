@@ -5,7 +5,7 @@ import { basicAuthMiddleware, errorMiddleware } from '../../shared/middlewares';
 import { createUpdatePostValidationSchema } from '../validation';
 import { objectIdValidation } from '../../shared/validation';
 
-const createUpdatePostValidators = [checkSchema(createUpdatePostValidationSchema, ['body']), errorMiddleware];
+const postBodyValidator = checkSchema(createUpdatePostValidationSchema, ['body']);
 
 export const PostsRouter = Router();
 
@@ -18,13 +18,14 @@ const PostsController = {
 };
 
 PostsRouter.get('/', PostsController.getAllPosts);
-PostsRouter.get('/:id', objectIdValidation, PostsController.getPostById);
-PostsRouter.post('/', basicAuthMiddleware, ...createUpdatePostValidators, PostsController.createPost);
+PostsRouter.get('/:id', objectIdValidation, errorMiddleware, PostsController.getPostById);
+PostsRouter.post('/', basicAuthMiddleware, postBodyValidator, errorMiddleware, PostsController.createPost);
 PostsRouter.put(
     '/:id',
     basicAuthMiddleware,
     objectIdValidation,
-    ...createUpdatePostValidators,
+    postBodyValidator,
+    errorMiddleware,
     PostsController.updatePostById
 );
-PostsRouter.delete('/:id', basicAuthMiddleware, objectIdValidation, PostsController.deletePostById);
+PostsRouter.delete('/:id', basicAuthMiddleware, objectIdValidation, errorMiddleware, PostsController.deletePostById);

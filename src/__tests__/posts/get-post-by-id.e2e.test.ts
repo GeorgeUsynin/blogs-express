@@ -1,25 +1,36 @@
-import { request } from '../test-helpers';
-import { setDB } from '../../db';
+import { dbHelper, request } from '../test-helpers';
 import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
-import { dataset } from '../dataset';
+import { posts } from '../dataset';
+import { mapToPostViewModel } from '../../features/posts/api/mappers';
 
 describe('get post by id', () => {
-    it('returns post by requested id', async () => {
-        //populating database
-        setDB({ blogs: [], posts: dataset.posts });
+    beforeAll(async () => {
+        await dbHelper.connectToDb();
+    });
 
-        const requestedId = '103';
+    beforeEach(async () => {
+        await dbHelper.setDb({ posts });
+    });
+
+    afterEach(async () => {
+        await dbHelper.resetCollections(['posts']);
+    });
+
+    afterAll(async () => {
+        await dbHelper.dropDb();
+        await dbHelper.closeConnection();
+    });
+
+    it('returns post by requested id', async () => {
+        const requestedId = (await dbHelper.getPost(2))._id;
         //requesting post by id
         const { body } = await request.get(`${ROUTES.POSTS}/${requestedId}`).expect(HTTP_STATUS_CODES.OK_200);
 
-        expect(body).toEqual(dataset.posts.find(p => p.id === requestedId));
+        expect(body).toEqual(mapToPostViewModel(posts[2]));
     });
 
     it('returns 404 status code if there is no requested post in database', async () => {
-        //populating database
-        setDB({ blogs: [], posts: dataset.posts });
-
-        const fakeRequestedId = '10001';
+        const fakeRequestedId = '507f1f77bcf86cd799439011';
         //requesting post by id
         await request.get(`${ROUTES.POSTS}/${fakeRequestedId}`).expect(HTTP_STATUS_CODES.NOT_FOUND_404);
     });

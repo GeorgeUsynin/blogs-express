@@ -1,17 +1,29 @@
-import { request, createErrorMessages, getAuthorization } from '../test-helpers';
-import { setDB } from '../../db';
+import { dbHelper, request, createErrorMessages, getAuthorization } from '../test-helpers';
 import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
-import { dataset, longDescription, longWebsiteUrl } from '../dataset';
+import { blogs, longDescription, longWebsiteUrl } from '../dataset';
 import { CreateUpdateBlogInputModel } from '../../features/blogs/models';
+import { mapToBlogViewModel } from '../../features/blogs/api/mappers';
 
 describe('update blog by id', () => {
-    beforeEach(() => {
-        setDB({ blogs: dataset.blogs, posts: [] });
+    beforeAll(async () => {
+        await dbHelper.connectToDb();
     });
 
-    const requestedId = '2';
+    beforeEach(async () => {
+        await dbHelper.setDb({ blogs });
+    });
+
+    afterEach(async () => {
+        await dbHelper.resetCollections(['blogs']);
+    });
+
+    afterAll(async () => {
+        await dbHelper.dropDb();
+        await dbHelper.closeConnection();
+    });
 
     it('updates blog by id', async () => {
+        const requestedId = (await dbHelper.getBlog(1))._id;
         const updatedBlog: CreateUpdateBlogInputModel = {
             description: 'New description',
             name: 'New name',
@@ -28,10 +40,19 @@ describe('update blog by id', () => {
         //checking that the blog was updated
         const { body } = await request.get(`${ROUTES.BLOGS}/${requestedId}`).expect(HTTP_STATUS_CODES.OK_200);
 
-        expect(body).toEqual({ id: requestedId, ...updatedBlog });
+        expect(body).toEqual({
+            ...mapToBlogViewModel(blogs[1]),
+            ...updatedBlog,
+        });
     });
 
     describe('blog payload validation', () => {
+        let requestedId: string;
+
+        beforeEach(async () => {
+            requestedId = (await dbHelper.getBlog(1))._id.toString();
+        });
+
         describe('name', () => {
             it('returns 400 status code and proper error object if `name` is missing', async () => {
                 //@ts-expect-error bad request (name is missing)
@@ -193,6 +214,7 @@ describe('update blog by id', () => {
     });
 
     it('return 401 Unauthorized status code if there is no proper Authorization header', async () => {
+        const requestedId = (await dbHelper.getBlog(1))._id;
         const updatedBlog: CreateUpdateBlogInputModel = {
             description: 'Eco lifestyle description',
             name: 'Eco Lifestyle',
@@ -206,7 +228,7 @@ describe('update blog by id', () => {
     });
 
     it('return 404 status code if there is no blog in database', async () => {
-        const fakeRequestedId = '999';
+        const fakeRequestedId = '507f1f77bcf86cd799439011';
         const updatedBlog: CreateUpdateBlogInputModel = {
             description: 'New description',
             name: 'New name',

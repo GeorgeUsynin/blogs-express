@@ -1,12 +1,20 @@
-import { request, createErrorMessages, getAuthorization } from '../test-helpers';
-import { setDB } from '../../db';
+import { dbHelper, request, createErrorMessages, getAuthorization } from '../test-helpers';
 import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
 import { longDescription, longWebsiteUrl } from '../dataset';
-import { CreateUpdateBlogInputModel, BlogViewModel } from '../../features/blogs/models';
+import { CreateUpdateBlogInputModel } from '../../features/blogs/models';
 
 describe('create a blog', () => {
-    beforeEach(() => {
-        setDB();
+    beforeAll(async () => {
+        await dbHelper.connectToDb();
+    });
+
+    afterEach(async () => {
+        await dbHelper.resetCollections(['blogs']);
+    });
+
+    afterAll(async () => {
+        await dbHelper.dropDb();
+        await dbHelper.closeConnection();
     });
 
     it('creates a new blog', async () => {
@@ -16,11 +24,6 @@ describe('create a blog', () => {
             websiteUrl: 'https://ecolifestyle.com',
         };
 
-        const createdBlog: BlogViewModel = {
-            id: expect.any(String),
-            ...newBlog,
-        };
-
         //creating new blog
         const { body: newBlogBodyResponse } = await request
             .post(ROUTES.BLOGS)
@@ -28,12 +31,17 @@ describe('create a blog', () => {
             .send(newBlog)
             .expect(HTTP_STATUS_CODES.CREATED_201);
 
-        expect(newBlogBodyResponse).toEqual(createdBlog);
+        expect(newBlogBodyResponse).toEqual({
+            id: expect.any(String),
+            ...newBlog,
+            isMembership: false,
+            createdAt: expect.any(String),
+        });
 
         //checking that the blog was created
         const { body: allBlogsBodyResponse } = await request.get(ROUTES.BLOGS).expect(HTTP_STATUS_CODES.OK_200);
 
-        expect(allBlogsBodyResponse).toEqual([createdBlog]);
+        expect(allBlogsBodyResponse).toEqual([newBlogBodyResponse]);
     });
 
     describe('blog payload validation', () => {

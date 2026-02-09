@@ -1,25 +1,36 @@
-import { request } from '../test-helpers';
-import { setDB } from '../../db';
+import { dbHelper, request } from '../test-helpers';
 import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
-import { dataset } from '../dataset';
+import { mapToBlogViewModel } from '../../features/blogs/api/mappers';
+import { blogs } from '../dataset';
 
 describe('get blog by id', () => {
-    it('returns blog by requested id', async () => {
-        //populating database
-        setDB({ blogs: dataset.blogs, posts: [] });
+    beforeAll(async () => {
+        await dbHelper.connectToDb();
+    });
 
-        const requestedId = '2';
+    beforeEach(async () => {
+        await dbHelper.setDb({ blogs });
+    });
+
+    afterEach(async () => {
+        await dbHelper.resetCollections(['blogs']);
+    });
+
+    afterAll(async () => {
+        await dbHelper.dropDb();
+        await dbHelper.closeConnection();
+    });
+
+    it('returns blog by requested id', async () => {
+        const requestedId = (await dbHelper.getBlog(1))._id;
         //requesting blog by id
         const { body } = await request.get(`${ROUTES.BLOGS}/${requestedId}`).expect(HTTP_STATUS_CODES.OK_200);
 
-        expect(body).toEqual(dataset.blogs[1]);
+        expect(body).toEqual(mapToBlogViewModel(blogs[1]));
     });
 
     it('returns 404 status code if there is no requested blog in database', async () => {
-        //populating database
-        setDB({ blogs: dataset.blogs, posts: [] });
-
-        const fakeRequestedId = '999';
+        const fakeRequestedId = '507f1f77bcf86cd799439011';
         //requesting blog by id
         await request.get(`${ROUTES.BLOGS}/${fakeRequestedId}`).expect(HTTP_STATUS_CODES.NOT_FOUND_404);
     });

@@ -4,7 +4,7 @@ import { BlogsRouter, PostsRouter, TestRouter } from './features';
 import { HTTP_STATUS_CODES, ROUTES } from './features/shared/constants';
 import { setupSwagger } from './swagger/swagger-setup';
 
-export const setupApp = async (app: Express) => {
+export const setupApp = (app: Express) => {
     // Parses incoming requests with JSON payloads
     // and makes the data available in req.body
     app.use(express.json());

@@ -6,7 +6,10 @@ export const SETTINGS = {
         LOGIN: process.env.ADMIN_USERNAME,
         PASSWORD: process.env.ADMIN_PASSWORD,
     },
-    DB_NAME: 'BloggerPlatformReborn',
+    DB_NAME: {
+        PROD: 'BloggerPlatformReborn',
+        TEST: 'TestBloggerPlatform',
+    },
     COLLECTIONS: {
         BLOGS: 'Blogs',
         POSTS: 'Posts',

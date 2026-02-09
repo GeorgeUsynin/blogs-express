@@ -1,10 +1,15 @@
-import { app } from '../setup-app';
+import express from 'express';
+import { setupApp } from '../setup-app';
 import { agent } from 'supertest';
 import { CreateUpdateErrorViewModel } from '../features/shared/models';
 import { capitalizeFirstLetter } from '../helpers';
 import { SETTINGS } from '../core';
+import { runDB, client, blogsCollection, postsCollection, db } from '../db';
+import { TDataset } from './dataset';
 
-export const request = agent(app);
+const app = express();
+
+export const request = agent(setupApp(app));
 
 type TProperties = 'isRequired' | 'isString' | 'maxLength';
 
@@ -171,4 +176,41 @@ export const getAuthorization = () => {
     const codedAuth = buff.toString('base64');
 
     return { Authorization: `Basic ${codedAuth}` };
+};
+
+export const dbHelper = {
+    connectToDb: async () => {
+        await runDB(SETTINGS.MONGO_URL!, true);
+    },
+    closeConnection: async () => {
+        await client.close();
+    },
+    resetCollections: async (collectionNames: (keyof TDataset)[]) => {
+        if (collectionNames.includes('blogs')) {
+            await blogsCollection.deleteMany({});
+        }
+        if (collectionNames.includes('posts')) {
+            await postsCollection.deleteMany({});
+        }
+    },
+    setDb: async (dataset: TDataset) => {
+        if (dataset.blogs?.length) {
+            await blogsCollection.insertMany(dataset.blogs);
+        }
+
+        if (dataset.posts?.length) {
+            await postsCollection.insertMany(dataset.posts);
+        }
+    },
+    dropDb: async () => {
+        await db.dropDatabase();
+    },
+    getBlog: async (arrayIndex: number) => {
+        const allBlogs = await blogsCollection.find({}).toArray();
+        return allBlogs[arrayIndex];
+    },
+    getPost: async (arrayIndex: number) => {
+        const allPosts = await postsCollection.find({}).toArray();
+        return allPosts[arrayIndex];
+    },
 };

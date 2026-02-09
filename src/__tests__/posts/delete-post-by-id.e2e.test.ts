@@ -1,14 +1,27 @@
-import { request, getAuthorization } from '../test-helpers';
-import { setDB } from '../../db';
+import { dbHelper, request, getAuthorization } from '../test-helpers';
 import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
-import { dataset } from '../dataset';
+import { posts } from '../dataset';
 
 describe('delete post by id', () => {
-    it('deletes post from database by providing ID', async () => {
-        //populating database
-        setDB({ blogs: [], posts: dataset.posts });
+    beforeAll(async () => {
+        await dbHelper.connectToDb();
+    });
 
-        const requestedId = '103';
+    beforeEach(async () => {
+        await dbHelper.setDb({ posts });
+    });
+
+    afterEach(async () => {
+        await dbHelper.resetCollections(['posts']);
+    });
+
+    afterAll(async () => {
+        await dbHelper.dropDb();
+        await dbHelper.closeConnection();
+    });
+
+    it('deletes post from database by providing ID', async () => {
+        const requestedId = (await dbHelper.getPost(2))._id;
 
         await request
             .delete(`${ROUTES.POSTS}/${requestedId}`)
@@ -23,10 +36,7 @@ describe('delete post by id', () => {
     });
 
     it('returns 404 status code if the post was not founded by requested ID', async () => {
-        //populating database
-        setDB({ blogs: [], posts: dataset.posts });
-
-        const fakeRequestedId = '999';
+        const fakeRequestedId = '507f1f77bcf86cd799439011';
 
         await request
             .delete(`${ROUTES.POSTS}/${fakeRequestedId}`)
@@ -35,10 +45,7 @@ describe('delete post by id', () => {
     });
 
     it('return 401 Unauthorized status code if there is no proper Authorization header', async () => {
-        //populating database
-        setDB({ blogs: [], posts: dataset.posts });
-
-        const requestedId = '103';
+        const requestedId = (await dbHelper.getPost(2))._id;
 
         await request.delete(`${ROUTES.POSTS}/${requestedId}`).expect(HTTP_STATUS_CODES.UNAUTHORIZED_401);
     });

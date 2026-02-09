@@ -5,7 +5,7 @@ import { basicAuthMiddleware, errorMiddleware } from '../../shared/middlewares';
 import { createUpdateBlogValidationSchema } from '../validation';
 import { objectIdValidation } from '../../shared/validation';
 
-const createUpdateBlogValidators = [checkSchema(createUpdateBlogValidationSchema, ['body']), errorMiddleware];
+const blogBodyValidator = checkSchema(createUpdateBlogValidationSchema, ['body']);
 
 export const BlogsRouter = Router();
 
@@ -18,13 +18,14 @@ const BlogsController = {
 };
 
 BlogsRouter.get('/', BlogsController.getAllBlogs);
-BlogsRouter.get('/:id', objectIdValidation, BlogsController.getBlogById);
-BlogsRouter.post('/', basicAuthMiddleware, ...createUpdateBlogValidators, BlogsController.createBlog);
+BlogsRouter.get('/:id', objectIdValidation, errorMiddleware, BlogsController.getBlogById);
+BlogsRouter.post('/', basicAuthMiddleware, blogBodyValidator, errorMiddleware, BlogsController.createBlog);
 BlogsRouter.put(
     '/:id',
     basicAuthMiddleware,
     objectIdValidation,
-    ...createUpdateBlogValidators,
+    blogBodyValidator,
+    errorMiddleware,
     BlogsController.updateBlogById
 );
-BlogsRouter.delete('/:id', basicAuthMiddleware, objectIdValidation, BlogsController.deleteBlogById);
+BlogsRouter.delete('/:id', basicAuthMiddleware, objectIdValidation, errorMiddleware, BlogsController.deleteBlogById);

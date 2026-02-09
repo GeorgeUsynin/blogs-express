@@ -1,14 +1,27 @@
-import { request, getAuthorization } from '../test-helpers';
-import { setDB } from '../../db';
+import { dbHelper, request, getAuthorization } from '../test-helpers';
 import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
-import { dataset } from '../dataset';
+import { blogs } from '../dataset';
 
 describe('delete blog by id', () => {
-    it('deletes blog from database by providing ID', async () => {
-        //populating database
-        setDB({ blogs: dataset.blogs, posts: [] });
+    beforeAll(async () => {
+        await dbHelper.connectToDb();
+    });
 
-        const requestedId = '2';
+    beforeEach(async () => {
+        await dbHelper.setDb({ blogs });
+    });
+
+    afterEach(async () => {
+        await dbHelper.resetCollections(['blogs']);
+    });
+
+    afterAll(async () => {
+        await dbHelper.dropDb();
+        await dbHelper.closeConnection();
+    });
+
+    it('deletes blog from database by providing ID', async () => {
+        const requestedId = (await dbHelper.getBlog(1))._id;
 
         await request
             .delete(`${ROUTES.BLOGS}/${requestedId}`)
@@ -23,10 +36,7 @@ describe('delete blog by id', () => {
     });
 
     it('returns 404 status code if the blog was not founded by requested ID', async () => {
-        //populating database
-        setDB({ blogs: dataset.blogs, posts: [] });
-
-        const fakeRequestedId = '999';
+        const fakeRequestedId = '507f1f77bcf86cd799439011';
 
         await request
             .delete(`${ROUTES.BLOGS}/${fakeRequestedId}`)
@@ -34,11 +44,8 @@ describe('delete blog by id', () => {
             .expect(HTTP_STATUS_CODES.NOT_FOUND_404);
     });
 
-    it('return 401 Unauthorized status code if there is no proper Authorization header', async () => {
-        //populating database
-        setDB({ blogs: dataset.blogs, posts: [] });
-
-        const requestedId = '2';
+    it('returns 401 Unauthorized status code if there is no proper Authorization header', async () => {
+        const requestedId = (await dbHelper.getBlog(1))._id;
 
         await request.delete(`${ROUTES.BLOGS}/${requestedId}`).expect(HTTP_STATUS_CODES.UNAUTHORIZED_401);
     });

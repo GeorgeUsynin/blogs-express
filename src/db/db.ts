@@ -5,10 +5,12 @@ import { SETTINGS } from '../core';
 export let client: MongoClient;
 export let blogsCollection: Collection<TBlog>;
 export let postsCollection: Collection<TPost>;
+export let db: Db;
 
-export async function runDB(url: string): Promise<void> {
+export async function runDB(url: string, isTest: boolean = true): Promise<void> {
     client = new MongoClient(url);
-    const db: Db = client.db(SETTINGS.DB_NAME);
+    const dbName = isTest ? SETTINGS.DB_NAME.TEST : SETTINGS.DB_NAME.PROD;
+    db = client.db(dbName);
 
     blogsCollection = db.collection<TBlog>(SETTINGS.COLLECTIONS.BLOGS);
     postsCollection = db.collection<TPost>(SETTINGS.COLLECTIONS.POSTS);
