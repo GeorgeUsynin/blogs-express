@@ -180,7 +180,7 @@ export const getAuthorization = () => {
 
 export const dbHelper = {
     connectToDb: async () => {
-        await runDB(SETTINGS.MONGO_URL!, true);
+        await runDB(SETTINGS.MONGO_URL!);
     },
     closeConnection: async () => {
         await client.close();
