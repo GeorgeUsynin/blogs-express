@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { type Request, type Response } from 'express';
-import { URIParamsBlogModel, BlogViewModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../shared/constants';
+import { URIParamsBlogModel, BlogViewModel } from '../../api/models';
+import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { blogsRepository } from '../../repository';
 import { mapToBlogViewModel } from '../mappers';
 

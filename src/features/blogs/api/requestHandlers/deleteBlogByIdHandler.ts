@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { type Request, type Response } from 'express';
-import { URIParamsBlogModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../shared/constants';
+import { URIParamsBlogModel } from '../../api/models';
+import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { blogsRepository } from '../../repository';
 
 export const deleteBlogByIdHandler = async (req: Request<URIParamsBlogModel>, res: Response) => {

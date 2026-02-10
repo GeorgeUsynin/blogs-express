@@ -1,5 +1,5 @@
 import { dbHelper, request, getAuthorization } from '../test-helpers';
-import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
+import { HTTP_STATUS_CODES, ROUTES } from '../../core/constants';
 import { posts } from '../dataset';
 
 describe('delete post by id', () => {

@@ -1,7 +1,7 @@
 import { dbHelper, request, createErrorMessages, getAuthorization } from '../test-helpers';
-import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
+import { HTTP_STATUS_CODES, ROUTES } from '../../core/constants';
 import { longDescription, longWebsiteUrl } from '../dataset';
-import { CreateUpdateBlogInputModel } from '../../features/blogs/models';
+import { CreateUpdateBlogInputModel } from '../../features/blogs/api/models';
 
 describe('create a blog', () => {
     beforeAll(async () => {

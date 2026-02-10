@@ -1,8 +1,8 @@
 import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
 import { BlogsRouter, PostsRouter, TestRouter } from './features';
-import { HTTP_STATUS_CODES, ROUTES } from './features/shared/constants';
-import { setupSwagger } from './swagger/swagger-setup';
+import { HTTP_STATUS_CODES, ROUTES } from './core/constants';
+import { setupSwagger } from './core/swagger';
 
 export const setupApp = (app: Express) => {
     // Parses incoming requests with JSON payloads

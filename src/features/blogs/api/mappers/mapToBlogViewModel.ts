@@ -1,6 +1,6 @@
 import { WithId } from 'mongodb';
-import { TBlog } from '../../../../db';
-import { BlogViewModel } from '../../models';
+import { TBlog } from '../../domain';
+import { BlogViewModel } from '../../api/models';
 
 export const mapToBlogViewModel = (blog: WithId<TBlog>): BlogViewModel => ({
     id: blog._id.toString(),

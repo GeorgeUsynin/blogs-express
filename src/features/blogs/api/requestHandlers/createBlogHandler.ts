@@ -1,7 +1,7 @@
 import { type Response } from 'express';
-import { type RequestWithBody } from '../../../shared/types';
-import { CreateUpdateBlogInputModel, BlogViewModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../shared/constants';
+import { type RequestWithBody } from '../../../../core/types';
+import { CreateUpdateBlogInputModel, BlogViewModel } from '../../api/models';
+import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { blogsRepository } from '../../repository';
 import { mapToBlogViewModel } from '../mappers';
 

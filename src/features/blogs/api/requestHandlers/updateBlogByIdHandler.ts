@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
 import { type Response } from 'express';
-import { RequestWithParamsAndBody } from '../../../shared/types';
-import { CreateUpdateBlogInputModel, BlogViewModel, URIParamsBlogModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../shared/constants';
+import { RequestWithParamsAndBody } from '../../../../core/types';
+import { CreateUpdateBlogInputModel, BlogViewModel, URIParamsBlogModel } from '../../api/models';
+import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { blogsRepository } from '../../repository';
 
 export const updateBlogByIdHandler = async (

@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
-import { BlogViewModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../shared/constants';
+import { BlogViewModel } from '../../api/models';
+import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { blogsRepository } from '../../repository';
 import { mapToBlogViewModel } from '../mappers';
 

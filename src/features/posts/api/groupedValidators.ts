@@ -1,6 +1,6 @@
 import { checkSchema } from 'express-validator';
-import { basicAuthMiddleware, errorMiddleware } from '../../shared/middlewares';
-import { objectIdValidation } from '../../shared/validation';
+import { basicAuthMiddleware, errorMiddleware } from '../../../core/middlewares';
+import { objectIdValidation } from '../../../core/validation';
 import { createUpdatePostValidationSchema } from '../validation';
 
 export const getByIdValidators = [objectIdValidation, errorMiddleware];

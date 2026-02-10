@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { type Request, type Response } from 'express';
 import { URIParamsPostModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../shared/constants';
+import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { postsRepository } from '../../repository';
 
 export const deletePostByIdHandler = async (req: Request<URIParamsPostModel>, res: Response) => {

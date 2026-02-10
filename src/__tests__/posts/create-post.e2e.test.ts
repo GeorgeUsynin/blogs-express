@@ -1,5 +1,5 @@
 import { dbHelper, request, createErrorMessages, getAuthorization } from '../test-helpers';
-import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
+import { HTTP_STATUS_CODES, ROUTES } from '../../core/constants';
 import { blogs, longContent, longTitle, longShortDescription } from '../dataset';
 import { CreateUpdatePostInputModel } from '../../features/posts/models';
 

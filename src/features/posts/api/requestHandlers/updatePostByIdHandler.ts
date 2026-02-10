@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
 import { type Response } from 'express';
-import { RequestWithParamsAndBody } from '../../../shared/types';
+import { RequestWithParamsAndBody } from '../../../../core/types';
 import { CreateUpdatePostInputModel, PostViewModel, URIParamsPostModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../shared/constants';
+import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { postsRepository } from '../../repository';
 
 export const updatePostByIdHandler = async (

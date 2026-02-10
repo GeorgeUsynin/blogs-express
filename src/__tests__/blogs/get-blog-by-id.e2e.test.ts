@@ -1,5 +1,5 @@
 import { dbHelper, request } from '../test-helpers';
-import { HTTP_STATUS_CODES, ROUTES } from '../../features/shared/constants';
+import { HTTP_STATUS_CODES, ROUTES } from '../../core/constants';
 import { mapToBlogViewModel } from '../../features/blogs/api/mappers';
 import { blogs } from '../dataset';
 

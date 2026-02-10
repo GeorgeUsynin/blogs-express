@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
 import { type Response } from 'express';
-import { type RequestWithBody } from '../../../shared/types';
+import { type RequestWithBody } from '../../../../core/types';
 import { CreateUpdatePostInputModel, PostViewModel } from '../../models';
-import { HTTP_STATUS_CODES } from '../../../shared/constants';
+import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { postsRepository } from '../../repository';
 import { blogsRepository } from '../../../blogs/repository';
 import { mapToPostViewModel } from '../mappers';

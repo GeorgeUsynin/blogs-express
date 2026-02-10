@@ -1,6 +1,7 @@
 import { ObjectId, WithId } from 'mongodb';
-import { blogsCollection, TBlog } from '../../../db';
-import { CreateUpdateBlogInputModel } from '../models';
+import { blogsCollection } from '../../../db';
+import { CreateUpdateBlogInputModel } from '../api/models';
+import { TBlog } from '../domain';
 
 export const blogsRepository = {
     async findAll(): Promise<WithId<TBlog>[]> {

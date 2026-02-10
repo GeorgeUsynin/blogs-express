@@ -1,15 +1,17 @@
 import { Collection, Db, MongoClient } from 'mongodb';
-import { type TBlog, type TPost } from './types';
-import { SETTINGS } from '../core';
+import { type TPost } from './types';
+import { SETTINGS } from '../core/settings';
+import { TBlog } from '../features/blogs/domain';
 
 export let client: MongoClient;
 export let blogsCollection: Collection<TBlog>;
 export let postsCollection: Collection<TPost>;
 export let db: Db;
 
+const dbName = process.env.NODE_ENV === 'test' ? SETTINGS.DB_NAME.TEST : SETTINGS.DB_NAME.PROD;
+
 export async function runDB(url: string): Promise<void> {
     client = new MongoClient(url);
-    const dbName = process.env.NODE_ENV === 'test' ? SETTINGS.DB_NAME.TEST : SETTINGS.DB_NAME.PROD;
     db = client.db(dbName);
 
     blogsCollection = db.collection<TBlog>(SETTINGS.COLLECTIONS.BLOGS);

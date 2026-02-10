@@ -1,9 +1,9 @@
 import express from 'express';
 import { setupApp } from '../setup-app';
 import { agent } from 'supertest';
-import { CreateUpdateErrorViewModel } from '../features/shared/models';
-import { capitalizeFirstLetter } from '../helpers';
-import { SETTINGS } from '../core';
+import { CreateUpdateErrorViewModel } from '../core/models';
+import { capitalizeFirstLetter } from '../core/helpers';
+import { SETTINGS } from '../core/settings';
 import { runDB, client, blogsCollection, postsCollection, db } from '../db';
 import { TDataset } from './dataset';
 

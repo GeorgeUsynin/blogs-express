@@ -1,0 +1,221 @@
+openapi: 3.0.0
+info:
+  title: Blogs API Documentation
+  version: 1.0.0
+  description: API for managing blogs
+
+tags:
+  - name: Blogs
+    description: API for managing blogs
+
+paths:
+  /blogs:
+    get:
+      summary: Get all blogs
+      tags: [ Blogs ]
+      operationId: getAllBlogs
+      responses:
+        '200':
+          description: List of blogs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BlogViewModel'
+    post:
+      summary: Create a blog
+      tags: [ Blogs ]
+      operationId: createBlog
+      security:
+        - BasicAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateBlogInputModel'
+      responses:
+        '201':
+          description: Blog created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogViewModel'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+  /blogs/{id}:
+    get:
+      summary: Get blog by id
+      tags: [ Blogs ]
+      operationId: getBlogById
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '200':
+          description: Blog found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogViewModel'
+        '400':
+          description: Invalid id format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Blog not found
+    put:
+      summary: Update blog by id
+      tags: [ Blogs ]
+      operationId: updateBlogById
+      security:
+        - BasicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateBlogInputModel'
+      responses:
+        '204':
+          description: Blog updated
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Blog not found
+    delete:
+      summary: Delete blog by id
+      tags: [ Blogs ]
+      operationId: deleteBlogById
+      security:
+        - BasicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      responses:
+        '204':
+          description: Blog deleted
+        '400':
+          description: Invalid id format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Blog not found
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+
+  parameters:
+    IdPathParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 65be9b3cb8f09f3f6e9f41af
+      description: Blog identifier (MongoDB ObjectId)
+
+  schemas:
+    BlogViewModel:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - websiteUrl
+        - isMembership
+        - createdAt
+      properties:
+        id:
+          type: string
+          example: 65be9b3cb8f09f3f6e9f41af
+        name:
+          type: string
+          maxLength: 15
+          example: Tech Trends
+        description:
+          type: string
+          maxLength: 500
+          example: Latest trends in technology and software.
+        websiteUrl:
+          type: string
+          maxLength: 100
+          pattern: ^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*/?$
+          example: https://techtrends.io
+        isMembership:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-02-09T10:15:30.000Z'
+
+    CreateUpdateBlogInputModel:
+      type: object
+      required:
+        - name
+        - description
+        - websiteUrl
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 15
+          example: Tech Trends
+        description:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: Latest trends in technology and software.
+        websiteUrl:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: ^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*/?$
+          example: https://techtrends.io
+
+    ErrorItem:
+      type: object
+      required:
+        - message
+        - field
+      properties:
+        message:
+          type: string
+          example: Name field is required
+        field:
+          type: string
+          example: name
+
+    ErrorResponse:
+      type: object
+      required:
+        - errorsMessages
+      properties:
+        errorsMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
