@@ -132,6 +132,64 @@ paths:
         '404':
           description: Blog not found
 
+  /blogs/{id}/posts:
+    get:
+      summary: Get posts for blog by blog id
+      tags: [ Blogs ]
+      operationId: getPostsByBlogId
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+        - $ref: '#/components/parameters/PageNumberQueryParam'
+        - $ref: '#/components/parameters/PageSizeQueryParam'
+        - $ref: '#/components/parameters/PostSortByQueryParam'
+        - $ref: '#/components/parameters/SortDirectionQueryParam'
+      responses:
+        '200':
+          description: List of posts for the blog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostListPaginatedOutput'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Blog not found
+    post:
+      summary: Create post for blog by blog id
+      tags: [ Blogs ]
+      operationId: createPostForBlogByBlogId
+      security:
+        - BasicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/IdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostForBlogByBlogIdInputModel'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostViewModel'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Blog not found
+
 components:
   securitySchemes:
     BasicAuth:
@@ -177,6 +235,16 @@ components:
         default: createdAt
         example: createdAt
       description: Field used for sorting blogs
+    PostSortByQueryParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [ createdAt, title, blogName ]
+        default: createdAt
+        example: createdAt
+      description: Field used for sorting posts
     SortDirectionQueryParam:
       name: sortDirection
       in: query
@@ -257,6 +325,69 @@ components:
           format: date-time
           example: '2026-02-09T10:15:30.000Z'
 
+    PostListPaginatedOutput:
+      type: object
+      required:
+        - pagesCount
+        - page
+        - pageSize
+        - totalCount
+        - items
+      properties:
+        pagesCount:
+          type: integer
+          example: 3
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 10
+        totalCount:
+          type: integer
+          example: 25
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostViewModel'
+
+    PostViewModel:
+      type: object
+      required:
+        - id
+        - title
+        - shortDescription
+        - content
+        - blogId
+        - blogName
+        - createdAt
+      properties:
+        id:
+          type: string
+          example: 65be9b3cb8f09f3f6e9f41af
+        title:
+          type: string
+          maxLength: 30
+          example: Latest AI Innovations
+        shortDescription:
+          type: string
+          maxLength: 100
+          example: Discover the most exciting AI breakthroughs.
+        content:
+          type: string
+          maxLength: 1000
+          example: AI is advancing rapidly across many industries.
+        blogId:
+          type: string
+          example: 65be9b3cb8f09f3f6e9f41af
+        blogName:
+          type: string
+          example: Tech Trends
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-02-09T10:15:30.000Z'
+
     CreateUpdateBlogInputModel:
       type: object
       required:
@@ -280,6 +411,29 @@ components:
           maxLength: 100
           pattern: ^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*/?$
           example: https://techtrends.io
+
+    CreatePostForBlogByBlogIdInputModel:
+      type: object
+      required:
+        - title
+        - shortDescription
+        - content
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 30
+          example: Latest AI Innovations
+        shortDescription:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Discover the most exciting AI breakthroughs.
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          example: AI is advancing rapidly across many industries.
 
     ErrorItem:
       type: object

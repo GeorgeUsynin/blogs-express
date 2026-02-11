@@ -1,14 +1,31 @@
 import { checkSchema } from 'express-validator';
-import { createUpdateBlogValidationSchema } from '.';
-import { errorMiddleware, objectIdValidation } from '../../../../core/middlewares|validation';
+import {
+    errorMiddleware,
+    objectIdValidation,
+    queryPaginationAndSortParamsValidationSchema,
+} from '../../../../core/middlewares|validation';
 import { basicAuthMiddleware } from '../../../../auth|middlewares';
 import { queryParamsValidationSchema } from './queryParamsValidationSchema';
+import { PostSortFields } from '../../../posts/api/models';
+import { createUpdatePostWithoutBlogIdValidationSchema } from '../../../posts/api/validation';
+import { createUpdateBlogValidationSchema } from './createUpdateBlogValidationSchema';
 
 export const getValidators = [checkSchema(queryParamsValidationSchema, ['query']), errorMiddleware];
 export const getByIdValidators = [objectIdValidation, errorMiddleware];
+export const getPostsByBlogIdValidators = [
+    objectIdValidation,
+    checkSchema(queryPaginationAndSortParamsValidationSchema(PostSortFields), ['query']),
+    errorMiddleware,
+];
 export const postValidators = [
     basicAuthMiddleware,
     checkSchema(createUpdateBlogValidationSchema, ['body']),
+    errorMiddleware,
+];
+export const createPostForBlogByBlogIdValidators = [
+    basicAuthMiddleware,
+    objectIdValidation,
+    checkSchema(createUpdatePostWithoutBlogIdValidationSchema, ['body']),
     errorMiddleware,
 ];
 export const updateValidators = [

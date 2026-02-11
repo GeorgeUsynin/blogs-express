@@ -4,13 +4,27 @@ import { CreateUpdatePostInputModel, PostQueryInput } from '../api/models';
 import { type TPost } from '../domain';
 import { RepositoryNotFoundError } from '../../../core/errors';
 
+type FindPostsFilter = Partial<Pick<TPost, 'blogId'>>;
+
 export const postsRepository = {
     async findMany(queryDto: PostQueryInput): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
+        return this.findManyWithFilter(queryDto);
+    },
+
+    async findManyByBlogId(
+        blogId: string,
+        queryDto: PostQueryInput
+    ): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
+        return this.findManyWithFilter(queryDto, { blogId });
+    },
+
+    async findManyWithFilter(
+        queryDto: PostQueryInput,
+        filter: FindPostsFilter = {}
+    ): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
         const { sortBy, sortDirection, pageNumber, pageSize } = queryDto;
 
         const skip = (pageNumber - 1) * pageSize;
-
-        const filter: any = {};
 
         const items = await postsCollection
             .find(filter)
@@ -28,7 +42,7 @@ export const postsRepository = {
         const res = await postsCollection.findOne({ _id: new ObjectId(id) });
 
         if (!res) {
-            throw new RepositoryNotFoundError('Post not exist');
+            throw new RepositoryNotFoundError("Post doesn't exist");
         }
         return res;
     },

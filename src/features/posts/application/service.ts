@@ -9,6 +9,13 @@ export const postsService = {
         return postsRepository.findMany(queryDto);
     },
 
+    async findManyByBlogId(
+        blogId: string,
+        queryDto: PostQueryInput
+    ): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
+        return postsRepository.findManyByBlogId(blogId, queryDto);
+    },
+
     async findByIdOrFail(id: string): Promise<WithId<TPost>> {
         return postsRepository.findByIdOrFail(id);
     },
@@ -20,7 +27,7 @@ export const postsService = {
     },
 
     async create(postAttributes: CreateUpdatePostInputModel): Promise<string> {
-        const blogName = (await blogsRepository.findByIdOrFail(postAttributes.blogId)).name;
+        const { name: blogName } = await blogsRepository.findByIdOrFail(postAttributes.blogId);
 
         const newPost: TPost = {
             blogName,

@@ -1,4 +1,4 @@
-import { type Request, type Response } from 'express';
+import { type Response } from 'express';
 import { PostListPaginatedOutput, PostQueryInput } from '../models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToPostListPaginatedOutput } from '../mappers';
@@ -6,8 +6,12 @@ import { matchedData } from 'express-validator';
 import { setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
 import { postsService } from '../../application';
 import { errorsHandler } from '../../../../core/errors';
+import { RequestWithQuery } from '../../../../core/types';
 
-export const getAllPostsHandler = async (req: Request, res: Response<PostListPaginatedOutput>) => {
+export const getAllPostsHandler = async (
+    req: RequestWithQuery<Partial<PostQueryInput>>,
+    res: Response<PostListPaginatedOutput>
+) => {
     try {
         const sanitizedQuery = matchedData<PostQueryInput>(req, {
             locations: ['query'],

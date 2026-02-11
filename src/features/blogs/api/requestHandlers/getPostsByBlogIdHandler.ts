@@ -1,19 +1,22 @@
 import { type Response } from 'express';
 import { matchedData } from 'express-validator';
-import { BlogListPaginatedOutput, BlogQueryInput } from '../../api/models';
+import { PostListPaginatedOutput, PostQueryInput } from '../../../posts/api/models';
+import { URIParamsBlogModel } from '../../api/models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
-import { mapToBlogListPaginatedOutput } from '../mappers';
 import { setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
 import { blogsService } from '../../application';
 import { errorsHandler } from '../../../../core/errors';
-import { RequestWithQuery } from '../../../../core/types';
+import { postsService } from '../../../posts/application';
+import { mapToPostListPaginatedOutput } from '../../../posts/api/mappers';
+import { RequestWithParamsAndQuery } from '../../../../core/types';
 
-export const getAllBlogsHandler = async (
-    req: RequestWithQuery<Partial<BlogQueryInput>>,
-    res: Response<BlogListPaginatedOutput>
+export const getPostsByBlogIdHandler = async (
+    req: RequestWithParamsAndQuery<URIParamsBlogModel, Partial<PostQueryInput>>,
+    res: Response<PostListPaginatedOutput>
 ) => {
     try {
-        const sanitizedQuery = matchedData<BlogQueryInput>(req, {
+        const id = req.params.id;
+        const sanitizedQuery = matchedData<PostQueryInput>(req, {
             locations: ['query'],
             includeOptionals: true,
         });
@@ -21,9 +24,11 @@ export const getAllBlogsHandler = async (
         // double safe in case of default from schema values not applied
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const { items, totalCount } = await blogsService.findMany(queryInput);
+        await blogsService.findByIdOrFail(id);
 
-        const blogsListOutput = mapToBlogListPaginatedOutput(items, {
+        const { items, totalCount } = await postsService.findManyByBlogId(id, queryInput);
+
+        const blogsListOutput = mapToPostListPaginatedOutput(items, {
             pageNumber: queryInput.pageNumber,
             pageSize: queryInput.pageSize,
             totalCount,

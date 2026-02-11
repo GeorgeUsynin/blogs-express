@@ -7,7 +7,9 @@ const titleMaxLength = 30;
 const shortDescriptionMaxLength = 100;
 const contentMaxLength = 1000;
 
-export const createUpdatePostValidationSchema: Schema<keyof CreateUpdatePostInputModel> = {
+const baseCreateUpdatePostValidationSchema: Schema<
+    keyof Omit<CreateUpdatePostInputModel, 'blogId'>
+> = {
     title: {
         exists: {
             errorMessage: 'Title field is required',
@@ -59,6 +61,9 @@ export const createUpdatePostValidationSchema: Schema<keyof CreateUpdatePostInpu
             errorMessage: `Max length should be ${contentMaxLength} characters`,
         },
     },
+};
+
+const blogIdValidationSchema: Schema<'blogId'> = {
     blogId: {
         exists: {
             errorMessage: 'BlogId field is required',
@@ -82,4 +87,12 @@ export const createUpdatePostValidationSchema: Schema<keyof CreateUpdatePostInpu
             errorMessage: 'There is no blog existed with provided blogId',
         },
     },
+};
+
+export const createUpdatePostWithoutBlogIdValidationSchema =
+    baseCreateUpdatePostValidationSchema;
+
+export const createUpdatePostValidationSchema: Schema<keyof CreateUpdatePostInputModel> = {
+    ...baseCreateUpdatePostValidationSchema,
+    ...blogIdValidationSchema,
 };
