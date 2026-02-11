@@ -42,4 +42,69 @@ describe('get all posts', () => {
         });
         expect(body.items).toHaveLength(posts.length);
     });
+
+    it('returns paginated and sorted posts for query params', async () => {
+        await dbHelper.setDb({ posts });
+
+        const expectedItems = [...posts]
+            .sort((a, b) => a.title.localeCompare(b.title))
+            .slice(3, 6)
+            .map(mapToPostViewModel);
+
+        const { body } = await request
+            .get(ROUTES.POSTS)
+            .query({ sortBy: 'title', sortDirection: 'asc', pageNumber: 2, pageSize: 3 })
+            .expect(HTTP_STATUS_CODES.OK_200);
+
+        expect(body).toEqual({
+            pagesCount: 3,
+            page: 2,
+            pageSize: 3,
+            totalCount: posts.length,
+            items: expectedItems,
+        });
+    });
+
+    it('sorts posts by blogName in descending order', async () => {
+        await dbHelper.setDb({ posts });
+
+        const expectedItems = [...posts]
+            .sort((a, b) => b.blogName.localeCompare(a.blogName))
+            .map(mapToPostViewModel);
+
+        const { body } = await request
+            .get(ROUTES.POSTS)
+            .query({ sortBy: 'blogName', sortDirection: 'desc' })
+            .expect(HTTP_STATUS_CODES.OK_200);
+
+        expect(body).toEqual({
+            pagesCount: 1,
+            page: 1,
+            pageSize: 10,
+            totalCount: posts.length,
+            items: expectedItems,
+        });
+    });
+
+    it('returns 400 for invalid query params', async () => {
+        const { body } = await request
+            .get(ROUTES.POSTS)
+            .query({ pageSize: 0, sortBy: 'invalid' })
+            .expect(HTTP_STATUS_CODES.BAD_REQUEST_400);
+
+        expect(body).toEqual({
+            errorsMessages: expect.arrayContaining([
+                {
+                    status: HTTP_STATUS_CODES.BAD_REQUEST_400,
+                    field: 'sortBy',
+                    message: expect.stringContaining('SortBy field should be equal one of the following values'),
+                },
+                {
+                    status: HTTP_STATUS_CODES.BAD_REQUEST_400,
+                    field: 'pageSize',
+                    message: 'PageSize field should be a positive number',
+                },
+            ]),
+        });
+    });
 });
