@@ -1,3 +1,4 @@
 import { BlogViewModel } from './BlogViewModel';
+import { BlogListPaginatedOutput } from './BlogListPaginatedOutput';
 
-export { BlogViewModel };
+export { BlogViewModel, BlogListPaginatedOutput };

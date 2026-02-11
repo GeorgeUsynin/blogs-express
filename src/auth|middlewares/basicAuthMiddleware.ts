@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { HTTP_STATUS_CODES } from '../constants';
-import { SETTINGS } from '../settings';
+import { HTTP_STATUS_CODES } from '../core/constants';
+import { SETTINGS } from '../core/settings';
 
 const ADMIN_USERNAME = SETTINGS.CREDENTIALS.LOGIN;
 const ADMIN_PASSWORD = SETTINGS.CREDENTIALS.PASSWORD;

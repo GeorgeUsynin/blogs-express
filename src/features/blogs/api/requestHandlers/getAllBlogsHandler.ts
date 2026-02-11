@@ -1,17 +1,32 @@
 import { type Request, type Response } from 'express';
-import { BlogViewModel } from '../../api/models';
+import { matchedData } from 'express-validator';
+import { BlogListPaginatedOutput, BlogQueryInput } from '../../api/models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
-import { blogsRepository } from '../../repository';
-import { mapToBlogViewModel } from '../mappers';
+import { mapToBlogListPaginatedOutput } from '../mappers';
+import { setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
+import { blogsService } from '../../application';
+import { errorsHandler } from '../../../../core/errors';
 
-export const getAllBlogsHandler = async (req: Request, res: Response<BlogViewModel[]>) => {
+export const getAllBlogsHandler = async (req: Request, res: Response<BlogListPaginatedOutput>) => {
     try {
-        const blogs = await blogsRepository.findAll();
+        const sanitizedQuery = matchedData<BlogQueryInput>(req, {
+            locations: ['query'],
+            includeOptionals: true,
+        });
 
-        const mappedBlogs = blogs.map(mapToBlogViewModel);
+        // double safe in case of default from schema values not applied
+        const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        res.status(HTTP_STATUS_CODES.OK_200).send(mappedBlogs);
+        const { items, totalCount } = await blogsService.findMany(queryInput);
+
+        const blogsListOutput = mapToBlogListPaginatedOutput(items, {
+            pageNumber: queryInput.pageNumber,
+            pageSize: queryInput.pageSize,
+            totalCount,
+        });
+
+        res.status(HTTP_STATUS_CODES.OK_200).send(blogsListOutput);
     } catch (e: unknown) {
-        res.sendStatus(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR_500);
+        errorsHandler(e, res);
     }
 };

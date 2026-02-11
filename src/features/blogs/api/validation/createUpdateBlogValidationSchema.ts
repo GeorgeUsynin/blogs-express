@@ -1,12 +1,12 @@
+import { makeStrictSchema } from '../../../../core/helpers';
 import { CreateUpdateBlogInputModel } from '../models';
-import { Schema } from 'express-validator';
 
 const nameMaxLength = 15;
 const descriptionMaxLength = 500;
 const websiteUrlMaxLength = 100;
 const pattern = '^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$';
 
-export const createUpdateBlogValidationSchema: Schema<keyof CreateUpdateBlogInputModel> = {
+export const createUpdateBlogValidationSchema = makeStrictSchema<CreateUpdateBlogInputModel>({
     name: {
         exists: {
             errorMessage: 'Name field is required',
@@ -61,4 +61,4 @@ export const createUpdateBlogValidationSchema: Schema<keyof CreateUpdateBlogInpu
             errorMessage: `WebsiteUrl should match the specified ${pattern} pattern`,
         },
     },
-};
+});

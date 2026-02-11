@@ -1,5 +1,6 @@
 import { ObjectId, WithId } from 'mongodb';
-import { type TBlog, type TPost } from '../db';
+import { type TPost } from '../db';
+import { TBlog } from '../features/blogs/domain';
 
 const blogsIds = [];
 const postsIds = [];
