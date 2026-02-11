@@ -14,15 +14,24 @@ paths:
       summary: Get all posts
       tags: [ Posts ]
       operationId: getAllPosts
+      parameters:
+        - $ref: '#/components/parameters/PageNumberQueryParam'
+        - $ref: '#/components/parameters/PageSizeQueryParam'
+        - $ref: '#/components/parameters/SortByQueryParam'
+        - $ref: '#/components/parameters/SortDirectionQueryParam'
       responses:
         '200':
           description: List of posts
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PostViewModel'
+                $ref: '#/components/schemas/PostListPaginatedOutput'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       summary: Create a post
       tags: [ Posts ]
@@ -137,8 +146,74 @@ components:
         type: string
         example: 65be9b3cb8f09f3f6e9f41af
       description: Post identifier (MongoDB ObjectId)
+    PageNumberQueryParam:
+      name: pageNumber
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+      description: Page number for pagination
+    PageSizeQueryParam:
+      name: pageSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        example: 10
+      description: Number of posts per page
+    SortByQueryParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [ createdAt, title, blogName ]
+        default: createdAt
+        example: createdAt
+      description: Field used for sorting posts
+    SortDirectionQueryParam:
+      name: sortDirection
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [ asc, desc ]
+        default: desc
+        example: desc
+      description: Sort direction
 
   schemas:
+    PostListPaginatedOutput:
+      type: object
+      required:
+        - pagesCount
+        - page
+        - pageSize
+        - totalCount
+        - items
+      properties:
+        pagesCount:
+          type: integer
+          example: 3
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 10
+        totalCount:
+          type: integer
+          example: 25
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostViewModel'
+
     PostViewModel:
       type: object
       required:

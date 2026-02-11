@@ -14,15 +14,25 @@ paths:
       summary: Get all blogs
       tags: [ Blogs ]
       operationId: getAllBlogs
+      parameters:
+        - $ref: '#/components/parameters/PageNumberQueryParam'
+        - $ref: '#/components/parameters/PageSizeQueryParam'
+        - $ref: '#/components/parameters/SortByQueryParam'
+        - $ref: '#/components/parameters/SortDirectionQueryParam'
+        - $ref: '#/components/parameters/SearchNameTermQueryParam'
       responses:
         '200':
           description: List of blogs
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BlogViewModel'
+                $ref: '#/components/schemas/BlogListPaginatedOutput'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       summary: Create a blog
       tags: [ Blogs ]
@@ -137,8 +147,82 @@ components:
         type: string
         example: 65be9b3cb8f09f3f6e9f41af
       description: Blog identifier (MongoDB ObjectId)
+    PageNumberQueryParam:
+      name: pageNumber
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+      description: Page number for pagination
+    PageSizeQueryParam:
+      name: pageSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        example: 10
+      description: Number of blogs per page
+    SortByQueryParam:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [ createdAt, name ]
+        default: createdAt
+        example: createdAt
+      description: Field used for sorting blogs
+    SortDirectionQueryParam:
+      name: sortDirection
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [ asc, desc ]
+        default: desc
+        example: desc
+      description: Sort direction
+    SearchNameTermQueryParam:
+      name: searchNameTerm
+      in: query
+      required: false
+      schema:
+        type: string
+        example: tech
+      description: Filters blogs by name substring
 
   schemas:
+    BlogListPaginatedOutput:
+      type: object
+      required:
+        - pagesCount
+        - page
+        - pageSize
+        - totalCount
+        - items
+      properties:
+        pagesCount:
+          type: integer
+          example: 3
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 10
+        totalCount:
+          type: integer
+          example: 25
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlogViewModel'
+
     BlogViewModel:
       type: object
       required:
