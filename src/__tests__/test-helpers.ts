@@ -1,15 +1,19 @@
 import express from 'express';
 import { setupApp } from '../setup-app';
 import { agent } from 'supertest';
-import { CreateUpdateErrorViewModel } from '../core/models';
 import { capitalizeFirstLetter } from '../core/helpers';
 import { SETTINGS } from '../core/settings';
+import { HTTP_STATUS_CODES } from '../core/constants';
 import { runDB, client, blogsCollection, postsCollection, db } from '../db';
 import { TDataset } from './dataset';
 
 const app = express();
 
 export const request = agent(setupApp(app));
+
+type CreateUpdateErrorViewModel = {
+    errorsMessages: { status: HTTP_STATUS_CODES; message: string; field: string }[];
+};
 
 type TProperties = 'isRequired' | 'isString' | 'maxLength';
 
@@ -27,22 +31,27 @@ const websiteUrlPattern = '^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-
 
 const errorMessagesConfig = {
     isRequired: (field: string) => ({
+        status: HTTP_STATUS_CODES.BAD_REQUEST_400,
         message: `${capitalizeFirstLetter(field)} field is required`,
         field,
     }),
     isString: (field: string) => ({
+        status: HTTP_STATUS_CODES.BAD_REQUEST_400,
         message: `${capitalizeFirstLetter(field)} field should be a string`,
         field,
     }),
     maxLength: (field: string, length: number) => ({
+        status: HTTP_STATUS_CODES.BAD_REQUEST_400,
         message: `Max length should be ${length} characters`,
         field,
     }),
     isPattern: (field: string) => ({
+        status: HTTP_STATUS_CODES.BAD_REQUEST_400,
         message: `${capitalizeFirstLetter(field)} should match the specified ${websiteUrlPattern} pattern`,
         field,
     }),
     blogIdNotExist: (field: string) => ({
+        status: HTTP_STATUS_CODES.BAD_REQUEST_400,
         message: `There is no blog existed with provided ${field}`,
         field,
     }),

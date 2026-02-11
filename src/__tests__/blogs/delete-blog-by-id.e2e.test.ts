@@ -32,7 +32,8 @@ describe('delete blog by id', () => {
         await request.get(`${ROUTES.BLOGS}/${requestedId}`).expect(HTTP_STATUS_CODES.NOT_FOUND_404);
 
         const { body } = await request.get(ROUTES.BLOGS).expect(HTTP_STATUS_CODES.OK_200);
-        expect(body.length).toBe(3);
+        expect(body.totalCount).toBe(3);
+        expect(body.items).toHaveLength(3);
     });
 
     it('returns 404 status code if the blog was not founded by requested ID', async () => {

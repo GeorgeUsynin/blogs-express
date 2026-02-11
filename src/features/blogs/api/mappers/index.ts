@@ -1,2 +1,2 @@
 export * from './mapToBlogViewModel';
-export * from './mapToDriverListPaginatedOutput';
+export * from './mapToBlogListPaginatedOutput';

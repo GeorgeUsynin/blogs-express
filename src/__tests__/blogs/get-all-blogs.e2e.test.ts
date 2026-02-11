@@ -23,6 +23,15 @@ describe('get all blogs', () => {
 
     it('gets all available blogs', async () => {
         // checking if all blogs are in the database
-        await request.get(ROUTES.BLOGS).expect(HTTP_STATUS_CODES.OK_200, [...blogs.map(mapToBlogViewModel)]);
+        const { body } = await request.get(ROUTES.BLOGS).expect(HTTP_STATUS_CODES.OK_200);
+
+        expect(body).toEqual({
+            pagesCount: 1,
+            page: 1,
+            pageSize: 10,
+            totalCount: blogs.length,
+            items: expect.arrayContaining(blogs.map(mapToBlogViewModel)),
+        });
+        expect(body.items).toHaveLength(blogs.length);
     });
 });

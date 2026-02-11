@@ -32,7 +32,8 @@ describe('delete post by id', () => {
         await request.get(`${ROUTES.POSTS}/${requestedId}`).expect(HTTP_STATUS_CODES.NOT_FOUND_404);
 
         const { body } = await request.get(ROUTES.POSTS).expect(HTTP_STATUS_CODES.OK_200);
-        expect(body.length).toBe(7);
+        expect(body.totalCount).toBe(7);
+        expect(body.items).toHaveLength(7);
     });
 
     it('returns 404 status code if the post was not founded by requested ID', async () => {

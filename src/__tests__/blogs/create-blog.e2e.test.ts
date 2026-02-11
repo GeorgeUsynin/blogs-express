@@ -41,7 +41,13 @@ describe('create a blog', () => {
         //checking that the blog was created
         const { body: allBlogsBodyResponse } = await request.get(ROUTES.BLOGS).expect(HTTP_STATUS_CODES.OK_200);
 
-        expect(allBlogsBodyResponse).toEqual([newBlogBodyResponse]);
+        expect(allBlogsBodyResponse).toEqual({
+            pagesCount: 1,
+            page: 1,
+            pageSize: 10,
+            totalCount: 1,
+            items: [newBlogBodyResponse],
+        });
     });
 
     describe('blog payload validation', () => {

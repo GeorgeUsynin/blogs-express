@@ -1,7 +1,7 @@
 import { dbHelper, request, createErrorMessages, getAuthorization } from '../test-helpers';
 import { HTTP_STATUS_CODES, ROUTES } from '../../core/constants';
 import { blogs, longContent, longTitle, longShortDescription } from '../dataset';
-import { CreateUpdatePostInputModel } from '../../features/posts/models';
+import { CreateUpdatePostInputModel } from '../../features/posts/api/models';
 
 describe('create a post', () => {
     beforeAll(async () => {
@@ -47,7 +47,13 @@ describe('create a post', () => {
         //checking that the post was created
         const { body: allPostsBodyResponse } = await request.get(ROUTES.POSTS).expect(HTTP_STATUS_CODES.OK_200);
 
-        expect(allPostsBodyResponse).toEqual([newPostBodyResponse]);
+        expect(allPostsBodyResponse).toEqual({
+            pagesCount: 1,
+            page: 1,
+            pageSize: 10,
+            totalCount: 1,
+            items: [newPostBodyResponse],
+        });
     });
 
     describe('post payload validation', () => {
