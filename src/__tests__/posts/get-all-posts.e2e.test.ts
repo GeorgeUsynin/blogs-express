@@ -68,9 +68,7 @@ describe('get all posts', () => {
     it('sorts posts by blogName in descending order', async () => {
         await dbHelper.setDb({ posts });
 
-        const expectedItems = [...posts]
-            .sort((a, b) => b.blogName.localeCompare(a.blogName))
-            .map(mapToPostViewModel);
+        const expectedItems = [...posts].sort((a, b) => b.blogName.localeCompare(a.blogName)).map(mapToPostViewModel);
 
         const { body } = await request
             .get(ROUTES.POSTS)

@@ -7,18 +7,20 @@ import { postsService } from '../../../posts/application';
 import { mapToPostViewModel } from '../../../posts/api/mappers';
 import { asyncHandler } from '../../../../core/helpers';
 
-export const createPostForBlogByBlogIdHandler = asyncHandler(async (
-    req: RequestWithParamsAndBody<URIParamsBlogModel, Omit<CreateUpdatePostInputModel, 'blogId'>>,
-    res: Response<PostViewModel>
-) => {
-    const id = req.params.id;
-    const payload = req.body;
+export const createPostForBlogByBlogIdHandler = asyncHandler(
+    async (
+        req: RequestWithParamsAndBody<URIParamsBlogModel, Omit<CreateUpdatePostInputModel, 'blogId'>>,
+        res: Response<PostViewModel>
+    ) => {
+        const id = req.params.id;
+        const payload = req.body;
 
-    const createdPostId = await postsService.create({ ...payload, blogId: id });
+        const createdPostId = await postsService.create({ ...payload, blogId: id });
 
-    const createdPost = await postsService.findByIdOrFail(createdPostId);
+        const createdPost = await postsService.findByIdOrFail(createdPostId);
 
-    const mappedPost = mapToPostViewModel(createdPost);
+        const mappedPost = mapToPostViewModel(createdPost);
 
-    res.status(HTTP_STATUS_CODES.CREATED_201).send(mappedPost);
-});
+        res.status(HTTP_STATUS_CODES.CREATED_201).send(mappedPost);
+    }
+);

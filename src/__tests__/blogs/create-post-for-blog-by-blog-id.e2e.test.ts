@@ -95,7 +95,10 @@ describe('create post for blog by blog id', () => {
             content: 'New content',
         };
 
-        await request.post(`${ROUTES.BLOGS}/${requestedId}/posts`).send(payload).expect(HTTP_STATUS_CODES.UNAUTHORIZED_401);
+        await request
+            .post(`${ROUTES.BLOGS}/${requestedId}/posts`)
+            .send(payload)
+            .expect(HTTP_STATUS_CODES.UNAUTHORIZED_401);
     });
 
     it('returns 404 if blog does not exist', async () => {

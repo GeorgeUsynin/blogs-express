@@ -7,25 +7,24 @@ import { asyncHandler, setDefaultSortAndPaginationIfNotExist } from '../../../..
 import { postsService } from '../../application';
 import { RequestWithQuery } from '../../../../core/types';
 
-export const getAllPostsHandler = asyncHandler(async (
-    req: RequestWithQuery<Partial<PostQueryInput>>,
-    res: Response<PostListPaginatedOutput>
-) => {
-    const sanitizedQuery = matchedData<PostQueryInput>(req, {
-        locations: ['query'],
-        includeOptionals: true,
-    });
+export const getAllPostsHandler = asyncHandler(
+    async (req: RequestWithQuery<Partial<PostQueryInput>>, res: Response<PostListPaginatedOutput>) => {
+        const sanitizedQuery = matchedData<PostQueryInput>(req, {
+            locations: ['query'],
+            includeOptionals: true,
+        });
 
-    // double safe in case of default from schema values not applied
-    const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
+        // double safe in case of default from schema values not applied
+        const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-    const { items, totalCount } = await postsService.findMany(queryInput);
+        const { items, totalCount } = await postsService.findMany(queryInput);
 
-    const postsListOutput = mapToPostListPaginatedOutput(items, {
-        pageNumber: queryInput.pageNumber,
-        pageSize: queryInput.pageSize,
-        totalCount,
-    });
+        const postsListOutput = mapToPostListPaginatedOutput(items, {
+            pageNumber: queryInput.pageNumber,
+            pageSize: queryInput.pageSize,
+            totalCount,
+        });
 
-    res.status(HTTP_STATUS_CODES.OK_200).send(postsListOutput);
-});
+        res.status(HTTP_STATUS_CODES.OK_200).send(postsListOutput);
+    }
+);

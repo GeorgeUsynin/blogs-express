@@ -5,12 +5,14 @@ import { mapToPostViewModel } from '../mappers';
 import { postsService } from '../../application';
 import { asyncHandler } from '../../../../core/helpers';
 
-export const getPostByIdHandler = asyncHandler(async (req: Request<URIParamsPostModel>, res: Response<PostViewModel>) => {
-    const id = req.params.id;
+export const getPostByIdHandler = asyncHandler(
+    async (req: Request<URIParamsPostModel>, res: Response<PostViewModel>) => {
+        const id = req.params.id;
 
-    const foundPost = await postsService.findByIdOrFail(id);
+        const foundPost = await postsService.findByIdOrFail(id);
 
-    const mappedPost = mapToPostViewModel(foundPost);
+        const mappedPost = mapToPostViewModel(foundPost);
 
-    res.status(HTTP_STATUS_CODES.OK_200).send(mappedPost);
-});
+        res.status(HTTP_STATUS_CODES.OK_200).send(mappedPost);
+    }
+);

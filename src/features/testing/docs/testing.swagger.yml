@@ -1,19 +1,19 @@
 openapi: 3.0.0
 info:
-  title: Testing API Documentation
-  version: 1.0.0
-  description: API for test utilities
+    title: Testing API Documentation
+    version: 1.0.0
+    description: API for test utilities
 
 tags:
-  - name: Testing
-    description: API for testing utilities
+    - name: Testing
+      description: API for testing utilities
 
 paths:
-  /testing/all-data:
-    delete:
-      summary: Delete all blogs and posts from database
-      tags: [ Testing ]
-      operationId: deleteAllData
-      responses:
-        '204':
-          description: Data deleted
+    /testing/all-data:
+        delete:
+            summary: Delete all blogs and posts from database
+            tags: [Testing]
+            operationId: deleteAllData
+            responses:
+                '204':
+                    description: Data deleted

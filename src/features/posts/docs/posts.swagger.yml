@@ -1,303 +1,303 @@
 openapi: 3.0.0
 info:
-  title: Posts API Documentation
-  version: 1.0.0
-  description: API for managing posts
-
-tags:
-  - name: Posts
+    title: Posts API Documentation
+    version: 1.0.0
     description: API for managing posts
 
-paths:
-  /posts:
-    get:
-      summary: Get all posts
-      tags: [ Posts ]
-      operationId: getAllPosts
-      parameters:
-        - $ref: '#/components/parameters/PageNumberQueryParam'
-        - $ref: '#/components/parameters/PageSizeQueryParam'
-        - $ref: '#/components/parameters/SortByQueryParam'
-        - $ref: '#/components/parameters/SortDirectionQueryParam'
-      responses:
-        '200':
-          description: List of posts
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostListPaginatedOutput'
-        '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    post:
-      summary: Create a post
-      tags: [ Posts ]
-      operationId: createPost
-      security:
-        - BasicAuth: [ ]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateUpdatePostInputModel'
-      responses:
-        '201':
-          description: Post created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostViewModel'
-        '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
+tags:
+    - name: Posts
+      description: API for managing posts
 
-  /posts/{id}:
-    get:
-      summary: Get post by id
-      tags: [ Posts ]
-      operationId: getPostById
-      parameters:
-        - $ref: '#/components/parameters/IdPathParam'
-      responses:
-        '200':
-          description: Post found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostViewModel'
-        '400':
-          description: Invalid id format
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Post not found
-    put:
-      summary: Update post by id
-      tags: [ Posts ]
-      operationId: updatePostById
-      security:
-        - BasicAuth: [ ]
-      parameters:
-        - $ref: '#/components/parameters/IdPathParam'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateUpdatePostInputModel'
-      responses:
-        '204':
-          description: Post updated
-        '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Post not found
-    delete:
-      summary: Delete post by id
-      tags: [ Posts ]
-      operationId: deletePostById
-      security:
-        - BasicAuth: [ ]
-      parameters:
-        - $ref: '#/components/parameters/IdPathParam'
-      responses:
-        '204':
-          description: Post deleted
-        '400':
-          description: Invalid id format
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Post not found
+paths:
+    /posts:
+        get:
+            summary: Get all posts
+            tags: [Posts]
+            operationId: getAllPosts
+            parameters:
+                - $ref: '#/components/parameters/PageNumberQueryParam'
+                - $ref: '#/components/parameters/PageSizeQueryParam'
+                - $ref: '#/components/parameters/SortByQueryParam'
+                - $ref: '#/components/parameters/SortDirectionQueryParam'
+            responses:
+                '200':
+                    description: List of posts
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PostListPaginatedOutput'
+                '400':
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+        post:
+            summary: Create a post
+            tags: [Posts]
+            operationId: createPost
+            security:
+                - BasicAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateUpdatePostInputModel'
+            responses:
+                '201':
+                    description: Post created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PostViewModel'
+                '400':
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Unauthorized
+
+    /posts/{id}:
+        get:
+            summary: Get post by id
+            tags: [Posts]
+            operationId: getPostById
+            parameters:
+                - $ref: '#/components/parameters/IdPathParam'
+            responses:
+                '200':
+                    description: Post found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PostViewModel'
+                '400':
+                    description: Invalid id format
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '404':
+                    description: Post not found
+        put:
+            summary: Update post by id
+            tags: [Posts]
+            operationId: updatePostById
+            security:
+                - BasicAuth: []
+            parameters:
+                - $ref: '#/components/parameters/IdPathParam'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateUpdatePostInputModel'
+            responses:
+                '204':
+                    description: Post updated
+                '400':
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Unauthorized
+                '404':
+                    description: Post not found
+        delete:
+            summary: Delete post by id
+            tags: [Posts]
+            operationId: deletePostById
+            security:
+                - BasicAuth: []
+            parameters:
+                - $ref: '#/components/parameters/IdPathParam'
+            responses:
+                '204':
+                    description: Post deleted
+                '400':
+                    description: Invalid id format
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Unauthorized
+                '404':
+                    description: Post not found
 
 components:
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
+    securitySchemes:
+        BasicAuth:
+            type: http
+            scheme: basic
 
-  parameters:
-    IdPathParam:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        example: 65be9b3cb8f09f3f6e9f41af
-      description: Post identifier (MongoDB ObjectId)
-    PageNumberQueryParam:
-      name: pageNumber
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-        example: 1
-      description: Page number for pagination
-    PageSizeQueryParam:
-      name: pageSize
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-        example: 10
-      description: Number of posts per page
-    SortByQueryParam:
-      name: sortBy
-      in: query
-      required: false
-      schema:
-        type: string
-        enum: [ createdAt, title, blogName ]
-        default: createdAt
-        example: createdAt
-      description: Field used for sorting posts
-    SortDirectionQueryParam:
-      name: sortDirection
-      in: query
-      required: false
-      schema:
-        type: string
-        enum: [ asc, desc ]
-        default: desc
-        example: desc
-      description: Sort direction
+    parameters:
+        IdPathParam:
+            name: id
+            in: path
+            required: true
+            schema:
+                type: string
+                example: 65be9b3cb8f09f3f6e9f41af
+            description: Post identifier (MongoDB ObjectId)
+        PageNumberQueryParam:
+            name: pageNumber
+            in: query
+            required: false
+            schema:
+                type: integer
+                minimum: 1
+                default: 1
+                example: 1
+            description: Page number for pagination
+        PageSizeQueryParam:
+            name: pageSize
+            in: query
+            required: false
+            schema:
+                type: integer
+                minimum: 1
+                default: 10
+                example: 10
+            description: Number of posts per page
+        SortByQueryParam:
+            name: sortBy
+            in: query
+            required: false
+            schema:
+                type: string
+                enum: [createdAt, title, blogName]
+                default: createdAt
+                example: createdAt
+            description: Field used for sorting posts
+        SortDirectionQueryParam:
+            name: sortDirection
+            in: query
+            required: false
+            schema:
+                type: string
+                enum: [asc, desc]
+                default: desc
+                example: desc
+            description: Sort direction
 
-  schemas:
-    PostListPaginatedOutput:
-      type: object
-      required:
-        - pagesCount
-        - page
-        - pageSize
-        - totalCount
-        - items
-      properties:
-        pagesCount:
-          type: integer
-          example: 3
-        page:
-          type: integer
-          example: 1
-        pageSize:
-          type: integer
-          example: 10
-        totalCount:
-          type: integer
-          example: 25
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/PostViewModel'
+    schemas:
+        PostListPaginatedOutput:
+            type: object
+            required:
+                - pagesCount
+                - page
+                - pageSize
+                - totalCount
+                - items
+            properties:
+                pagesCount:
+                    type: integer
+                    example: 3
+                page:
+                    type: integer
+                    example: 1
+                pageSize:
+                    type: integer
+                    example: 10
+                totalCount:
+                    type: integer
+                    example: 25
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PostViewModel'
 
-    PostViewModel:
-      type: object
-      required:
-        - id
-        - title
-        - shortDescription
-        - content
-        - blogId
-        - blogName
-        - createdAt
-      properties:
-        id:
-          type: string
-          example: 65be9b3cb8f09f3f6e9f41af
-        title:
-          type: string
-          maxLength: 30
-          example: Latest AI Innovations
-        shortDescription:
-          type: string
-          maxLength: 100
-          example: Discover the most exciting AI breakthroughs.
-        content:
-          type: string
-          maxLength: 1000
-          example: AI is advancing rapidly across many industries.
-        blogId:
-          type: string
-          example: 65be9b3cb8f09f3f6e9f41af
-        blogName:
-          type: string
-          example: Tech Trends
-        createdAt:
-          type: string
-          format: date-time
-          example: '2026-02-09T10:15:30.000Z'
+        PostViewModel:
+            type: object
+            required:
+                - id
+                - title
+                - shortDescription
+                - content
+                - blogId
+                - blogName
+                - createdAt
+            properties:
+                id:
+                    type: string
+                    example: 65be9b3cb8f09f3f6e9f41af
+                title:
+                    type: string
+                    maxLength: 30
+                    example: Latest AI Innovations
+                shortDescription:
+                    type: string
+                    maxLength: 100
+                    example: Discover the most exciting AI breakthroughs.
+                content:
+                    type: string
+                    maxLength: 1000
+                    example: AI is advancing rapidly across many industries.
+                blogId:
+                    type: string
+                    example: 65be9b3cb8f09f3f6e9f41af
+                blogName:
+                    type: string
+                    example: Tech Trends
+                createdAt:
+                    type: string
+                    format: date-time
+                    example: '2026-02-09T10:15:30.000Z'
 
-    CreateUpdatePostInputModel:
-      type: object
-      required:
-        - title
-        - shortDescription
-        - content
-        - blogId
-      properties:
-        title:
-          type: string
-          minLength: 1
-          maxLength: 30
-          example: Latest AI Innovations
-        shortDescription:
-          type: string
-          minLength: 1
-          maxLength: 100
-          example: Discover the most exciting AI breakthroughs.
-        content:
-          type: string
-          minLength: 1
-          maxLength: 1000
-          example: AI is advancing rapidly across many industries.
-        blogId:
-          type: string
-          minLength: 1
-          example: 65be9b3cb8f09f3f6e9f41af
+        CreateUpdatePostInputModel:
+            type: object
+            required:
+                - title
+                - shortDescription
+                - content
+                - blogId
+            properties:
+                title:
+                    type: string
+                    minLength: 1
+                    maxLength: 30
+                    example: Latest AI Innovations
+                shortDescription:
+                    type: string
+                    minLength: 1
+                    maxLength: 100
+                    example: Discover the most exciting AI breakthroughs.
+                content:
+                    type: string
+                    minLength: 1
+                    maxLength: 1000
+                    example: AI is advancing rapidly across many industries.
+                blogId:
+                    type: string
+                    minLength: 1
+                    example: 65be9b3cb8f09f3f6e9f41af
 
-    ErrorItem:
-      type: object
-      required:
-        - message
-        - field
-      properties:
-        message:
-          type: string
-          example: Title field is required
-        field:
-          type: string
-          example: title
+        ErrorItem:
+            type: object
+            required:
+                - message
+                - field
+            properties:
+                message:
+                    type: string
+                    example: Title field is required
+                field:
+                    type: string
+                    example: title
 
-    ErrorResponse:
-      type: object
-      required:
-        - errorsMessages
-      properties:
-        errorsMessages:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorItem'
+        ErrorResponse:
+            type: object
+            required:
+                - errorsMessages
+            properties:
+                errorsMessages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ErrorItem'
