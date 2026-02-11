@@ -14,9 +14,20 @@ jobs:
         runs-on: ubuntu-latest
         environment: test
 
+        services:
+            mongodb:
+                image: mongo:7
+                ports:
+                    - 27017:27017
+                options: >-
+                    --health-cmd="mongosh --eval 'db.runCommand({ ping: 1 })'"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=10
+
         env:
             NODE_ENV: test
-            MONGO_URL: ${{ secrets.MONGO_URL }}
+            MONGO_URL: mongodb://localhost:27017
             ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
             ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
@@ -32,10 +43,6 @@ jobs:
 
             - name: Install dependencies
               run: npm ci
-
-            - name: Validate required environment
-              run: |
-                  test -n "$MONGO_URL" || (echo "MONGO_URL is not set in GitHub Environment 'test' secrets" && exit 1)
 
             - name: Run tests
               run: npm run jest
