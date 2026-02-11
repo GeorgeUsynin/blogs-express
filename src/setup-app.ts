@@ -3,6 +3,7 @@ import express, { Express, Request, Response } from 'express';
 import { BlogsRouter, PostsRouter, TestRouter } from './features';
 import { HTTP_STATUS_CODES, ROUTES } from './core/constants';
 import { setupSwagger } from './core/swagger';
+import { globalErrorMiddleware } from './core/errors';
 
 export const setupApp = (app: Express) => {
     // Parses incoming requests with JSON payloads
@@ -22,6 +23,8 @@ export const setupApp = (app: Express) => {
     });
 
     setupSwagger(app);
+
+    app.use(globalErrorMiddleware);
 
     return app;
 };

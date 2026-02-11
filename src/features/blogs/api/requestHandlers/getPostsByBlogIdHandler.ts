@@ -3,37 +3,31 @@ import { matchedData } from 'express-validator';
 import { PostListPaginatedOutput, PostQueryInput } from '../../../posts/api/models';
 import { URIParamsBlogModel } from '../../api/models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
-import { setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
-import { blogsService } from '../../application';
-import { errorsHandler } from '../../../../core/errors';
+import { asyncHandler, setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
 import { postsService } from '../../../posts/application';
 import { mapToPostListPaginatedOutput } from '../../../posts/api/mappers';
 import { RequestWithParamsAndQuery } from '../../../../core/types';
 
-export const getPostsByBlogIdHandler = async (
+export const getPostsByBlogIdHandler = asyncHandler(async (
     req: RequestWithParamsAndQuery<URIParamsBlogModel, Partial<PostQueryInput>>,
     res: Response<PostListPaginatedOutput>
 ) => {
-    try {
-        const id = req.params.id;
-        const sanitizedQuery = matchedData<PostQueryInput>(req, {
-            locations: ['query'],
-            includeOptionals: true,
-        });
+    const id = req.params.id;
+    const sanitizedQuery = matchedData<PostQueryInput>(req, {
+        locations: ['query'],
+        includeOptionals: true,
+    });
 
-        // double safe in case of default from schema values not applied
-        const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
+    // double safe in case of default from schema values not applied
+    const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const { items, totalCount } = await postsService.findManyByBlogId(id, queryInput);
+    const { items, totalCount } = await postsService.findManyByBlogId(id, queryInput);
 
-        const blogsListOutput = mapToPostListPaginatedOutput(items, {
-            pageNumber: queryInput.pageNumber,
-            pageSize: queryInput.pageSize,
-            totalCount,
-        });
+    const blogsListOutput = mapToPostListPaginatedOutput(items, {
+        pageNumber: queryInput.pageNumber,
+        pageSize: queryInput.pageSize,
+        totalCount,
+    });
 
-        res.status(HTTP_STATUS_CODES.OK_200).send(blogsListOutput);
-    } catch (e: unknown) {
-        errorsHandler(e, res);
-    }
-};
+    res.status(HTTP_STATUS_CODES.OK_200).send(blogsListOutput);
+});
