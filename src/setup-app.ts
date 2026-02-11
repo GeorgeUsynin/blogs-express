@@ -1,6 +1,6 @@
 import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
-import { BlogsRouter, PostsRouter, TestRouter } from './features';
+import { AuthRouter, BlogsRouter, PostsRouter, TestRouter, UsersRouter } from './features';
 import { HTTP_STATUS_CODES, ROUTES } from './core/constants';
 import { setupSwagger } from './core/swagger';
 import { globalErrorMiddleware } from './core/errors';
@@ -14,8 +14,10 @@ export const setupApp = (app: Express) => {
     // allowing requests from different origins (domains)
     app.use(cors());
 
+    app.use(ROUTES.AUTH, AuthRouter);
     app.use(ROUTES.BLOGS, BlogsRouter);
     app.use(ROUTES.POSTS, PostsRouter);
+    app.use(ROUTES.USERS, UsersRouter);
     app.use(ROUTES.TESTING, TestRouter);
 
     app.get('/', (req: Request, res: Response) => {

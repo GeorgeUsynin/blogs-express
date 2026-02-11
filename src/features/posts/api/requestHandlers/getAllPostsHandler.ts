@@ -4,8 +4,8 @@ import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToPostListPaginatedOutput } from '../mappers';
 import { matchedData } from 'express-validator';
 import { asyncHandler, setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
-import { postsService } from '../../application';
 import { RequestWithQuery } from '../../../../core/types';
+import { postsQueryRepository } from '../../repository';
 
 export const getAllPostsHandler = asyncHandler(
     async (req: RequestWithQuery<Partial<PostQueryInput>>, res: Response<PostListPaginatedOutput>) => {
@@ -17,7 +17,7 @@ export const getAllPostsHandler = asyncHandler(
         // double safe in case of default from schema values not applied
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const { items, totalCount } = await postsService.findMany(queryInput);
+        const { items, totalCount } = await postsQueryRepository.findMany(queryInput);
 
         const postsListOutput = mapToPostListPaginatedOutput(items, {
             pageNumber: queryInput.pageNumber,

@@ -5,6 +5,7 @@ import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToBlogViewModel } from '../mappers';
 import { blogsService } from '../../application';
 import { asyncHandler } from '../../../../core/helpers';
+import { blogsQueryRepository } from '../../repository';
 
 export const createBlogHandler = asyncHandler(
     async (req: RequestWithBody<CreateUpdateBlogInputModel>, res: Response<BlogViewModel>) => {
@@ -12,7 +13,7 @@ export const createBlogHandler = asyncHandler(
 
         const createdBlogId = await blogsService.create(payload);
 
-        const createdBlog = await blogsService.findByIdOrFail(createdBlogId);
+        const createdBlog = await blogsQueryRepository.findByIdOrFail(createdBlogId);
 
         const mappedBlog = mapToBlogViewModel(createdBlog);
 

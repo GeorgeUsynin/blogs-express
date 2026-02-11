@@ -13,6 +13,8 @@ export const SETTINGS = {
     COLLECTIONS: {
         BLOGS: 'blogs',
         POSTS: 'posts',
+        USERS: 'users',
     },
     MONGO_URL: process.env.MONGO_URL,
+    SALT_ROUNDS: 10,
 };

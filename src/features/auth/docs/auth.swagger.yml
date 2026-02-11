@@ -1,0 +1,73 @@
+openapi: 3.0.0
+info:
+    title: Auth API Documentation
+    version: 1.0.0
+    description: API for authentication
+
+tags:
+    - name: Auth
+      description: API for authentication
+
+paths:
+    /auth/login:
+        post:
+            summary: Login user
+            tags: [Auth]
+            operationId: login
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateLoginInputModel'
+            responses:
+                '204':
+                    description: Login successful
+                '400':
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Unauthorized
+
+components:
+    schemas:
+        CreateLoginInputModel:
+            type: object
+            required:
+                - loginOrEmail
+                - password
+            properties:
+                loginOrEmail:
+                    type: string
+                    minLength: 1
+                    example: johndoe
+                password:
+                    type: string
+                    minLength: 1
+                    example: securePass123
+
+        ErrorItem:
+            type: object
+            required:
+                - message
+                - field
+            properties:
+                message:
+                    type: string
+                    example: LoginOrEmail field is required
+                field:
+                    type: string
+                    example: loginOrEmail
+
+        ErrorResponse:
+            type: object
+            required:
+                - errorsMessages
+            properties:
+                errorsMessages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ErrorItem'

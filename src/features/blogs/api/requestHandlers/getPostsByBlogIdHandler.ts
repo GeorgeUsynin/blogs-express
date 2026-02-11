@@ -4,9 +4,9 @@ import { PostListPaginatedOutput, PostQueryInput } from '../../../posts/api/mode
 import { URIParamsBlogModel } from '../../api/models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { asyncHandler, setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
-import { postsService } from '../../../posts/application';
 import { mapToPostListPaginatedOutput } from '../../../posts/api/mappers';
 import { RequestWithParamsAndQuery } from '../../../../core/types';
+import { postsQueryRepository } from '../../../posts/repository';
 
 export const getPostsByBlogIdHandler = asyncHandler(
     async (
@@ -22,7 +22,7 @@ export const getPostsByBlogIdHandler = asyncHandler(
         // double safe in case of default from schema values not applied
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const { items, totalCount } = await postsService.findManyByBlogId(id, queryInput);
+        const { items, totalCount } = await postsQueryRepository.findManyByBlogId(id, queryInput);
 
         const blogsListOutput = mapToPostListPaginatedOutput(items, {
             pageNumber: queryInput.pageNumber,

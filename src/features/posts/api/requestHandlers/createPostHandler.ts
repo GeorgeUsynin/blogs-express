@@ -5,6 +5,7 @@ import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToPostViewModel } from '../mappers';
 import { postsService } from '../../application';
 import { asyncHandler } from '../../../../core/helpers';
+import { postsQueryRepository } from '../../repository';
 
 export const createPostHandler = asyncHandler(
     async (req: RequestWithBody<CreateUpdatePostInputModel>, res: Response<PostViewModel>) => {
@@ -12,7 +13,7 @@ export const createPostHandler = asyncHandler(
 
         const createdPostId = await postsService.create(payload);
 
-        const createdPost = await postsService.findByIdOrFail(createdPostId);
+        const createdPost = await postsQueryRepository.findByIdOrFail(createdPostId);
 
         const mappedPost = mapToPostViewModel(createdPost);
 

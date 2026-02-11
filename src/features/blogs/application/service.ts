@@ -1,17 +1,8 @@
-import { WithId } from 'mongodb';
-import { BlogQueryInput, CreateUpdateBlogInputModel } from '../api/models';
+import { CreateUpdateBlogInputModel } from '../api/models';
 import { blogsRepository } from '../repository';
 import { TBlog } from '../domain';
 
 export const blogsService = {
-    async findMany(queryDto: BlogQueryInput): Promise<{ items: WithId<TBlog>[]; totalCount: number }> {
-        return blogsRepository.findMany(queryDto);
-    },
-
-    async findByIdOrFail(id: string): Promise<WithId<TBlog>> {
-        return blogsRepository.findByIdOrFail(id);
-    },
-
     async removeById(id: string): Promise<void> {
         await blogsRepository.removeById(id);
 

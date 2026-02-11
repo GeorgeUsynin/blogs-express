@@ -1,52 +1,10 @@
-import { ObjectId, WithId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import { postsCollection } from '../../../db';
-import { CreateUpdatePostInputModel, PostQueryInput } from '../api/models';
+import { CreateUpdatePostInputModel } from '../api/models';
 import { type TPost } from '../domain';
 import { RepositoryNotFoundError } from '../../../core/errors';
 
-type FindPostsFilter = Partial<Pick<TPost, 'blogId'>>;
-
 export const postsRepository = {
-    async findMany(queryDto: PostQueryInput): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
-        return this.findManyWithFilter(queryDto);
-    },
-
-    async findManyByBlogId(
-        blogId: string,
-        queryDto: PostQueryInput
-    ): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
-        return this.findManyWithFilter(queryDto, { blogId });
-    },
-
-    async findManyWithFilter(
-        queryDto: PostQueryInput,
-        filter: FindPostsFilter = {}
-    ): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
-        const { sortBy, sortDirection, pageNumber, pageSize } = queryDto;
-
-        const skip = (pageNumber - 1) * pageSize;
-
-        const items = await postsCollection
-            .find(filter)
-            .sort({ [sortBy]: sortDirection })
-            .skip(skip)
-            .limit(pageSize)
-            .toArray();
-
-        const totalCount = await postsCollection.countDocuments(filter);
-
-        return { items, totalCount };
-    },
-
-    async findByIdOrFail(id: string): Promise<WithId<TPost>> {
-        const res = await postsCollection.findOne({ _id: new ObjectId(id) });
-
-        if (!res) {
-            throw new RepositoryNotFoundError("Post doesn't exist");
-        }
-        return res;
-    },
-
     async create(post: TPost): Promise<string> {
         const { insertedId } = await postsCollection.insertOne(post);
 

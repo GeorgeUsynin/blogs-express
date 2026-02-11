@@ -2,14 +2,14 @@ import { type Request, type Response } from 'express';
 import { URIParamsPostModel, PostViewModel } from '../models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToPostViewModel } from '../mappers';
-import { postsService } from '../../application';
 import { asyncHandler } from '../../../../core/helpers';
+import { postsQueryRepository } from '../../repository';
 
 export const getPostByIdHandler = asyncHandler(
     async (req: Request<URIParamsPostModel>, res: Response<PostViewModel>) => {
         const id = req.params.id;
 
-        const foundPost = await postsService.findByIdOrFail(id);
+        const foundPost = await postsQueryRepository.findByIdOrFail(id);
 
         const mappedPost = mapToPostViewModel(foundPost);
 

@@ -3,6 +3,8 @@ import { RepositoryNotFoundError } from './RepositoryNotFoundError';
 import { HTTP_STATUS_CODES } from '../constants';
 import { createErrorMessages } from '../middlewares|validation';
 import { DomainError } from './domainError';
+import { BadRequestError } from './BadRequestError';
+import { UnauthorizedError } from './UnauthorizedError';
 
 export function errorsHandler(error: unknown, res: Response): void {
     if (error instanceof RepositoryNotFoundError) {
@@ -16,6 +18,28 @@ export function errorsHandler(error: unknown, res: Response): void {
                 },
             ])
         );
+
+        return;
+    }
+
+    if (error instanceof BadRequestError) {
+        const httpStatus = HTTP_STATUS_CODES.BAD_REQUEST_400;
+
+        res.status(httpStatus).send(
+            createErrorMessages([
+                {
+                    status: httpStatus,
+                    message: error.message,
+                    field: error.field,
+                },
+            ])
+        );
+
+        return;
+    }
+
+    if (error instanceof UnauthorizedError) {
+        res.sendStatus(HTTP_STATUS_CODES.UNAUTHORIZED_401);
 
         return;
     }

@@ -10,7 +10,9 @@ export enum HTTP_STATUS_CODES {
 }
 
 export const ROUTES = {
+    AUTH: '/auth',
     BLOGS: '/blogs',
     POSTS: '/posts',
+    USERS: '/users',
     TESTING: '/testing/all-data',
 };

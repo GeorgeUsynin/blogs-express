@@ -4,8 +4,8 @@ import { BlogListPaginatedOutput, BlogQueryInput } from '../../api/models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToBlogListPaginatedOutput } from '../mappers';
 import { asyncHandler, setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
-import { blogsService } from '../../application';
 import { RequestWithQuery } from '../../../../core/types';
+import { blogsQueryRepository } from '../../repository';
 
 export const getAllBlogsHandler = asyncHandler(
     async (req: RequestWithQuery<Partial<BlogQueryInput>>, res: Response<BlogListPaginatedOutput>) => {
@@ -17,7 +17,7 @@ export const getAllBlogsHandler = asyncHandler(
         // double safe in case of default from schema values not applied
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const { items, totalCount } = await blogsService.findMany(queryInput);
+        const { items, totalCount } = await blogsQueryRepository.findMany(queryInput);
 
         const blogsListOutput = mapToBlogListPaginatedOutput(items, {
             pageNumber: queryInput.pageNumber,

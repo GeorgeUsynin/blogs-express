@@ -6,6 +6,7 @@ import { CreateUpdatePostInputModel, PostViewModel } from '../../../posts/api/mo
 import { postsService } from '../../../posts/application';
 import { mapToPostViewModel } from '../../../posts/api/mappers';
 import { asyncHandler } from '../../../../core/helpers';
+import { postsQueryRepository } from '../../../posts/repository';
 
 export const createPostForBlogByBlogIdHandler = asyncHandler(
     async (
@@ -17,7 +18,7 @@ export const createPostForBlogByBlogIdHandler = asyncHandler(
 
         const createdPostId = await postsService.create({ ...payload, blogId: id });
 
-        const createdPost = await postsService.findByIdOrFail(createdPostId);
+        const createdPost = await postsQueryRepository.findByIdOrFail(createdPostId);
 
         const mappedPost = mapToPostViewModel(createdPost);
 
