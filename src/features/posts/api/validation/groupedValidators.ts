@@ -1,8 +1,10 @@
 import { checkSchema } from 'express-validator';
-import { createUpdatePostValidationSchema } from '../validation';
-import { errorMiddleware, objectIdValidation } from '../../../core/middlewares|validation';
-import { basicAuthMiddleware } from '../../../auth|middlewares';
+import { createUpdatePostValidationSchema } from './createUpdatePostValidationSchema';
+import { errorMiddleware, objectIdValidation } from '../../../../core/middlewares|validation';
+import { basicAuthMiddleware } from '../../../../auth|middlewares';
+import { queryParamsValidationSchema } from './queryParamsValidationSchema';
 
+export const getValidators = [checkSchema(queryParamsValidationSchema, ['query']), errorMiddleware];
 export const getByIdValidators = [objectIdValidation, errorMiddleware];
 export const postValidators = [
     basicAuthMiddleware,

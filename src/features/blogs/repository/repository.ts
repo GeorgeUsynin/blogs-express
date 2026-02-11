@@ -56,7 +56,7 @@ export const blogsRepository = {
         );
 
         if (matchedCount < 1) {
-            throw new RepositoryNotFoundError('Blog not exist');
+            throw new RepositoryNotFoundError("Blog doesn't exist");
         }
 
         return;
@@ -66,7 +66,7 @@ export const blogsRepository = {
         const { deletedCount } = await blogsCollection.deleteOne({ _id: new ObjectId(id) });
 
         if (deletedCount < 1) {
-            throw new RepositoryNotFoundError('Blog not exist');
+            throw new RepositoryNotFoundError("Blog doesn't exist");
         }
 
         return;

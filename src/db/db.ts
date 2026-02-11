@@ -1,7 +1,7 @@
 import { Collection, Db, MongoClient } from 'mongodb';
-import { type TPost } from './types';
 import { SETTINGS } from '../core/settings';
-import { TBlog } from '../features/blogs/domain';
+import { type TBlog } from '../features/blogs/domain';
+import { type TPost } from '../features/posts/domain';
 
 export let client: MongoClient;
 export let blogsCollection: Collection<TBlog>;

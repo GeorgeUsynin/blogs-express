@@ -1,11 +1,10 @@
-import { ObjectId } from 'mongodb';
 import { type Response } from 'express';
 import { type RequestWithBody } from '../../../../core/types';
-import { CreateUpdatePostInputModel, PostViewModel } from '../../models';
+import { CreateUpdatePostInputModel, PostViewModel } from '../models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
-import { postsRepository } from '../../repository';
-import { blogsRepository } from '../../../blogs/repository';
 import { mapToPostViewModel } from '../mappers';
+import { postsService } from '../../application';
+import { errorsHandler } from '../../../../core/errors';
 
 export const createPostHandler = async (
     req: RequestWithBody<CreateUpdatePostInputModel>,
@@ -14,16 +13,14 @@ export const createPostHandler = async (
     try {
         const payload = req.body;
 
-        // we are checking blog existence in the middleware
-        // so we are 100% sure that the blog exists
-        // bad pattern, in future we will do this in use-case
-        const blogName = (await blogsRepository.findById(new ObjectId(payload.blogId)))?.name!;
-        const createdPost = await postsRepository.create(blogName, payload);
+        const createdPostId = await postsService.create(payload);
+
+        const createdPost = await postsService.findByIdOrFail(createdPostId);
 
         const mappedPost = mapToPostViewModel(createdPost);
 
         res.status(HTTP_STATUS_CODES.CREATED_201).send(mappedPost);
     } catch (e: unknown) {
-        res.sendStatus(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR_500);
+        errorsHandler(e, res);
     }
 };

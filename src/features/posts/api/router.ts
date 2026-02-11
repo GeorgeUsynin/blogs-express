@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as RequestHandlers from './requestHandlers';
-import * as Validators from './groupedValidators';
+import * as Validators from './validation';
 
 export const PostsRouter = Router();
 
@@ -12,7 +12,7 @@ const PostsController = {
     deletePostById: RequestHandlers.deletePostByIdHandler,
 };
 
-PostsRouter.get('/', PostsController.getAllPosts);
+PostsRouter.get('/', ...Validators.getValidators, PostsController.getAllPosts);
 PostsRouter.get('/:id', ...Validators.getByIdValidators, PostsController.getPostById);
 PostsRouter.post('/', ...Validators.postValidators, PostsController.createPost);
 PostsRouter.put('/:id', ...Validators.updateValidators, PostsController.updatePostById);

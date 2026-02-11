@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { Schema } from 'express-validator';
 import { CreateUpdatePostInputModel } from '../models';
-import { blogsRepository } from '../../blogs/repository';
+import { blogsRepository } from '../../../blogs/repository';
 
 const titleMaxLength = 30;
 const shortDescriptionMaxLength = 100;
@@ -73,7 +73,7 @@ export const createUpdatePostValidationSchema: Schema<keyof CreateUpdatePostInpu
         },
         custom: {
             options: async (blogId: string) => {
-                const blog = await blogsRepository.findById(new ObjectId(blogId));
+                const blog = await blogsRepository.findByIdOrFail(blogId);
                 if (!blog) {
                     throw new Error('There is no blog existed with provided blogId');
                 }
