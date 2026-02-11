@@ -12,7 +12,7 @@ const app = express();
 export const request = agent(setupApp(app));
 
 type CreateUpdateErrorViewModel = {
-    errorsMessages: { status: HTTP_STATUS_CODES; message: string; field: string }[];
+    errorsMessages: { status: HTTP_STATUS_CODES; message: string; field?: string }[];
 };
 
 type TProperties = 'isRequired' | 'isString' | 'maxLength';
@@ -51,9 +51,8 @@ const errorMessagesConfig = {
         field,
     }),
     blogIdNotExist: (field: string) => ({
-        status: HTTP_STATUS_CODES.BAD_REQUEST_400,
-        message: `There is no blog existed with provided ${field}`,
-        field,
+        status: HTTP_STATUS_CODES.NOT_FOUND_404,
+        message: `Blog doesn't exist`,
     }),
 } as const;
 

@@ -14,6 +14,7 @@ export const blogsService = {
 
     async removeById(id: string): Promise<void> {
         await blogsRepository.removeById(id);
+
         return;
     },
 

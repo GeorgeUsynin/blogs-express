@@ -246,7 +246,7 @@ describe('create a post', () => {
                 expect(createErrorMessages({ blogId: ['isString'] })).toEqual(body);
             });
 
-            it('returns 400 status code and proper error object if `blogId` does not exist', async () => {
+            it('returns 404 status code and proper error object if `blogId` does not exist', async () => {
                 const newPost: CreateUpdatePostInputModel = {
                     title: 'New title',
                     blogId: '507f1f77bcf86cd799439011',
@@ -257,7 +257,7 @@ describe('create a post', () => {
                     .post(ROUTES.POSTS)
                     .set(getAuthorization())
                     .send(newPost)
-                    .expect(HTTP_STATUS_CODES.BAD_REQUEST_400);
+                    .expect(HTTP_STATUS_CODES.NOT_FOUND_404);
 
                 expect(createErrorMessages({ blogId: ['blogIdNotExist'] })).toEqual(body);
             });

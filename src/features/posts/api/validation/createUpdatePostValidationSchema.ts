@@ -7,9 +7,7 @@ const titleMaxLength = 30;
 const shortDescriptionMaxLength = 100;
 const contentMaxLength = 1000;
 
-const baseCreateUpdatePostValidationSchema: Schema<
-    keyof Omit<CreateUpdatePostInputModel, 'blogId'>
-> = {
+const baseCreateUpdatePostValidationSchema: Schema<keyof Omit<CreateUpdatePostInputModel, 'blogId'>> = {
     title: {
         exists: {
             errorMessage: 'Title field is required',
@@ -76,21 +74,22 @@ const blogIdValidationSchema: Schema<'blogId'> = {
         notEmpty: {
             errorMessage: 'BlogId field should not be empty or contain only spaces',
         },
-        custom: {
-            options: async (blogId: string) => {
-                const blog = await blogsRepository.findByIdOrFail(blogId);
-                if (!blog) {
-                    throw new Error('There is no blog existed with provided blogId');
-                }
-                return true;
-            },
-            errorMessage: 'There is no blog existed with provided blogId',
-        },
+        // just for practice purpose
+        // real validation is in BLL
+        // custom: {
+        //     options: async (blogId: string) => {
+        //         const blog = await blogsRepository.findByIdOrFail(blogId);
+        //         if (!blog) {
+        //             throw new Error('There is no blog existed with provided blogId');
+        //         }
+        //         return true;
+        //     },
+        //     errorMessage: 'There is no blog existed with provided blogId',
+        // },
     },
 };
 
-export const createUpdatePostWithoutBlogIdValidationSchema =
-    baseCreateUpdatePostValidationSchema;
+export const createUpdatePostWithoutBlogIdValidationSchema = baseCreateUpdatePostValidationSchema;
 
 export const createUpdatePostValidationSchema: Schema<keyof CreateUpdatePostInputModel> = {
     ...baseCreateUpdatePostValidationSchema,

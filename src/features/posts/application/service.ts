@@ -13,6 +13,8 @@ export const postsService = {
         blogId: string,
         queryDto: PostQueryInput
     ): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
+        await blogsRepository.findByIdOrFail(blogId);
+
         return postsRepository.findManyByBlogId(blogId, queryDto);
     },
 
@@ -39,6 +41,8 @@ export const postsService = {
     },
 
     async updateById(id: string, postAttributes: CreateUpdatePostInputModel): Promise<void> {
+        await blogsRepository.findByIdOrFail(postAttributes.blogId);
+
         await postsRepository.updateById(id, postAttributes);
 
         return;

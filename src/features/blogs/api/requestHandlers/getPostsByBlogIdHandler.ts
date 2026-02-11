@@ -24,8 +24,6 @@ export const getPostsByBlogIdHandler = async (
         // double safe in case of default from schema values not applied
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        await blogsService.findByIdOrFail(id);
-
         const { items, totalCount } = await postsService.findManyByBlogId(id, queryInput);
 
         const blogsListOutput = mapToPostListPaginatedOutput(items, {
