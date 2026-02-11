@@ -7,6 +7,7 @@ import { asyncHandler, setDefaultSortAndPaginationIfNotExist } from '../../../..
 import { mapToPostListPaginatedOutput } from '../../../posts/api/mappers';
 import { RequestWithParamsAndQuery } from '../../../../core/types';
 import { postsQueryRepository } from '../../../posts/repository';
+import { blogsQueryRepository } from '../../repository';
 
 export const getPostsByBlogIdHandler = asyncHandler(
     async (
@@ -14,6 +15,9 @@ export const getPostsByBlogIdHandler = asyncHandler(
         res: Response<PostListPaginatedOutput>
     ) => {
         const id = req.params.id;
+
+        await blogsQueryRepository.findByIdOrFail(id);
+
         const sanitizedQuery = matchedData<PostQueryInput>(req, {
             locations: ['query'],
             includeOptionals: true,
