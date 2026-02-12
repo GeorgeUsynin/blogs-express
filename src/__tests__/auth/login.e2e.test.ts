@@ -35,7 +35,14 @@ describe('auth login endpoint', () => {
             password: newUser.password,
         };
 
-        await request.post(`${ROUTES.AUTH}/login`).send(payload).expect(HTTP_STATUS_CODES.NO_CONTENT_204);
+        const { body } = await request
+            .post(`${ROUTES.AUTH}/login`)
+            .send(payload)
+            .expect(HTTP_STATUS_CODES.OK_200);
+
+        expect(body).toEqual({
+            accessToken: expect.any(String),
+        });
     });
 
     it('logs in with email', async () => {
@@ -52,7 +59,14 @@ describe('auth login endpoint', () => {
             password: newUser.password,
         };
 
-        await request.post(`${ROUTES.AUTH}/login`).send(payload).expect(HTTP_STATUS_CODES.NO_CONTENT_204);
+        const { body } = await request
+            .post(`${ROUTES.AUTH}/login`)
+            .send(payload)
+            .expect(HTTP_STATUS_CODES.OK_200);
+
+        expect(body).toEqual({
+            accessToken: expect.any(String),
+        });
     });
 
     it('returns 401 for invalid credentials', async () => {

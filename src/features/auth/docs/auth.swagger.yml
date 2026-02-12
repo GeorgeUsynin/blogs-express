@@ -21,8 +21,12 @@ paths:
                         schema:
                             $ref: '#/components/schemas/CreateLoginInputModel'
             responses:
-                '204':
+                '200':
                     description: Login successful
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LoginOutputModel'
                 '400':
                     description: Validation error
                     content:
@@ -48,6 +52,15 @@ components:
                     type: string
                     minLength: 1
                     example: securePass123
+
+        LoginOutputModel:
+            type: object
+            required:
+                - accessToken
+            properties:
+                accessToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
         ErrorItem:
             type: object
