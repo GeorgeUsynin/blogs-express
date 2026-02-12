@@ -1,10 +1,11 @@
 import { UnauthorizedError } from '../../../core/errors';
 import { usersRepository } from '../../users/repository';
 import { CreateLoginInputModel } from '../api/models';
+import { jwtService } from './jwtService';
 import { passwordService } from './passwordService';
 
 export const authService = {
-    async login(loginAttributes: CreateLoginInputModel): Promise<void> {
+    async login(loginAttributes: CreateLoginInputModel): Promise<string> {
         const { loginOrEmail, password } = loginAttributes;
 
         const user = await usersRepository.findUserByLoginOrEmail(loginOrEmail);
@@ -19,6 +20,8 @@ export const authService = {
             throw new UnauthorizedError();
         }
 
-        return;
+        const accessToken = jwtService.createJwtToken(user._id.toString());
+
+        return accessToken;
     },
 };

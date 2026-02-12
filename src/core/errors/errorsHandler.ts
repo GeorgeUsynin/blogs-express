@@ -39,7 +39,20 @@ export function errorsHandler(error: unknown, res: Response): void {
     }
 
     if (error instanceof UnauthorizedError) {
-        res.sendStatus(HTTP_STATUS_CODES.UNAUTHORIZED_401);
+        const httpStatus = HTTP_STATUS_CODES.UNAUTHORIZED_401;
+
+        if (error.message || error.jwtError?.name) {
+            const responseBody = {
+                status: httpStatus,
+                message: error.message,
+                ...(error.message ? {} : { error: JSON.stringify(error.jwtError) }),
+            };
+
+            res.status(httpStatus).send(createErrorMessages([responseBody]));
+            return;
+        }
+
+        res.sendStatus(httpStatus);
 
         return;
     }

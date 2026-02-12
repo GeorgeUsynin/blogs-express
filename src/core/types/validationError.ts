@@ -5,4 +5,5 @@ export type TValidationError = {
     message: string;
     field?: string;
     code?: string;
+    error?: string;
 };
