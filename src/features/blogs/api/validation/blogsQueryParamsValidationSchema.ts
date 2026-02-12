@@ -2,7 +2,7 @@ import { makeStrictSchema } from '../../../../core/helpers';
 import { queryPaginationAndSortParamsValidationSchema } from '../../../../core/middlewares|validation';
 import { BlogQueryInput, BlogSortFields } from '../models';
 
-export const queryParamsValidationSchema = makeStrictSchema<BlogQueryInput>({
+export const blogsQueryParamsValidationSchema = makeStrictSchema<BlogQueryInput>({
     ...queryPaginationAndSortParamsValidationSchema(BlogSortFields),
     ...{
         searchNameTerm: {

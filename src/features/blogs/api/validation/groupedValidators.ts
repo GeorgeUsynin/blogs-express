@@ -5,12 +5,12 @@ import {
     queryPaginationAndSortParamsValidationSchema,
 } from '../../../../core/middlewares|validation';
 import { basicAuthMiddleware } from '../../../../auth|middlewares';
-import { queryParamsValidationSchema } from './queryParamsValidationSchema';
+import { blogsQueryParamsValidationSchema } from './blogsQueryParamsValidationSchema';
 import { PostSortFields } from '../../../posts/api/models';
 import { createUpdatePostWithoutBlogIdValidationSchema } from '../../../posts/api/validation';
 import { createUpdateBlogValidationSchema } from './createUpdateBlogValidationSchema';
 
-export const getValidators = [checkSchema(queryParamsValidationSchema, ['query']), errorMiddleware];
+export const getValidators = [checkSchema(blogsQueryParamsValidationSchema, ['query']), errorMiddleware];
 export const getByIdValidators = [objectIdValidation, errorMiddleware];
 export const getPostsByBlogIdValidators = [
     objectIdValidation,

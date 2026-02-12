@@ -10,28 +10,28 @@ import { postsQueryRepository } from '../../../posts/repository';
 import { blogsQueryRepository } from '../../repository';
 
 export const getPostsByBlogIdHandler = async (
-        req: RequestWithParamsAndQuery<URIParamsBlogModel, Partial<PostQueryInput>>,
-        res: Response<PostListPaginatedOutput>
-    ) => {
-        const id = req.params.id;
+    req: RequestWithParamsAndQuery<URIParamsBlogModel, Partial<PostQueryInput>>,
+    res: Response<PostListPaginatedOutput>
+) => {
+    const blogId = req.params.id;
 
-        await blogsQueryRepository.findByIdOrFail(id);
+    await blogsQueryRepository.findByIdOrFail(blogId);
 
-        const sanitizedQuery = matchedData<PostQueryInput>(req, {
-            locations: ['query'],
-            includeOptionals: true,
-        });
+    const sanitizedQuery = matchedData<PostQueryInput>(req, {
+        locations: ['query'],
+        includeOptionals: true,
+    });
 
-        // double safe in case of default from schema values not applied
-        const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
+    // double safe in case of default from schema values not applied
+    const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const { items, totalCount } = await postsQueryRepository.findManyByBlogId(id, queryInput);
+    const { items, totalCount } = await postsQueryRepository.findManyByBlogId(blogId, queryInput);
 
-        const blogsListOutput = mapToPostListPaginatedOutput(items, {
-            pageNumber: queryInput.pageNumber,
-            pageSize: queryInput.pageSize,
-            totalCount,
-        });
+    const blogsListOutput = mapToPostListPaginatedOutput(items, {
+        pageNumber: queryInput.pageNumber,
+        pageSize: queryInput.pageSize,
+        totalCount,
+    });
 
-        res.status(HTTP_STATUS_CODES.OK_200).send(blogsListOutput);
-    }
+    res.status(HTTP_STATUS_CODES.OK_200).send(blogsListOutput);
+};

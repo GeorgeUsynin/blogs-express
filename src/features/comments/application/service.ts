@@ -1,5 +1,8 @@
 import { ForbiddenError } from '../../../core/errors';
+import { postsRepository } from '../../posts/repository';
+import { usersRepository } from '../../users/repository';
 import { CreateUpdateCommentInputModel } from '../api/models';
+import { TComment } from '../domain';
 import { commentsRepository } from '../repository';
 
 export const commentsService = {
@@ -17,17 +20,23 @@ export const commentsService = {
         return;
     },
 
-    // async create(postAttributes: CreateUpdatePostInputModel): Promise<string> {
-    //     const { name: blogName } = await blogsRepository.findByIdOrFail(postAttributes.blogId);
+    async create(postId: string, userId: string, commentAttributes: CreateUpdateCommentInputModel): Promise<string> {
+        await postsRepository.findByIdOrFail(postId);
 
-    //     const newPost: TPost = {
-    //         blogName,
-    //         createdAt: new Date().toISOString(),
-    //         ...postAttributes,
-    //     };
+        const { login } = await usersRepository.findByIdOrFail(userId);
 
-    //     return postsRepository.create(newPost);
-    // },
+        const newComment: TComment = {
+            postId,
+            commentatorInfo: {
+                userId,
+                userLogin: login,
+            },
+            createdAt: new Date().toISOString(),
+            ...commentAttributes,
+        };
+
+        return commentsRepository.create(newComment);
+    },
 
     async updateById(
         commentId: string,
