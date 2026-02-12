@@ -3,7 +3,7 @@ import { createUpdateCommentValidationSchema } from './createUpdateCommentValida
 import { errorMiddleware, objectIdValidation } from '../../../../core/middlewares|validation';
 import { jwtAuthMiddleware } from '../../../../auth|middlewares';
 
-export const getByIdValidators = [jwtAuthMiddleware, objectIdValidation, errorMiddleware];
+export const getByIdValidators = [objectIdValidation, errorMiddleware];
 export const updateValidators = [
     jwtAuthMiddleware,
     objectIdValidation,

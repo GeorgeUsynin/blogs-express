@@ -41,21 +41,11 @@ describe('comments by id endpoints', () => {
         return commentDoc._id.toString();
     };
 
-    it('gets comment by id', async () => {
-        const user = await createUser({
-            login: 'c_get_01',
-            password: 'secret12',
-            email: 'comment-get@example.com',
-        });
-        const token = await loginAndGetToken(user.login, 'secret12');
-
+    it('gets comment by id without auth', async () => {
         await dbHelper.setDb({ comments: datasetComments });
         const commentId = datasetComments[0]._id.toString();
 
-        const { body } = await request
-            .get(`${ROUTES.COMMENTS}/${commentId}`)
-            .set({ Authorization: `Bearer ${token}` })
-            .expect(HTTP_STATUS_CODES.OK_200);
+        const { body } = await request.get(`${ROUTES.COMMENTS}/${commentId}`).expect(HTTP_STATUS_CODES.OK_200);
 
         expect(body).toEqual({
             id: commentId,
@@ -68,22 +58,8 @@ describe('comments by id endpoints', () => {
         });
     });
 
-    it('returns 401 when getting comment without auth', async () => {
-        await request.get(`${ROUTES.COMMENTS}/507f1f77bcf86cd799439011`).expect(HTTP_STATUS_CODES.UNAUTHORIZED_401);
-    });
-
     it('returns 404 when comment is not found', async () => {
-        const user = await createUser({
-            login: 'c_404_01',
-            password: 'secret12',
-            email: 'comment-404@example.com',
-        });
-        const token = await loginAndGetToken(user.login, 'secret12');
-
-        await request
-            .get(`${ROUTES.COMMENTS}/507f1f77bcf86cd799439011`)
-            .set({ Authorization: `Bearer ${token}` })
-            .expect(HTTP_STATUS_CODES.NOT_FOUND_404);
+        await request.get(`${ROUTES.COMMENTS}/507f1f77bcf86cd799439011`).expect(HTTP_STATUS_CODES.NOT_FOUND_404);
     });
 
     it('updates own comment by id', async () => {
