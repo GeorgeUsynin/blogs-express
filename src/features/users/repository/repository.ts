@@ -1,7 +1,7 @@
 import { ObjectId, WithId } from 'mongodb';
 import { usersCollection } from '../../../db';
 import { RepositoryNotFoundError } from '../../../core/errors';
-import { TUser } from '../domain/user';
+import { TUser } from '../domain';
 
 export const usersRepository = {
     async findUserByLogin(login: string): Promise<WithId<TUser> | null> {
@@ -14,6 +14,15 @@ export const usersRepository = {
 
     async findUserByLoginOrEmail(loginOrEmail: string): Promise<WithId<TUser> | null> {
         return usersCollection.findOne({ $or: [{ email: loginOrEmail }, { login: loginOrEmail }] });
+    },
+
+    async findByIdOrFail(id: string): Promise<WithId<TUser>> {
+        const res = await usersCollection.findOne({ _id: new ObjectId(id) });
+
+        if (!res) {
+            throw new RepositoryNotFoundError("User doesn't exist");
+        }
+        return res;
     },
 
     async create(user: TUser): Promise<string> {

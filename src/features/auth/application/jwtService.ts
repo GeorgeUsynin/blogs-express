@@ -1,6 +1,10 @@
-import jwt, { JsonWebTokenError, TokenExpiredError, NotBeforeError } from 'jsonwebtoken';
+import jwt, { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
 import { SETTINGS } from '../../../core/settings';
 import { UnauthorizedError } from '../../../core/errors';
+
+interface IJwtPayload extends JwtPayload {
+    userId: string;
+}
 
 export const jwtService = {
     createJwtToken(userId: string) {
@@ -10,16 +14,11 @@ export const jwtService = {
 
     verifyToken(token: string) {
         try {
-            const decoded = jwt.verify(token, SETTINGS.JWT_SECRET!);
+            const decoded = jwt.verify(token, SETTINGS.JWT_SECRET!) as IJwtPayload;
             return decoded;
         } catch (e: unknown) {
             if (e instanceof JsonWebTokenError) {
-                throw new UnauthorizedError(e.message, {
-                    name: e.name,
-                    message: e.message,
-                    ...(e instanceof TokenExpiredError ? { expiredAt: e.expiredAt } : {}),
-                    ...(e instanceof NotBeforeError ? { date: e.date } : {}),
-                });
+                throw new UnauthorizedError(e.message, e.name);
             }
 
             throw e;

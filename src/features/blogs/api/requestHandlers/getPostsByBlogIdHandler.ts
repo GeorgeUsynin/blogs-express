@@ -3,14 +3,13 @@ import { matchedData } from 'express-validator';
 import { PostListPaginatedOutput, PostQueryInput } from '../../../posts/api/models';
 import { URIParamsBlogModel } from '../../api/models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
-import { asyncHandler, setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
+import { setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
 import { mapToPostListPaginatedOutput } from '../../../posts/api/mappers';
 import { RequestWithParamsAndQuery } from '../../../../core/types';
 import { postsQueryRepository } from '../../../posts/repository';
 import { blogsQueryRepository } from '../../repository';
 
-export const getPostsByBlogIdHandler = asyncHandler(
-    async (
+export const getPostsByBlogIdHandler = async (
         req: RequestWithParamsAndQuery<URIParamsBlogModel, Partial<PostQueryInput>>,
         res: Response<PostListPaginatedOutput>
     ) => {
@@ -36,4 +35,3 @@ export const getPostsByBlogIdHandler = asyncHandler(
 
         res.status(HTTP_STATUS_CODES.OK_200).send(blogsListOutput);
     }
-);

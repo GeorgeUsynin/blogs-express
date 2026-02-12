@@ -1,13 +1,11 @@
-import { ObjectId } from 'mongodb';
-import { Schema } from 'express-validator';
 import { CreateUpdatePostInputModel } from '../models';
-import { blogsRepository } from '../../../blogs/repository';
+import { makeStrictSchema } from '../../../../core/helpers';
 
 const titleMaxLength = 30;
 const shortDescriptionMaxLength = 100;
 const contentMaxLength = 1000;
 
-const baseCreateUpdatePostValidationSchema: Schema<keyof Omit<CreateUpdatePostInputModel, 'blogId'>> = {
+const baseCreateUpdatePostValidationSchema = makeStrictSchema<Omit<CreateUpdatePostInputModel, 'blogId'>>({
     title: {
         exists: {
             errorMessage: 'Title field is required',
@@ -59,9 +57,9 @@ const baseCreateUpdatePostValidationSchema: Schema<keyof Omit<CreateUpdatePostIn
             errorMessage: `Max length should be ${contentMaxLength} characters`,
         },
     },
-};
+});
 
-const blogIdValidationSchema: Schema<'blogId'> = {
+const blogIdValidationSchema = makeStrictSchema<{ blogId: string }>({
     blogId: {
         exists: {
             errorMessage: 'BlogId field is required',
@@ -87,11 +85,11 @@ const blogIdValidationSchema: Schema<'blogId'> = {
         //     errorMessage: 'There is no blog existed with provided blogId',
         // },
     },
-};
+});
 
 export const createUpdatePostWithoutBlogIdValidationSchema = baseCreateUpdatePostValidationSchema;
 
-export const createUpdatePostValidationSchema: Schema<keyof CreateUpdatePostInputModel> = {
+export const createUpdatePostValidationSchema = makeStrictSchema<CreateUpdatePostInputModel>({
     ...baseCreateUpdatePostValidationSchema,
     ...blogIdValidationSchema,
-};
+});

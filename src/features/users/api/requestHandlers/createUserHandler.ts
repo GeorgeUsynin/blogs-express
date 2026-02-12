@@ -3,12 +3,10 @@ import { type RequestWithBody } from '../../../../core/types';
 import { CreateUserInputModel, UserViewModel } from '../models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToUserViewModel } from '../mappers';
-import { asyncHandler } from '../../../../core/helpers';
 import { usersService } from '../../application';
 import { usersQueryRepository } from '../../repository';
 
-export const createUserHandler = asyncHandler(
-    async (req: RequestWithBody<CreateUserInputModel>, res: Response<UserViewModel>) => {
+export const createUserHandler = async (req: RequestWithBody<CreateUserInputModel>, res: Response<UserViewModel>) => {
         const payload = req.body;
 
         const createdUserId = await usersService.create(payload);
@@ -19,4 +17,3 @@ export const createUserHandler = asyncHandler(
 
         res.status(HTTP_STATUS_CODES.CREATED_201).send(mappedUser);
     }
-);

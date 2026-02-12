@@ -3,10 +3,8 @@ import { RequestWithParamsAndBody } from '../../../../core/types';
 import { CreateUpdateBlogInputModel, BlogViewModel, URIParamsBlogModel } from '../../api/models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { blogsService } from '../../application';
-import { asyncHandler } from '../../../../core/helpers';
 
-export const updateBlogByIdHandler = asyncHandler(
-    async (
+export const updateBlogByIdHandler = async (
         req: RequestWithParamsAndBody<URIParamsBlogModel, CreateUpdateBlogInputModel>,
         res: Response<BlogViewModel>
     ) => {
@@ -17,4 +15,3 @@ export const updateBlogByIdHandler = asyncHandler(
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }
-);

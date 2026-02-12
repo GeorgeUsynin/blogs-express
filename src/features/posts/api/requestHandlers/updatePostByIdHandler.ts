@@ -3,10 +3,8 @@ import { RequestWithParamsAndBody } from '../../../../core/types';
 import { CreateUpdatePostInputModel, PostViewModel, URIParamsPostModel } from '../models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { postsService } from '../../application';
-import { asyncHandler } from '../../../../core/helpers';
 
-export const updatePostByIdHandler = asyncHandler(
-    async (
+export const updatePostByIdHandler = async (
         req: RequestWithParamsAndBody<URIParamsPostModel, CreateUpdatePostInputModel>,
         res: Response<PostViewModel>
     ) => {
@@ -17,4 +15,3 @@ export const updatePostByIdHandler = asyncHandler(
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }
-);

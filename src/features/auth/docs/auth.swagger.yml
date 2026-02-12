@@ -9,6 +9,23 @@ tags:
       description: API for authentication
 
 paths:
+    /auth/me:
+        get:
+            summary: Get current authenticated user
+            tags: [Auth]
+            operationId: getMe
+            security:
+                - BearerAuth: []
+            responses:
+                '200':
+                    description: Current user profile
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MeOutputModel'
+                '401':
+                    description: Unauthorized
+
     /auth/login:
         post:
             summary: Login user
@@ -37,7 +54,31 @@ paths:
                     description: Unauthorized
 
 components:
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
     schemas:
+        MeOutputModel:
+            type: object
+            required:
+                - email
+                - login
+                - userId
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
+                login:
+                    type: string
+                    example: johndoe
+                userId:
+                    type: string
+                    example: 65be9b3cb8f09f3f6e9f41af
+
         CreateLoginInputModel:
             type: object
             required:

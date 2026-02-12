@@ -14,6 +14,7 @@ export const SETTINGS = {
     COLLECTIONS: {
         BLOGS: 'blogs',
         POSTS: 'posts',
+        COMMENTS: 'comments',
         USERS: 'users',
     },
     MONGO_URL: process.env.MONGO_URL,

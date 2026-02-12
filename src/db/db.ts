@@ -2,11 +2,13 @@ import { Collection, Db, MongoClient } from 'mongodb';
 import { SETTINGS } from '../core/settings';
 import { type TBlog } from '../features/blogs/domain';
 import { type TPost } from '../features/posts/domain';
-import { type TUser } from '../features/users/domain/user';
+import { type TUser } from '../features/users/domain';
+import { type TComment } from '../features/comments/domain';
 
 export let client: MongoClient;
 export let blogsCollection: Collection<TBlog>;
 export let postsCollection: Collection<TPost>;
+export let commentsCollection: Collection<TComment>;
 export let usersCollection: Collection<TUser>;
 export let db: Db;
 
@@ -18,6 +20,7 @@ export async function runDB(url: string): Promise<void> {
 
     blogsCollection = db.collection<TBlog>(SETTINGS.COLLECTIONS.BLOGS);
     postsCollection = db.collection<TPost>(SETTINGS.COLLECTIONS.POSTS);
+    commentsCollection = db.collection<TComment>(SETTINGS.COLLECTIONS.COMMENTS);
     usersCollection = db.collection<TUser>(SETTINGS.COLLECTIONS.USERS);
 
     try {

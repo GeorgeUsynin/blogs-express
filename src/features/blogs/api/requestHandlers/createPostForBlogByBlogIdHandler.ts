@@ -5,11 +5,9 @@ import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { CreateUpdatePostInputModel, PostViewModel } from '../../../posts/api/models';
 import { postsService } from '../../../posts/application';
 import { mapToPostViewModel } from '../../../posts/api/mappers';
-import { asyncHandler } from '../../../../core/helpers';
 import { postsQueryRepository } from '../../../posts/repository';
 
-export const createPostForBlogByBlogIdHandler = asyncHandler(
-    async (
+export const createPostForBlogByBlogIdHandler = async (
         req: RequestWithParamsAndBody<URIParamsBlogModel, Omit<CreateUpdatePostInputModel, 'blogId'>>,
         res: Response<PostViewModel>
     ) => {
@@ -24,4 +22,3 @@ export const createPostForBlogByBlogIdHandler = asyncHandler(
 
         res.status(HTTP_STATUS_CODES.CREATED_201).send(mappedPost);
     }
-);

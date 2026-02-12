@@ -1,7 +1,7 @@
 import { BadRequestError } from '../../../core/errors';
 import { passwordService } from '../../auth/application';
 import { CreateUserInputModel } from '../api/models';
-import { TUser } from '../domain/user';
+import { TUser } from '../domain';
 import { usersRepository } from '../repository';
 
 export const usersService = {

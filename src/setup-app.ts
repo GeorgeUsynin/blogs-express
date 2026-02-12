@@ -1,6 +1,6 @@
 import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
-import { AuthRouter, BlogsRouter, PostsRouter, TestRouter, UsersRouter } from './features';
+import { AuthRouter, BlogsRouter, PostsRouter, CommentsRouter, TestRouter, UsersRouter } from './features';
 import { HTTP_STATUS_CODES, ROUTES } from './core/constants';
 import { setupSwagger } from './core/swagger';
 import { globalErrorMiddleware } from './core/errors';
@@ -17,6 +17,7 @@ export const setupApp = (app: Express) => {
     app.use(ROUTES.AUTH, AuthRouter);
     app.use(ROUTES.BLOGS, BlogsRouter);
     app.use(ROUTES.POSTS, PostsRouter);
+    app.use(ROUTES.COMMENTS, CommentsRouter);
     app.use(ROUTES.USERS, UsersRouter);
     app.use(ROUTES.TESTING, TestRouter);
 

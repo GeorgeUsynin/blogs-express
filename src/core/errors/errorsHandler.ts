@@ -5,6 +5,7 @@ import { createErrorMessages } from '../middlewares|validation';
 import { DomainError } from './domainError';
 import { BadRequestError } from './BadRequestError';
 import { UnauthorizedError } from './UnauthorizedError';
+import { ForbiddenError } from './ForbiddenError';
 
 export function errorsHandler(error: unknown, res: Response): void {
     if (error instanceof RepositoryNotFoundError) {
@@ -41,11 +42,11 @@ export function errorsHandler(error: unknown, res: Response): void {
     if (error instanceof UnauthorizedError) {
         const httpStatus = HTTP_STATUS_CODES.UNAUTHORIZED_401;
 
-        if (error.message || error.jwtError?.name) {
+        if (error.message || error.code) {
             const responseBody = {
                 status: httpStatus,
                 message: error.message,
-                ...(error.message ? {} : { error: JSON.stringify(error.jwtError) }),
+                ...(error.code ? { code: error.code } : {}),
             };
 
             res.status(httpStatus).send(createErrorMessages([responseBody]));
@@ -53,6 +54,21 @@ export function errorsHandler(error: unknown, res: Response): void {
         }
 
         res.sendStatus(httpStatus);
+
+        return;
+    }
+
+    if (error instanceof ForbiddenError) {
+        const httpStatus = HTTP_STATUS_CODES.FORBIDDEN_403;
+
+        res.status(httpStatus).send(
+            createErrorMessages([
+                {
+                    status: httpStatus,
+                    message: error.message,
+                },
+            ])
+        );
 
         return;
     }

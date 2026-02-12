@@ -3,12 +3,11 @@ import { matchedData } from 'express-validator';
 import { BlogListPaginatedOutput, BlogQueryInput } from '../../api/models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToBlogListPaginatedOutput } from '../mappers';
-import { asyncHandler, setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
+import { setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
 import { RequestWithQuery } from '../../../../core/types';
 import { blogsQueryRepository } from '../../repository';
 
-export const getAllBlogsHandler = asyncHandler(
-    async (req: RequestWithQuery<Partial<BlogQueryInput>>, res: Response<BlogListPaginatedOutput>) => {
+export const getAllBlogsHandler = async (req: RequestWithQuery<Partial<BlogQueryInput>>, res: Response<BlogListPaginatedOutput>) => {
         const sanitizedQuery = matchedData<BlogQueryInput>(req, {
             locations: ['query'],
             includeOptionals: true,
@@ -27,4 +26,3 @@ export const getAllBlogsHandler = asyncHandler(
 
         res.status(HTTP_STATUS_CODES.OK_200).send(blogsListOutput);
     }
-);

@@ -3,8 +3,8 @@ import { setupApp } from '../setup-app';
 import { agent } from 'supertest';
 import { capitalizeFirstLetter } from '../core/helpers';
 import { SETTINGS } from '../core/settings';
-import { HTTP_STATUS_CODES } from '../core/constants';
-import { runDB, client, blogsCollection, postsCollection, db } from '../db';
+import { HTTP_STATUS_CODES, ROUTES } from '../core/constants';
+import { runDB, client, blogsCollection, postsCollection, commentsCollection, db } from '../db';
 import { TDataset } from './dataset';
 
 const app = express();
@@ -186,6 +186,15 @@ export const getAuthorization = () => {
     return { Authorization: `Basic ${codedAuth}` };
 };
 
+export const loginAndGetToken = async (loginOrEmail: string, password: string): Promise<string> => {
+    const { body } = await request
+        .post(`${ROUTES.AUTH}/login`)
+        .send({ loginOrEmail, password })
+        .expect(HTTP_STATUS_CODES.OK_200);
+
+    return body.accessToken;
+};
+
 export const dbHelper = {
     connectToDb: async () => {
         await runDB(SETTINGS.MONGO_URL!);
@@ -200,6 +209,9 @@ export const dbHelper = {
         if (collectionNames.includes('posts')) {
             await postsCollection.deleteMany({});
         }
+        if (collectionNames.includes('comments')) {
+            await commentsCollection.deleteMany({});
+        }
     },
     setDb: async (dataset: TDataset) => {
         if (dataset.blogs?.length) {
@@ -208,6 +220,9 @@ export const dbHelper = {
 
         if (dataset.posts?.length) {
             await postsCollection.insertMany(dataset.posts);
+        }
+        if (dataset.comments?.length) {
+            await commentsCollection.insertMany(dataset.comments);
         }
     },
     dropDb: async () => {
@@ -220,5 +235,9 @@ export const dbHelper = {
     getPost: async (arrayIndex: number) => {
         const allPosts = await postsCollection.find({}).toArray();
         return allPosts[arrayIndex];
+    },
+    getComment: async (arrayIndex: number) => {
+        const allComments = await commentsCollection.find({}).toArray();
+        return allComments[arrayIndex];
     },
 };

@@ -2,11 +2,9 @@ import { type Request, type Response } from 'express';
 import { URIParamsPostModel, PostViewModel } from '../models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToPostViewModel } from '../mappers';
-import { asyncHandler } from '../../../../core/helpers';
 import { postsQueryRepository } from '../../repository';
 
-export const getPostByIdHandler = asyncHandler(
-    async (req: Request<URIParamsPostModel>, res: Response<PostViewModel>) => {
+export const getPostByIdHandler = async (req: Request<URIParamsPostModel>, res: Response<PostViewModel>) => {
         const id = req.params.id;
 
         const foundPost = await postsQueryRepository.findByIdOrFail(id);
@@ -15,4 +13,3 @@ export const getPostByIdHandler = asyncHandler(
 
         res.status(HTTP_STATUS_CODES.OK_200).send(mappedPost);
     }
-);

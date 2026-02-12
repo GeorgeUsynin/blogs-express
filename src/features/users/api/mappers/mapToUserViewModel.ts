@@ -1,5 +1,5 @@
 import { WithId } from 'mongodb';
-import { TUser } from '../../domain/user';
+import { TUser } from '../../domain';
 import { UserViewModel } from '../models';
 
 export const mapToUserViewModel = (user: WithId<TUser>): UserViewModel => ({

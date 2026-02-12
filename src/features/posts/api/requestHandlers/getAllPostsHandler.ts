@@ -3,12 +3,11 @@ import { PostListPaginatedOutput, PostQueryInput } from '../models';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
 import { mapToPostListPaginatedOutput } from '../mappers';
 import { matchedData } from 'express-validator';
-import { asyncHandler, setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
+import { setDefaultSortAndPaginationIfNotExist } from '../../../../core/helpers';
 import { RequestWithQuery } from '../../../../core/types';
 import { postsQueryRepository } from '../../repository';
 
-export const getAllPostsHandler = asyncHandler(
-    async (req: RequestWithQuery<Partial<PostQueryInput>>, res: Response<PostListPaginatedOutput>) => {
+export const getAllPostsHandler = async (req: RequestWithQuery<Partial<PostQueryInput>>, res: Response<PostListPaginatedOutput>) => {
         const sanitizedQuery = matchedData<PostQueryInput>(req, {
             locations: ['query'],
             includeOptionals: true,
@@ -27,4 +26,3 @@ export const getAllPostsHandler = asyncHandler(
 
         res.status(HTTP_STATUS_CODES.OK_200).send(postsListOutput);
     }
-);

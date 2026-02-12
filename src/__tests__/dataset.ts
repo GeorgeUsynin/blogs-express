@@ -1,19 +1,17 @@
 import { ObjectId, WithId } from 'mongodb';
 import { type TBlog } from '../features/blogs/domain';
 import { type TPost } from '../features/posts/domain';
+import { type TComment } from '../features/comments/domain';
 
-const blogsIds = [];
-const postsIds = [];
-for (let i = 0; i < 4; i++) {
-    blogsIds.push(new ObjectId());
-}
-for (let i = 0; i < 8; i++) {
-    postsIds.push(new ObjectId());
-}
+const createObjectIds = (count: number): ObjectId[] => Array.from({ length: count }, () => new ObjectId());
+
+const blogsIds = createObjectIds(4);
+const postsIds = createObjectIds(8);
 
 export type TDataset = {
     blogs?: typeof blogs;
     posts?: typeof posts;
+    comments?: typeof comments;
 };
 
 export const blogs: WithId<TBlog>[] = [
@@ -55,92 +53,102 @@ export const blogs: WithId<TBlog>[] = [
     },
 ];
 
-export const posts: WithId<TPost>[] = [
+const postsByBlog = [
+    [
+        {
+            title: 'Easy Green Home Tips',
+            shortDescription: 'Simple steps to make your home more eco-friendly.',
+            content:
+                "Transforming your home to be more sustainable doesn't have to be hard. Start by reducing plastic, recycling properly, and using energy-efficient appliances. Discover easy swaps that make a big impact on the environment and save you money.",
+        },
+        {
+            title: 'Top 5 Eco Products',
+            shortDescription: 'Our top picks for sustainable everyday products.',
+            content:
+                "From reusable water bottles to eco-friendly cleaning supplies, we've rounded up five essential products that make sustainable living easier. Learn about their benefits and where to find them, so you can reduce waste and promote greener practices.",
+        },
+    ],
+    [
+        {
+            title: 'Latest AI Innovations',
+            shortDescription: 'Discover the most exciting AI breakthroughs of 2023.',
+            content:
+                'Artificial intelligence is advancing faster than ever, with recent innovations in natural language processing, image recognition, and autonomous systems. Learn how these breakthroughs are shaping industries and everyday life, and what to expect in the near future.',
+        },
+        {
+            title: 'Gadgets You Need in 2024',
+            shortDescription: 'Must-have tech gadgets for the new year.',
+            content:
+                'Stay ahead of the curve with the latest in smart home tech, wearable devices, and innovative tools designed to make life easier. This list covers cutting-edge gadgets that bring functionality, style, and convenience to your daily routine.',
+        },
+    ],
+    [
+        {
+            title: 'Mindfulness for Beginners',
+            shortDescription: 'A simple guide to starting mindfulness.',
+            content:
+                "Mindfulness is a powerful tool for reducing stress and increasing focus. This beginner's guide covers basic mindfulness techniques, from breathing exercises to guided meditation, that can help bring calmness and clarity to your day-to-day life.",
+        },
+        {
+            title: '10 Healthy Snacks',
+            shortDescription: 'Quick and nutritious snack ideas for a busy day.',
+            content:
+                "Finding healthy snacks can be a challenge, but it doesn't have to be. Try these 10 easy snack ideas that are packed with nutrients, easy to prepare, and perfect for a quick energy boost without compromising your health goals.",
+        },
+    ],
+    [
+        {
+            title: 'Art Therapy for Stress',
+            shortDescription: 'How art can reduce stress and improve well-being.',
+            content:
+                'Engaging in creative activities has been shown to relieve stress and enhance mental health. Explore various art therapy techniques such as drawing, painting, and coloring, and learn how these can be integrated into your daily routine for a calmer mind.',
+        },
+        {
+            title: 'Tips for New Artists',
+            shortDescription: 'Advice for those starting their artistic journey.',
+            content:
+                'Starting as an artist can be both exciting and challenging. Discover essential tips, from finding your style to practicing regularly, to help build your skills and confidence as you dive into the world of art.',
+        },
+    ],
+] as const;
+
+export const posts: WithId<TPost>[] = postsByBlog.flatMap((blogPosts, blogIndex) =>
+    blogPosts.map((post, postIndex) => ({
+        _id: postsIds[blogIndex * 2 + postIndex]!,
+        ...post,
+        blogId: blogsIds[blogIndex]!.toString(),
+        blogName: blogs[blogIndex]!.name,
+        createdAt: new Date().toISOString(),
+    }))
+);
+
+export const comments: WithId<TComment>[] = posts.flatMap((post, index) => [
     {
-        _id: postsIds[0],
-        title: 'Easy Green Home Tips',
-        shortDescription: 'Simple steps to make your home more eco-friendly.',
-        content:
-            "Transforming your home to be more sustainable doesn't have to be hard. Start by reducing plastic, recycling properly, and using energy-efficient appliances. Discover easy swaps that make a big impact on the environment and save you money.",
-        blogId: blogsIds[0].toString(),
-        blogName: 'Eco Lifestyle',
+        _id: new ObjectId(),
+        content: `Great insights on "${post.title}". This is comment #1 for this post.`,
+        commentatorInfo: {
+            userId: new ObjectId().toString(),
+            userLogin: `user_${index * 2 + 1}`,
+        },
+        postId: post._id.toString(),
         createdAt: new Date().toISOString(),
     },
     {
-        _id: postsIds[1],
-        title: 'Top 5 Eco Products',
-        shortDescription: 'Our top picks for sustainable everyday products.',
-        content:
-            "From reusable water bottles to eco-friendly cleaning supplies, we've rounded up five essential products that make sustainable living easier. Learn about their benefits and where to find them, so you can reduce waste and promote greener practices.",
-        blogId: blogsIds[0].toString(),
-        blogName: 'Eco Lifestyle',
+        _id: new ObjectId(),
+        content: `Very helpful article about "${post.title}". This is comment #2 for this post.`,
+        commentatorInfo: {
+            userId: new ObjectId().toString(),
+            userLogin: `user_${index * 2 + 2}`,
+        },
+        postId: post._id.toString(),
         createdAt: new Date().toISOString(),
     },
-    {
-        _id: postsIds[2],
-        title: 'Latest AI Innovations',
-        shortDescription: 'Discover the most exciting AI breakthroughs of 2023.',
-        content:
-            'Artificial intelligence is advancing faster than ever, with recent innovations in natural language processing, image recognition, and autonomous systems. Learn how these breakthroughs are shaping industries and everyday life, and what to expect in the near future.',
-        blogId: blogsIds[1].toString(),
-        blogName: 'Tech Trends',
-        createdAt: new Date().toISOString(),
-    },
-    {
-        _id: postsIds[3],
-        title: 'Gadgets You Need in 2024',
-        shortDescription: 'Must-have tech gadgets for the new year.',
-        content:
-            'Stay ahead of the curve with the latest in smart home tech, wearable devices, and innovative tools designed to make life easier. This list covers cutting-edge gadgets that bring functionality, style, and convenience to your daily routine.',
-        blogId: blogsIds[1].toString(),
-        blogName: 'Tech Trends',
-        createdAt: new Date().toISOString(),
-    },
-    {
-        _id: postsIds[4],
-        title: 'Mindfulness for Beginners',
-        shortDescription: 'A simple guide to starting mindfulness.',
-        content:
-            "Mindfulness is a powerful tool for reducing stress and increasing focus. This beginner's guide covers basic mindfulness techniques, from breathing exercises to guided meditation, that can help bring calmness and clarity to your day-to-day life.",
-        blogId: blogsIds[2].toString(),
-        blogName: 'Wellness Path',
-        createdAt: new Date().toISOString(),
-    },
-    {
-        _id: postsIds[5],
-        title: '10 Healthy Snacks',
-        shortDescription: 'Quick and nutritious snack ideas for a busy day.',
-        content:
-            "Finding healthy snacks can be a challenge, but it doesn't have to be. Try these 10 easy snack ideas that are packed with nutrients, easy to prepare, and perfect for a quick energy boost without compromising your health goals.",
-        blogId: blogsIds[2].toString(),
-        blogName: 'Wellness Path',
-        createdAt: new Date().toISOString(),
-    },
-    {
-        _id: postsIds[6],
-        title: 'Art Therapy for Stress',
-        shortDescription: 'How art can reduce stress and improve well-being.',
-        content:
-            'Engaging in creative activities has been shown to relieve stress and enhance mental health. Explore various art therapy techniques such as drawing, painting, and coloring, and learn how these can be integrated into your daily routine for a calmer mind.',
-        blogId: blogsIds[3].toString(),
-        blogName: 'Creative Minds',
-        createdAt: new Date().toISOString(),
-    },
-    {
-        _id: postsIds[7],
-        title: 'Tips for New Artists',
-        shortDescription: 'Advice for those starting their artistic journey.',
-        content:
-            'Starting as an artist can be both exciting and challenging. Discover essential tips, from finding your style to practicing regularly, to help build your skills and confidence as you dive into the world of art.',
-        blogId: blogsIds[3].toString(),
-        blogName: 'Creative Minds',
-        createdAt: new Date().toISOString(),
-    },
-];
+]);
 
 export const dataset: TDataset = {
     blogs,
     posts,
+    comments,
 };
 
 export const longDescription =

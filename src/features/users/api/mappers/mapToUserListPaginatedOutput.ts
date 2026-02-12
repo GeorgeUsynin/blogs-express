@@ -1,5 +1,5 @@
 import { WithId } from 'mongodb';
-import { TUser } from '../../domain/user';
+import { TUser } from '../../domain';
 import { UserListPaginatedOutput } from '../models';
 import { mapToUserViewModel } from './mapToUserViewModel';
 

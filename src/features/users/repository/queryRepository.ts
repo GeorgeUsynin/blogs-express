@@ -1,6 +1,6 @@
 import { ObjectId, WithId } from 'mongodb';
 import { UserQueryInput } from '../api/models';
-import { TUser } from '../domain/user';
+import { TUser } from '../domain';
 import { usersCollection } from '../../../db';
 import { RepositoryNotFoundError } from '../../../core/errors';
 
