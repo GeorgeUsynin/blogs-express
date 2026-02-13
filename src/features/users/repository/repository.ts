@@ -12,6 +12,10 @@ export const usersRepository = {
         return usersCollection.findOne({ email });
     },
 
+    async findUserByConfirmationCode(code: string): Promise<WithId<TUser> | null> {
+        return usersCollection.findOne({ 'emailConfirmation.confirmationCode': code });
+    },
+
     async findUserByLoginOrEmail(loginOrEmail: string): Promise<WithId<TUser> | null> {
         return usersCollection.findOne({ $or: [{ email: loginOrEmail }, { login: loginOrEmail }] });
     },
@@ -23,6 +27,45 @@ export const usersRepository = {
             throw new RepositoryNotFoundError("User doesn't exist");
         }
         return res;
+    },
+
+    async setEmailConfirmed(id: string): Promise<void> {
+        const { matchedCount } = await usersCollection.updateOne(
+            { _id: new ObjectId(id) },
+            {
+                $set: {
+                    'emailConfirmation.isConfirmed': true,
+                },
+            }
+        );
+
+        if (matchedCount < 1) {
+            throw new RepositoryNotFoundError("User doesn't exist");
+        }
+
+        return;
+    },
+
+    async updateEmailConfirmationAttributes(
+        userId: string,
+        confirmationCode: string,
+        expirationDate: string
+    ): Promise<void> {
+        const { matchedCount } = await usersCollection.updateOne(
+            { _id: new ObjectId(userId) },
+            {
+                $set: {
+                    'emailConfirmation.confirmationCode': confirmationCode,
+                    'emailConfirmation.expirationDate': expirationDate,
+                },
+            }
+        );
+
+        if (matchedCount < 1) {
+            throw new RepositoryNotFoundError("User doesn't exist");
+        }
+
+        return;
     },
 
     async create(user: TUser): Promise<string> {

@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { SignOptions } from 'jsonwebtoken';
 
 export const SETTINGS = {
     PORT: process.env.PORT || 5001,
@@ -19,4 +20,8 @@ export const SETTINGS = {
     },
     MONGO_URL: process.env.MONGO_URL,
     SALT_ROUNDS: 10,
+    EXPIRATION_DATES: {
+        REGISTRATION_CODE_HOURS: 1,
+    },
+    JWT_ACCESS_TOKEN_EXPIRATION_IN_HOURS: '1h' as SignOptions['expiresIn'],
 };

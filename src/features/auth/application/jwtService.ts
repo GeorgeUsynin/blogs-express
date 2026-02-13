@@ -8,7 +8,9 @@ interface IJwtPayload extends JwtPayload {
 
 export const jwtService = {
     createJwtToken(userId: string) {
-        const token = jwt.sign({ userId }, SETTINGS.JWT_SECRET!, { expiresIn: '1h' });
+        const token = jwt.sign({ userId }, SETTINGS.JWT_SECRET!, {
+            expiresIn: SETTINGS.JWT_ACCESS_TOKEN_EXPIRATION_IN_HOURS,
+        });
         return token;
     },
 

@@ -1,16 +1,27 @@
 import { Router } from 'express';
-import { checkSchema } from 'express-validator';
 import * as RequestHandlers from './requestHandlers';
-import { createLoginValidationSchema } from './validation';
-import { errorMiddleware } from '../../../core/middlewares|validation';
-import { jwtAuthMiddleware } from '../../../auth|middlewares';
+import * as Validators from './validation';
 
 export const AuthRouter = Router();
 
 const AuthController = {
     login: RequestHandlers.loginHandler,
+    registration: RequestHandlers.registrationHandler,
+    registrationConfirmation: RequestHandlers.registrationConfirmationHandler,
+    registrationEmailResending: RequestHandlers.registrationEmailResendingHandler,
     me: RequestHandlers.meHandler,
 };
 
-AuthRouter.get('/me', jwtAuthMiddleware, AuthController.me);
-AuthRouter.post('/login', checkSchema(createLoginValidationSchema, ['body']), errorMiddleware, AuthController.login);
+AuthRouter.get('/me', ...Validators.meValidators, AuthController.me);
+AuthRouter.post('/login', ...Validators.loginValidators, AuthController.login);
+AuthRouter.post('/registration', ...Validators.registrationValidators, AuthController.registration);
+AuthRouter.post(
+    '/registration-confirmation',
+    ...Validators.registrationConfirmationValidators,
+    AuthController.registrationConfirmation
+);
+AuthRouter.post(
+    '/registration-email-resending',
+    ...Validators.registrationEmailResendingValidators,
+    AuthController.registrationEmailResending
+);

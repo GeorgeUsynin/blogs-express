@@ -1,11 +1,14 @@
+import { add } from 'date-fns/add';
+import { randomUUID } from 'node:crypto';
 import { BadRequestError } from '../../../core/errors';
 import { passwordService } from '../../auth/application';
 import { CreateUserInputModel } from '../api/models';
 import { TUser } from '../domain';
 import { usersRepository } from '../repository';
+import { SETTINGS } from '../../../core/settings';
 
 export const usersService = {
-    async create(userAttributes: CreateUserInputModel): Promise<string> {
+    async create(userAttributes: CreateUserInputModel, isConfirmed: boolean = false): Promise<string> {
         const { email, login, password } = userAttributes;
 
         const userWithExistedLogin = await usersRepository.findUserByLogin(login);
@@ -24,6 +27,11 @@ export const usersService = {
             email,
             login,
             passwordHash,
+            emailConfirmation: {
+                confirmationCode: this._generateConfirmationCode(),
+                expirationDate: this._generateExpirationDate(),
+                isConfirmed,
+            },
             createdAt: new Date().toISOString(),
         };
 
@@ -34,5 +42,24 @@ export const usersService = {
         await usersRepository.removeById(id);
 
         return;
+    },
+
+    async createAndUpdateEmailConfirmationCode(userId: string): Promise<string> {
+        const confirmationCode = this._generateConfirmationCode();
+        const expirationDate = this._generateExpirationDate();
+
+        await usersRepository.updateEmailConfirmationAttributes(userId, confirmationCode, expirationDate);
+
+        return confirmationCode;
+    },
+
+    _generateConfirmationCode(): string {
+        return randomUUID();
+    },
+
+    _generateExpirationDate(): string {
+        return add(new Date(), {
+            hours: SETTINGS.EXPIRATION_DATES.REGISTRATION_CODE_HOURS,
+        }).toISOString();
     },
 };

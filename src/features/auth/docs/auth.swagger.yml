@@ -53,6 +53,69 @@ paths:
                 '401':
                     description: Unauthorized
 
+    /auth/registration:
+        post:
+            summary: Register a new user
+            tags: [Auth]
+            operationId: registration
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateUserInputModel'
+            responses:
+                '204':
+                    description: Registration successful
+                '400':
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /auth/registration-confirmation:
+        post:
+            summary: Confirm user registration
+            tags: [Auth]
+            operationId: registrationConfirmation
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RegistrationConfirmationInputModel'
+            responses:
+                '204':
+                    description: Registration confirmed
+                '400':
+                    description: Validation or business error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /auth/registration-email-resending:
+        post:
+            summary: Resend registration confirmation email
+            tags: [Auth]
+            operationId: registrationEmailResending
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RegistrationEmailResendingInputModel'
+            responses:
+                '204':
+                    description: Confirmation email resent
+                '400':
+                    description: Validation or business error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
 components:
     securitySchemes:
         BearerAuth:
@@ -93,6 +156,49 @@ components:
                     type: string
                     minLength: 1
                     example: securePass123
+
+        CreateUserInputModel:
+            type: object
+            required:
+                - login
+                - password
+                - email
+            properties:
+                login:
+                    type: string
+                    minLength: 3
+                    maxLength: 10
+                    pattern: '^[a-zA-Z0-9_-]*$'
+                    example: johndoe
+                password:
+                    type: string
+                    minLength: 6
+                    maxLength: 20
+                    example: securePass123
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
+
+        RegistrationConfirmationInputModel:
+            type: object
+            required:
+                - code
+            properties:
+                code:
+                    type: string
+                    minLength: 1
+                    example: 8f6f6a72-4df5-4f25-a7a2-302f6df4e510
+
+        RegistrationEmailResendingInputModel:
+            type: object
+            required:
+                - email
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
 
         LoginOutputModel:
             type: object
