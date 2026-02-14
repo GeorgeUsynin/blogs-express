@@ -17,6 +17,7 @@ export const SETTINGS = {
         POSTS: 'posts',
         COMMENTS: 'comments',
         USERS: 'users',
+        DEVICES: 'devices',
     },
     MONGO_URL: process.env.MONGO_URL,
     SALT_ROUNDS: 10,
@@ -24,4 +25,5 @@ export const SETTINGS = {
         REGISTRATION_CODE_HOURS: 1,
     },
     JWT_ACCESS_TOKEN_EXPIRATION_IN_HOURS: '1h' as SignOptions['expiresIn'],
+    JWT_REFRESH_TOKEN_EXPIRATION_IN_HOURS: '2h' as SignOptions['expiresIn'],
 };

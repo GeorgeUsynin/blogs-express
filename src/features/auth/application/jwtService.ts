@@ -1,22 +1,32 @@
-import jwt, { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
+import jwt, { JsonWebTokenError, JwtPayload, SignOptions } from 'jsonwebtoken';
 import { SETTINGS } from '../../../core/settings';
 import { UnauthorizedError } from '../../../core/errors';
 
-interface IJwtPayload extends JwtPayload {
-    userId: string;
-}
+type JwtKind = 'access' | 'refresh';
+
+type TPayload<T extends JwtKind> = T extends 'access'
+    ? { userId: string }
+    : T extends 'refresh'
+      ? { deviceId: string; userId: string }
+      : never;
+
+type IJwtPayload<T extends JwtKind> = T extends 'access'
+    ? JwtPayload & TPayload<T>
+    : T extends 'refresh'
+      ? JwtPayload & TPayload<T>
+      : never;
 
 export const jwtService = {
-    createJwtToken(userId: string) {
-        const token = jwt.sign({ userId }, SETTINGS.JWT_SECRET!, {
-            expiresIn: SETTINGS.JWT_ACCESS_TOKEN_EXPIRATION_IN_HOURS,
+    createJwtToken<T extends JwtKind>(payload: TPayload<T>, expiresIn: SignOptions['expiresIn']) {
+        const token = jwt.sign(payload, SETTINGS.JWT_SECRET!, {
+            expiresIn,
         });
         return token;
     },
 
-    verifyToken(token: string) {
+    verifyToken<T extends JwtKind>(token: string) {
         try {
-            const decoded = jwt.verify(token, SETTINGS.JWT_SECRET!) as IJwtPayload;
+            const decoded = jwt.verify(token, SETTINGS.JWT_SECRET!) as IJwtPayload<T>;
             return decoded;
         } catch (e: unknown) {
             if (e instanceof JsonWebTokenError) {

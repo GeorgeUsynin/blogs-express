@@ -40,6 +40,12 @@ paths:
             responses:
                 '200':
                     description: Login successful
+                    headers:
+                        Set-Cookie:
+                            description: HttpOnly refresh token cookie
+                            schema:
+                                type: string
+                                example: refreshToken=eyJhbGciOiJIUzI1Ni...; Path=/; HttpOnly; Secure
                     content:
                         application/json:
                             schema:
@@ -50,6 +56,56 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Unauthorized
+
+    /auth/refresh-token:
+        post:
+            summary: Refresh access and refresh tokens
+            tags: [Auth]
+            operationId: refreshToken
+            security:
+                - BearerAuth: []
+            parameters:
+                - in: cookie
+                  name: refreshToken
+                  required: true
+                  schema:
+                      type: string
+                  description: Current refresh token
+            responses:
+                '200':
+                    description: Tokens refreshed successfully
+                    headers:
+                        Set-Cookie:
+                            description: New HttpOnly refresh token cookie
+                            schema:
+                                type: string
+                                example: refreshToken=eyJhbGciOiJIUzI1Ni...; Path=/; HttpOnly; Secure
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LoginOutputModel'
+                '401':
+                    description: Unauthorized
+
+    /auth/logout:
+        post:
+            summary: Logout user and revoke current refresh token
+            tags: [Auth]
+            operationId: logout
+            security:
+                - BearerAuth: []
+            parameters:
+                - in: cookie
+                  name: refreshToken
+                  required: true
+                  schema:
+                      type: string
+                  description: Current refresh token
+            responses:
+                '204':
+                    description: Logout successful
                 '401':
                     description: Unauthorized
 

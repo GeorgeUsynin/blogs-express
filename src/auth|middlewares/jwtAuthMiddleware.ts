@@ -18,7 +18,7 @@ export const jwtAuthMiddleware = async (req: Request, res: Response, next: NextF
         return;
     }
 
-    const { userId } = jwtService.verifyToken(token);
+    const { userId } = jwtService.verifyToken<'access'>(token);
 
     await usersRepository.findByIdOrFail(userId);
 

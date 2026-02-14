@@ -4,6 +4,7 @@ import { AuthRouter, BlogsRouter, PostsRouter, CommentsRouter, TestRouter, Users
 import { HTTP_STATUS_CODES, ROUTES } from './core/constants';
 import { setupSwagger } from './core/swagger';
 import { globalErrorMiddleware } from './core/errors';
+import cookieParser from 'cookie-parser';
 
 export const setupApp = (app: Express) => {
     // Parses incoming requests with JSON payloads
@@ -13,6 +14,8 @@ export const setupApp = (app: Express) => {
     // Enables Cross-Origin Resource Sharing (CORS)
     // allowing requests from different origins (domains)
     app.use(cors());
+
+    app.use(cookieParser());
 
     app.use(ROUTES.AUTH, AuthRouter);
     app.use(ROUTES.BLOGS, BlogsRouter);

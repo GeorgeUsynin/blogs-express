@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
-import { authService } from '../../application';
+import { registrationService } from '../../application';
 import { RegistrationConfirmationInputModel } from '../models';
 
 export const registrationConfirmationHandler = async (
@@ -9,7 +9,7 @@ export const registrationConfirmationHandler = async (
 ) => {
     const payload = req.body;
 
-    await authService.confirmRegistration(payload);
+    await registrationService.confirmRegistration(payload);
 
     res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
 };

@@ -1,18 +1,18 @@
-import { BadRequestError, UnauthorizedError } from '../../../core/errors';
-import { emailManager } from '../../../shared/managers/emailManager';
-import { CreateUserInputModel } from '../../users/api/models';
-import { usersService } from '../../users/application';
+import { UnauthorizedError } from '../../../core/errors';
+import { SETTINGS } from '../../../core/settings';
+import { devicesService } from '../../devices/application';
+import { devicesRepository } from '../../devices/repository';
 import { usersRepository } from '../../users/repository';
-import {
-    CreateLoginInputModel,
-    RegistrationConfirmationInputModel,
-    RegistrationEmailResendingInputModel,
-} from '../api/models';
+import { CreateLoginInputModel } from '../api/models';
+import { UpdateTokensDto } from './dto';
 import { jwtService } from './jwtService';
 import { passwordService } from './passwordService';
 
 export const authService = {
-    async login(loginAttributes: CreateLoginInputModel): Promise<string> {
+    async login(loginAttributes: CreateLoginInputModel): Promise<{
+        accessToken: string;
+        refreshToken: string;
+    }> {
         const { loginOrEmail, password } = loginAttributes;
 
         const user = await usersRepository.findUserByLoginOrEmail(loginOrEmail);
@@ -31,60 +31,39 @@ export const authService = {
             throw new UnauthorizedError('Email address is not confirmed', 'EMAIL_NOT_CONFIRMED');
         }
 
-        const accessToken = jwtService.createJwtToken(user._id.toString());
+        const deviceId = await devicesService.create(user._id.toString());
 
-        return accessToken;
+        return this._generateTokens(user._id.toString(), deviceId);
     },
 
-    async registerNewUser(userAttributes: CreateUserInputModel): Promise<void> {
-        const createdUserId = await usersService.create(userAttributes);
-
-        const user = await usersRepository.findByIdOrFail(createdUserId);
-
-        emailManager.sendConfirmationEmail(user.email, user.emailConfirmation.confirmationCode);
+    async logout(deviceId: string, currentRefreshToken: string): Promise<void> {
+        await devicesRepository.revokeRefreshToken(deviceId, currentRefreshToken);
 
         return;
     },
 
-    async confirmRegistration(confirmationAttributes: RegistrationConfirmationInputModel): Promise<void> {
-        const user = await usersRepository.findUserByConfirmationCode(confirmationAttributes.code);
+    async updateTokens(refreshSession: UpdateTokensDto): Promise<{
+        accessToken: string;
+        refreshToken: string;
+    }> {
+        const { deviceId, userId, refreshToken } = refreshSession;
 
-        if (!user) {
-            throw new BadRequestError('Invalid confirmation code', 'code');
-        }
+        await devicesRepository.revokeRefreshToken(deviceId, refreshToken);
 
-        if (user.emailConfirmation.isConfirmed) {
-            throw new BadRequestError('Confirmation code already been applied', 'code');
-        }
-
-        const isConfirmationCodeExpired = Date.parse(user.emailConfirmation.expirationDate) < Date.now();
-
-        if (isConfirmationCodeExpired) {
-            throw new BadRequestError('Confirmation code is expired', 'code');
-        }
-
-        await usersRepository.setEmailConfirmed(user._id.toString());
-
-        return;
+        return this._generateTokens(userId, deviceId);
     },
 
-    async resendEmailConfirmationCode(
-        resendingConfirmationEmailAttributes: RegistrationEmailResendingInputModel
-    ): Promise<void> {
-        const user = await usersRepository.findUserByEmail(resendingConfirmationEmailAttributes.email);
+    _generateTokens(userId: string, deviceId: string) {
+        const accessToken = jwtService.createJwtToken<'access'>(
+            { userId },
+            SETTINGS.JWT_ACCESS_TOKEN_EXPIRATION_IN_HOURS
+        );
 
-        if (!user) {
-            throw new BadRequestError('Invalid email', 'email');
-        }
+        const refreshToken = jwtService.createJwtToken<'refresh'>(
+            { deviceId, userId },
+            SETTINGS.JWT_REFRESH_TOKEN_EXPIRATION_IN_HOURS
+        );
 
-        if (user.emailConfirmation.isConfirmed) {
-            throw new BadRequestError('Confirmation code already been applied', 'code');
-        }
-
-        const confirmationCode = await usersService.createAndUpdateEmailConfirmationCode(user._id.toString());
-
-        emailManager.sendConfirmationEmail(resendingConfirmationEmailAttributes.email, confirmationCode);
-
-        return;
+        return { accessToken, refreshToken };
     },
 };
