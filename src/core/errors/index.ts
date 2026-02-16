@@ -3,5 +3,6 @@ export * from './RepositoryNotFoundError';
 export * from './BadRequestError';
 export * from './UnauthorizedError';
 export * from './ForbiddenError';
+export * from './RateLimitError';
 export * from './domainError';
 export * from './globalErrorMiddleware';

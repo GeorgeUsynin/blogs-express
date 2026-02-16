@@ -4,7 +4,8 @@ import { type TBlog } from '../features/blogs/domain';
 import { type TPost } from '../features/posts/domain';
 import { type TUser } from '../features/users/domain';
 import { type TComment } from '../features/comments/domain';
-import { type TDevice } from '../features/devices/domain/device';
+import { type TDevice } from '../features/devices/domain';
+import { type TRateLimit } from '../features/apiRateLimit/domain';
 
 export let client: MongoClient;
 export let blogsCollection: Collection<TBlog>;
@@ -12,6 +13,7 @@ export let postsCollection: Collection<TPost>;
 export let commentsCollection: Collection<TComment>;
 export let usersCollection: Collection<TUser>;
 export let devicesCollection: Collection<TDevice>;
+export let apiRateLimitCollection: Collection<TRateLimit>;
 export let db: Db;
 
 const dbName = process.env.NODE_ENV === 'test' ? SETTINGS.DB_NAME.TEST : SETTINGS.DB_NAME.PROD;
@@ -25,6 +27,7 @@ export async function runDB(url: string): Promise<void> {
     commentsCollection = db.collection<TComment>(SETTINGS.COLLECTIONS.COMMENTS);
     usersCollection = db.collection<TUser>(SETTINGS.COLLECTIONS.USERS);
     devicesCollection = db.collection<TDevice>(SETTINGS.COLLECTIONS.DEVICES);
+    apiRateLimitCollection = db.collection<TRateLimit>(SETTINGS.COLLECTIONS.RATE_LIMIT);
 
     try {
         await client.connect();

@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+    title: Security Devices API Documentation
+    version: 1.0.0
+    description: API for managing active device sessions
+
+tags:
+    - name: Security Devices
+      description: API for managing current user's active sessions
+
+paths:
+    /security/devices:
+        get:
+            summary: Get all active device sessions for current user
+            tags: [Security Devices]
+            operationId: getAllSecurityDevices
+            parameters:
+                - in: cookie
+                  name: refreshToken
+                  required: true
+                  schema:
+                      type: string
+                  description: Current refresh token
+            responses:
+                '200':
+                    description: List of active sessions
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/DeviceViewModel'
+                '401':
+                    description: Unauthorized
+        delete:
+            summary: Terminate all active sessions except current
+            tags: [Security Devices]
+            operationId: deleteAllSecurityDevicesExceptCurrent
+            parameters:
+                - in: cookie
+                  name: refreshToken
+                  required: true
+                  schema:
+                      type: string
+                  description: Current refresh token
+            responses:
+                '204':
+                    description: Sessions terminated
+                '401':
+                    description: Unauthorized
+
+    /security/devices/{id}:
+        delete:
+            summary: Terminate a specific active session by device id
+            tags: [Security Devices]
+            operationId: deleteSecurityDeviceById
+            parameters:
+                - in: cookie
+                  name: refreshToken
+                  required: true
+                  schema:
+                      type: string
+                  description: Current refresh token
+                - $ref: '#/components/parameters/DeviceIdPathParam'
+            responses:
+                '204':
+                    description: Session terminated
+                '400':
+                    description: Invalid device id format
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '401':
+                    description: Unauthorized
+                '403':
+                    description: Attempt to delete another user's session
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '404':
+                    description: Device not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+    parameters:
+        DeviceIdPathParam:
+            name: id
+            in: path
+            required: true
+            schema:
+                type: string
+                format: uuid
+                example: 550e8400-e29b-41d4-a716-446655440000
+            description: Device identifier (UUID)
+
+    schemas:
+        DeviceViewModel:
+            type: object
+            required:
+                - ip
+                - title
+                - lastActiveDate
+                - deviceId
+            properties:
+                ip:
+                    type: string
+                    example: 127.0.0.1
+                title:
+                    type: string
+                    example: Chrome 131.0.0
+                lastActiveDate:
+                    type: string
+                    format: date-time
+                    example: 2026-02-16T10:15:30.000Z
+                deviceId:
+                    type: string
+                    format: uuid
+                    example: 550e8400-e29b-41d4-a716-446655440000
+
+        ErrorResponse:
+            type: object
+            properties:
+                errorsMessages:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            status:
+                                type: integer
+                                example: 400
+                            message:
+                                type: string
+                                example: Incorrect format of UUID
+                            field:
+                                type: string
+                                example: id
+                            code:
+                                type: string
+                                example: EMAIL_NOT_CONFIRMED

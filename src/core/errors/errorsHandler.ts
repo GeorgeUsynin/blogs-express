@@ -6,6 +6,7 @@ import { DomainError } from './domainError';
 import { BadRequestError } from './BadRequestError';
 import { UnauthorizedError } from './UnauthorizedError';
 import { ForbiddenError } from './ForbiddenError';
+import { RateLimitError } from './RateLimitError';
 
 export function errorsHandler(error: unknown, res: Response): void {
     if (error instanceof RepositoryNotFoundError) {
@@ -60,6 +61,21 @@ export function errorsHandler(error: unknown, res: Response): void {
 
     if (error instanceof ForbiddenError) {
         const httpStatus = HTTP_STATUS_CODES.FORBIDDEN_403;
+
+        res.status(httpStatus).send(
+            createErrorMessages([
+                {
+                    status: httpStatus,
+                    message: error.message,
+                },
+            ])
+        );
+
+        return;
+    }
+
+    if (error instanceof RateLimitError) {
+        const httpStatus = HTTP_STATUS_CODES.TOO_MANY_REQUESTS_429;
 
         res.status(httpStatus).send(
             createErrorMessages([

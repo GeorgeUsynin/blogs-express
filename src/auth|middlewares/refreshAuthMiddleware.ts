@@ -12,8 +12,13 @@ export const refreshAuthMiddleware = async (req: Request, res: Response, next: N
     }
 
     // verifyToken also checking expiration date under the hood
-    const { deviceId, userId } = jwtService.verifyToken<'refresh'>(refreshToken);
-    const device = await devicesRepository.findByIdOrFail(deviceId);
+    const { deviceId, userId, iat } = jwtService.verifyToken<'refresh'>(refreshToken);
+    const device = await devicesRepository.findByDeviceId(deviceId);
+
+    if (!device) {
+        res.sendStatus(HTTP_STATUS_CODES.UNAUTHORIZED_401);
+        return;
+    }
 
     const isTokenOwner = device.userId === userId;
     if (!isTokenOwner) {
@@ -21,9 +26,9 @@ export const refreshAuthMiddleware = async (req: Request, res: Response, next: N
         return;
     }
 
-    const isRefreshTokenRevoked = device.revokedRefreshTokens.includes(refreshToken);
+    const isRefreshTokenVersionValid = device.issuedAt === new Date(iat! * 1000).toISOString();
 
-    if (isRefreshTokenRevoked) {
+    if (!isRefreshTokenVersionValid) {
         res.sendStatus(HTTP_STATUS_CODES.UNAUTHORIZED_401);
         return;
     }

@@ -1,19 +1,19 @@
+import { randomUUID } from 'crypto';
 import { UnauthorizedError } from '../../../core/errors';
 import { SETTINGS } from '../../../core/settings';
 import { devicesService } from '../../devices/application';
 import { devicesRepository } from '../../devices/repository';
 import { usersRepository } from '../../users/repository';
-import { CreateLoginInputModel } from '../api/models';
-import { UpdateTokensDto } from './dto';
+import { CreateLoginDto } from './dto';
 import { jwtService } from './jwtService';
 import { passwordService } from './passwordService';
 
 export const authService = {
-    async login(loginAttributes: CreateLoginInputModel): Promise<{
+    async login(loginAttributes: CreateLoginDto): Promise<{
         accessToken: string;
         refreshToken: string;
     }> {
-        const { loginOrEmail, password } = loginAttributes;
+        const { loginOrEmail, password, clientIp, deviceName } = loginAttributes;
 
         const user = await usersRepository.findUserByLoginOrEmail(loginOrEmail);
 
@@ -31,26 +31,49 @@ export const authService = {
             throw new UnauthorizedError('Email address is not confirmed', 'EMAIL_NOT_CONFIRMED');
         }
 
-        const deviceId = await devicesService.create(user._id.toString());
+        const uniqueDeviceId = randomUUID();
 
-        return this._generateTokens(user._id.toString(), deviceId);
+        const { accessToken, refreshToken } = this._generateTokens(user._id.toString(), uniqueDeviceId);
+
+        const { iat, exp } = jwtService.verifyToken(refreshToken);
+        const issuedAt = new Date(iat! * 1000).toISOString();
+        const expiresIn = new Date(exp! * 1000).toISOString();
+
+        await devicesService.create({
+            userId: user._id.toString(),
+            deviceId: uniqueDeviceId,
+            clientIp,
+            deviceName,
+            issuedAt,
+            expiresIn,
+        });
+
+        return { accessToken, refreshToken };
     },
 
-    async logout(deviceId: string, currentRefreshToken: string): Promise<void> {
-        await devicesRepository.revokeRefreshToken(deviceId, currentRefreshToken);
+    async logout(deviceId: string): Promise<void> {
+        await devicesRepository.removeByDeviceId(deviceId);
 
         return;
     },
 
-    async updateTokens(refreshSession: UpdateTokensDto): Promise<{
+    async updateTokens(
+        userId: string,
+        deviceId: string
+    ): Promise<{
         accessToken: string;
         refreshToken: string;
     }> {
-        const { deviceId, userId, refreshToken } = refreshSession;
+        const { accessToken, refreshToken } = this._generateTokens(userId, deviceId);
 
-        await devicesRepository.revokeRefreshToken(deviceId, refreshToken);
+        const { iat, exp } = jwtService.verifyToken(refreshToken);
+        const issuedAt = new Date(iat! * 1000).toISOString();
+        const expiresIn = new Date(exp! * 1000).toISOString();
+        const payload = { issuedAt, expiresIn };
 
-        return this._generateTokens(userId, deviceId);
+        await devicesRepository.updateByDeviceId(deviceId, payload);
+
+        return { accessToken, refreshToken };
     },
 
     _generateTokens(userId: string, deviceId: string) {

@@ -1,12 +1,23 @@
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import express, { Express, Request, Response } from 'express';
-import { AuthRouter, BlogsRouter, PostsRouter, CommentsRouter, TestRouter, UsersRouter } from './features';
+import {
+    AuthRouter,
+    BlogsRouter,
+    PostsRouter,
+    CommentsRouter,
+    TestRouter,
+    UsersRouter,
+    SecurityDevicesRouter,
+} from './features';
 import { HTTP_STATUS_CODES, ROUTES } from './core/constants';
 import { setupSwagger } from './core/swagger';
 import { globalErrorMiddleware } from './core/errors';
-import cookieParser from 'cookie-parser';
 
 export const setupApp = (app: Express) => {
+    // Parses incoming cookies into req.cookies
+    app.use(cookieParser());
+
     // Parses incoming requests with JSON payloads
     // and makes the data available in req.body
     app.use(express.json());
@@ -15,13 +26,15 @@ export const setupApp = (app: Express) => {
     // allowing requests from different origins (domains)
     app.use(cors());
 
-    app.use(cookieParser());
+    // Trust reverse proxy headers (X-Forwarded-*) to get real client IP and protocol
+    app.set('trust proxy', true);
 
     app.use(ROUTES.AUTH, AuthRouter);
     app.use(ROUTES.BLOGS, BlogsRouter);
     app.use(ROUTES.POSTS, PostsRouter);
     app.use(ROUTES.COMMENTS, CommentsRouter);
     app.use(ROUTES.USERS, UsersRouter);
+    app.use(ROUTES.SECURITY_DEVICES, SecurityDevicesRouter);
     app.use(ROUTES.TESTING, TestRouter);
 
     app.get('/', (req: Request, res: Response) => {

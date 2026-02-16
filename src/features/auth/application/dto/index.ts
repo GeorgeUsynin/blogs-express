@@ -1,3 +1,3 @@
-import { UpdateTokensDto } from './UpdateTokensDto';
+import { CreateLoginDto } from './CreateLoginDto';
 
-export { UpdateTokensDto };
+export { CreateLoginDto };

@@ -1,5 +1,8 @@
 export type TDevice = {
-    _id: string;
     userId: string;
-    revokedRefreshTokens: string[];
+    deviceId: string;
+    issuedAt: string;
+    deviceName: string;
+    clientIp: string;
+    expiresIn: string;
 };
