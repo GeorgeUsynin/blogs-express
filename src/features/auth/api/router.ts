@@ -1,31 +1,24 @@
 import { Router } from 'express';
-import * as RequestHandlers from './requestHandlers';
 import * as Validators from './validation';
+import { AuthController } from './controller';
+import { container } from '../../../compositionRoot';
 
 export const AuthRouter = Router();
 
-const AuthController = {
-    login: RequestHandlers.loginHandler,
-    logout: RequestHandlers.logoutHandler,
-    registration: RequestHandlers.registrationHandler,
-    refreshToken: RequestHandlers.refreshTokenHandler,
-    registrationConfirmation: RequestHandlers.registrationConfirmationHandler,
-    registrationEmailResending: RequestHandlers.registrationEmailResendingHandler,
-    me: RequestHandlers.meHandler,
-};
+const authController: AuthController = container.get(AuthController);
 
-AuthRouter.get('/me', ...Validators.meValidators, AuthController.me);
-AuthRouter.post('/login', ...Validators.loginValidators, AuthController.login);
-AuthRouter.post('/logout', ...Validators.logoutValidators, AuthController.logout);
-AuthRouter.post('/refresh-token', ...Validators.refreshTokenValidators, AuthController.refreshToken);
-AuthRouter.post('/registration', ...Validators.registrationValidators, AuthController.registration);
+AuthRouter.get('/me', ...Validators.meValidators, authController.me.bind(authController));
+AuthRouter.post('/login', ...Validators.loginValidators, authController.login.bind(authController));
+AuthRouter.post('/logout', ...Validators.logoutValidators, authController.logout.bind(authController));
+AuthRouter.post('/refresh-token', ...Validators.refreshTokenValidators, authController.refreshToken.bind(authController));
+AuthRouter.post('/registration', ...Validators.registrationValidators, authController.registration.bind(authController));
 AuthRouter.post(
     '/registration-confirmation',
     ...Validators.registrationConfirmationValidators,
-    AuthController.registrationConfirmation
+    authController.registrationConfirmation.bind(authController)
 );
 AuthRouter.post(
     '/registration-email-resending',
     ...Validators.registrationEmailResendingValidators,
-    AuthController.registrationEmailResending
+    authController.registrationEmailResending.bind(authController)
 );

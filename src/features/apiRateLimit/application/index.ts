@@ -1,3 +1,1 @@
-import { apiRatesLimitService } from './service';
-
-export { apiRatesLimitService };
+export * from './service';

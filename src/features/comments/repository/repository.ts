@@ -1,10 +1,12 @@
 import { ObjectId, WithId } from 'mongodb';
+import { injectable } from 'inversify';
 import { commentsCollection } from '../../../db';
 import { CreateUpdateCommentInputModel } from '../api/models';
 import { type TComment } from '../domain';
 import { RepositoryNotFoundError } from '../../../core/errors';
 
-export const commentsRepository = {
+@injectable()
+export class CommentsRepository {
     async findByIdOrFail(id: string): Promise<WithId<TComment>> {
         const res = await commentsCollection.findOne({ _id: new ObjectId(id) });
 
@@ -12,13 +14,13 @@ export const commentsRepository = {
             throw new RepositoryNotFoundError("Comment doesn't exist");
         }
         return res;
-    },
+    }
 
     async create(comment: TComment): Promise<string> {
         const { insertedId } = await commentsCollection.insertOne(comment);
 
         return insertedId.toString();
-    },
+    }
 
     async updateById(id: string, dto: CreateUpdateCommentInputModel): Promise<void> {
         const { matchedCount } = await commentsCollection.updateOne(
@@ -35,7 +37,7 @@ export const commentsRepository = {
         }
 
         return;
-    },
+    }
 
     async removeById(id: string): Promise<void> {
         const { deletedCount } = await commentsCollection.deleteOne({ _id: new ObjectId(id) });
@@ -45,5 +47,5 @@ export const commentsRepository = {
         }
 
         return;
-    },
-};
+    }
+}

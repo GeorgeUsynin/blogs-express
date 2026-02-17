@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { HTTP_STATUS_CODES } from '../core/constants';
-import { jwtService } from '../features/auth/application';
-import { usersRepository } from '../features/users/repository';
+import { JwtService } from '../features/auth/application';
+import { UsersRepository } from '../features/users/repository';
+import { container } from '../compositionRoot';
+
+const jwtService: JwtService = container.get(JwtService);
+const usersRepository: UsersRepository = container.get(UsersRepository);
 
 export const jwtAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const auth = req.headers['authorization'] as string;

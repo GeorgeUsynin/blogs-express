@@ -1,10 +1,12 @@
 import { ObjectId, WithId } from 'mongodb';
+import { injectable } from 'inversify';
 import { blogsCollection } from '../../../db';
 import { CreateUpdateBlogInputModel } from '../api/models';
 import { TBlog } from '../domain';
 import { RepositoryNotFoundError } from '../../../core/errors';
 
-export const blogsRepository = {
+@injectable()
+export class BlogsRepository {
     async findByIdOrFail(id: string): Promise<WithId<TBlog>> {
         const res = await blogsCollection.findOne({ _id: new ObjectId(id) });
 
@@ -12,13 +14,13 @@ export const blogsRepository = {
             throw new RepositoryNotFoundError("Blog doesn't exist");
         }
         return res;
-    },
+    }
 
     async create(blog: TBlog): Promise<string> {
         const { insertedId } = await blogsCollection.insertOne(blog);
 
         return insertedId.toString();
-    },
+    }
 
     async updateById(id: string, dto: CreateUpdateBlogInputModel): Promise<void> {
         const { matchedCount } = await blogsCollection.updateOne(
@@ -37,7 +39,7 @@ export const blogsRepository = {
         }
 
         return;
-    },
+    }
 
     async removeById(id: string): Promise<void> {
         const { deletedCount } = await blogsCollection.deleteOne({ _id: new ObjectId(id) });
@@ -47,5 +49,5 @@ export const blogsRepository = {
         }
 
         return;
-    },
-};
+    }
+}

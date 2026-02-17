@@ -1,4 +1,2 @@
-import { postsQueryRepository } from './queryRepository';
-import { postsRepository } from './repository';
-
-export { postsRepository, postsQueryRepository };
+export * from './repository';
+export * from './queryRepository';

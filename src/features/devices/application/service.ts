@@ -1,9 +1,16 @@
+import { inject, injectable } from 'inversify';
 import { ForbiddenError } from '../../../core/errors';
 import { TDevice } from '../domain';
-import { devicesRepository } from '../repository';
+import { DevicesRepository } from '../repository/repository';
 import { CreateDeviceDto } from './dto';
 
-export const devicesService = {
+@injectable()
+export class DevicesService {
+    constructor(
+        @inject(DevicesRepository)
+        public devicesRepository: DevicesRepository
+    ) {}
+
     async create(dto: CreateDeviceDto): Promise<string> {
         const newDevice: TDevice = {
             userId: dto.userId,
@@ -14,11 +21,11 @@ export const devicesService = {
             expiresIn: dto.expiresIn,
         };
 
-        return devicesRepository.create(newDevice);
-    },
+        return this.devicesRepository.create(newDevice);
+    }
 
     async terminateDeviceSessionByDeviceId(deviceId: string, userId: string): Promise<void> {
-        const foundDevice = await devicesRepository.findByDeviceIdOrFail(deviceId);
+        const foundDevice = await this.devicesRepository.findByDeviceIdOrFail(deviceId);
 
         const isUserDevice = foundDevice.userId === userId;
 
@@ -26,14 +33,14 @@ export const devicesService = {
             throw new ForbiddenError();
         }
 
-        await devicesRepository.removeByDeviceId(deviceId);
+        await this.devicesRepository.removeByDeviceId(deviceId);
 
         return;
-    },
+    }
 
     async terminateAllDeviceSessionsExceptCurrent(deviceId: string, userId: string): Promise<void> {
-        await devicesRepository.removeAllDevicesExceptCurrent(deviceId, userId);
+        await this.devicesRepository.removeAllDevicesExceptCurrent(deviceId, userId);
 
         return;
-    },
-};
+    }
+}

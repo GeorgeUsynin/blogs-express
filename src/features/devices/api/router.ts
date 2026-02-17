@@ -1,19 +1,20 @@
 import { Router } from 'express';
-import * as RequestHandlers from './requestHandlers';
 import * as Validators from './validation';
+import { DevicesController } from './controller';
+import { container } from '../../../compositionRoot';
 
 export const SecurityDevicesRouter = Router();
 
-const DevicesController = {
-    getAllDevices: RequestHandlers.getAllDevicesHandler,
-    deleteAllDevicesExceptCurrent: RequestHandlers.deleteAllDevicesExceptCurrentHandler,
-    deleteDeviceById: RequestHandlers.deleteDeviceByIdHandler,
-};
+const devicesController: DevicesController = container.get(DevicesController);
 
-SecurityDevicesRouter.get('/', ...Validators.getAllDevicesValidators, DevicesController.getAllDevices);
+SecurityDevicesRouter.get('/', ...Validators.getAllDevicesValidators, devicesController.getAllDevices.bind(devicesController));
 SecurityDevicesRouter.delete(
     '',
     ...Validators.deleteAllDevicesExceptCurrentValidators,
-    DevicesController.deleteAllDevicesExceptCurrent
+    devicesController.deleteAllDevicesExceptCurrent.bind(devicesController)
 );
-SecurityDevicesRouter.delete('/:id', ...Validators.deleteDeviceByIdValidators, DevicesController.deleteDeviceById);
+SecurityDevicesRouter.delete(
+    '/:id',
+    ...Validators.deleteDeviceByIdValidators,
+    devicesController.deleteDeviceById.bind(devicesController)
+);

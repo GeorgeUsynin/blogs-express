@@ -1,9 +1,11 @@
+import { injectable } from 'inversify';
 import { SETTINGS } from '../../../core/settings';
 import { apiRateLimitCollection } from '../../../db';
 import { RateLimitInputDto } from '../application/dto';
 import { TRateLimit } from '../domain';
 
-export const rateLimitsRepository = {
+@injectable()
+export class ApiRateLimitRepository {
     async getTotalCountOfFilteredAPIRequests(dto: RateLimitInputDto): Promise<number> {
         const startDate = new Date(Date.parse(dto.date) - SETTINGS.API_RATE_LIMIT_TTL_IN_MS).toISOString();
         const endDate = dto.date;
@@ -15,11 +17,11 @@ export const rateLimitsRepository = {
         });
 
         return totalCount;
-    },
+    }
 
     async create(rateLimit: TRateLimit): Promise<void> {
         await apiRateLimitCollection.insertOne(rateLimit);
 
         return;
-    },
-};
+    }
+}

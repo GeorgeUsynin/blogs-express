@@ -1,3 +1,4 @@
+import { injectable } from 'inversify';
 import jwt, { JsonWebTokenError, JwtPayload, SignOptions } from 'jsonwebtoken';
 import { SETTINGS } from '../../../core/settings';
 import { UnauthorizedError } from '../../../core/errors';
@@ -16,13 +17,14 @@ type IJwtPayload<T extends JwtKind> = T extends 'access'
       ? JwtPayload & TPayload<T>
       : never;
 
-export const jwtService = {
+@injectable()
+export class JwtService {
     createJwtToken<T extends JwtKind>(payload: TPayload<T>, expiresIn: SignOptions['expiresIn']) {
         const token = jwt.sign(payload, SETTINGS.JWT_SECRET!, {
             expiresIn,
         });
         return token;
-    },
+    }
 
     verifyToken<T extends JwtKind>(token: string) {
         try {
@@ -35,5 +37,5 @@ export const jwtService = {
 
             throw e;
         }
-    },
-};
+    }
+}

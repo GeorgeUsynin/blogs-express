@@ -1,3 +1,1 @@
-import { rateLimitsRepository } from './repository';
-
-export { rateLimitsRepository };
+export * from './repository';

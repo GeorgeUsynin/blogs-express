@@ -1,4 +1,5 @@
 import { WithId } from 'mongodb';
+import { injectable } from 'inversify';
 import { devicesCollection } from '../../../db';
 import { TDevice } from '../domain/device';
 import { RepositoryNotFoundError } from '../../../core/errors';
@@ -8,7 +9,8 @@ type TDeviceAttributes = {
     expiresIn: string;
 };
 
-export const devicesRepository = {
+@injectable()
+export class DevicesRepository {
     async findByDeviceIdOrFail(id: string): Promise<TDevice> {
         const res = await devicesCollection.findOne({ deviceId: id });
 
@@ -16,21 +18,21 @@ export const devicesRepository = {
             throw new RepositoryNotFoundError("Device doesn't exist");
         }
         return res;
-    },
+    }
 
     async findByDeviceId(id: string): Promise<WithId<TDevice> | null> {
         const res = await devicesCollection.findOne({ deviceId: id });
 
         return res;
-    },
+    }
 
     async create(device: TDevice): Promise<string> {
         const { insertedId } = await devicesCollection.insertOne(device);
 
         return insertedId.toString();
-    },
+    }
 
-    async updateByDeviceId(deviceId: string, deviceAttributes: TDeviceAttributes) {
+    async updateByDeviceId(deviceId: string, deviceAttributes: TDeviceAttributes): Promise<void> {
         const { matchedCount } = await devicesCollection.updateOne(
             { deviceId },
             {
@@ -46,7 +48,7 @@ export const devicesRepository = {
         }
 
         return;
-    },
+    }
 
     async removeByDeviceId(id: string): Promise<void> {
         const { deletedCount } = await devicesCollection.deleteOne({ deviceId: id });
@@ -56,11 +58,11 @@ export const devicesRepository = {
         }
 
         return;
-    },
+    }
 
     async removeAllDevicesExceptCurrent(deviceId: string, userId: string): Promise<void> {
         await devicesCollection.deleteMany({ userId, deviceId: { $ne: deviceId } });
 
         return;
-    },
-};
+    }
+}

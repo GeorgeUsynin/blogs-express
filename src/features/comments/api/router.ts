@@ -1,15 +1,12 @@
 import { Router } from 'express';
-import * as RequestHandlers from './requestHandlers';
 import * as Validators from './validation';
+import { CommentsController } from './controller';
+import { container } from '../../../compositionRoot';
 
 export const CommentsRouter = Router();
 
-const CommentsController = {
-    getCommentById: RequestHandlers.getCommentByIdHandler,
-    updateCommentById: RequestHandlers.updateCommentByIdHandler,
-    deleteCommentById: RequestHandlers.deleteCommentByIdHandler,
-};
+const commentsController: CommentsController = container.get(CommentsController);
 
-CommentsRouter.get('/:id', ...Validators.getByIdValidators, CommentsController.getCommentById);
-CommentsRouter.put('/:id', ...Validators.updateValidators, CommentsController.updateCommentById);
-CommentsRouter.delete('/:id', ...Validators.deleteValidators, CommentsController.deleteCommentById);
+CommentsRouter.get('/:id', ...Validators.getByIdValidators, commentsController.getCommentById.bind(commentsController));
+CommentsRouter.put('/:id', ...Validators.updateValidators, commentsController.updateCommentById.bind(commentsController));
+CommentsRouter.delete('/:id', ...Validators.deleteValidators, commentsController.deleteCommentById.bind(commentsController));

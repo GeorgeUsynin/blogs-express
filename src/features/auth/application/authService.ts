@@ -1,27 +1,42 @@
 import { randomUUID } from 'crypto';
+import { inject, injectable } from 'inversify';
 import { UnauthorizedError } from '../../../core/errors';
 import { SETTINGS } from '../../../core/settings';
-import { devicesService } from '../../devices/application';
-import { devicesRepository } from '../../devices/repository';
-import { usersRepository } from '../../users/repository';
+import { DevicesService } from '../../devices/application/service';
+import { DevicesRepository } from '../../devices/repository/repository';
+import { UsersRepository } from '../../users/repository/repository';
 import { CreateLoginDto } from './dto';
-import { jwtService } from './jwtService';
-import { passwordService } from './passwordService';
+import { JwtService } from './jwtService';
+import { PasswordService } from './passwordService';
 
-export const authService = {
+@injectable()
+export class AuthService {
+    constructor(
+        @inject(UsersRepository)
+        public usersRepository: UsersRepository,
+        @inject(PasswordService)
+        public passwordService: PasswordService,
+        @inject(JwtService)
+        public jwtService: JwtService,
+        @inject(DevicesService)
+        public devicesService: DevicesService,
+        @inject(DevicesRepository)
+        public devicesRepository: DevicesRepository
+    ) {}
+
     async login(loginAttributes: CreateLoginDto): Promise<{
         accessToken: string;
         refreshToken: string;
     }> {
         const { loginOrEmail, password, clientIp, deviceName } = loginAttributes;
 
-        const user = await usersRepository.findUserByLoginOrEmail(loginOrEmail);
+        const user = await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
 
         if (!user) {
             throw new UnauthorizedError();
         }
 
-        const isValidPassword = await passwordService.comparePassword(password, user.passwordHash);
+        const isValidPassword = await this.passwordService.comparePassword(password, user.passwordHash);
 
         if (!isValidPassword) {
             throw new UnauthorizedError();
@@ -35,11 +50,11 @@ export const authService = {
 
         const { accessToken, refreshToken } = this._generateTokens(user._id.toString(), uniqueDeviceId);
 
-        const { iat, exp } = jwtService.verifyToken(refreshToken);
+        const { iat, exp } = this.jwtService.verifyToken<'refresh'>(refreshToken);
         const issuedAt = new Date(iat! * 1000).toISOString();
         const expiresIn = new Date(exp! * 1000).toISOString();
 
-        await devicesService.create({
+        await this.devicesService.create({
             userId: user._id.toString(),
             deviceId: uniqueDeviceId,
             clientIp,
@@ -49,13 +64,13 @@ export const authService = {
         });
 
         return { accessToken, refreshToken };
-    },
+    }
 
     async logout(deviceId: string): Promise<void> {
-        await devicesRepository.removeByDeviceId(deviceId);
+        await this.devicesRepository.removeByDeviceId(deviceId);
 
         return;
-    },
+    }
 
     async updateTokens(
         userId: string,
@@ -66,27 +81,27 @@ export const authService = {
     }> {
         const { accessToken, refreshToken } = this._generateTokens(userId, deviceId);
 
-        const { iat, exp } = jwtService.verifyToken(refreshToken);
+        const { iat, exp } = this.jwtService.verifyToken<'refresh'>(refreshToken);
         const issuedAt = new Date(iat! * 1000).toISOString();
         const expiresIn = new Date(exp! * 1000).toISOString();
         const payload = { issuedAt, expiresIn };
 
-        await devicesRepository.updateByDeviceId(deviceId, payload);
+        await this.devicesRepository.updateByDeviceId(deviceId, payload);
 
         return { accessToken, refreshToken };
-    },
+    }
 
     _generateTokens(userId: string, deviceId: string) {
-        const accessToken = jwtService.createJwtToken<'access'>(
+        const accessToken = this.jwtService.createJwtToken<'access'>(
             { userId },
             SETTINGS.JWT_ACCESS_TOKEN_EXPIRATION_IN_HOURS
         );
 
-        const refreshToken = jwtService.createJwtToken<'refresh'>(
+        const refreshToken = this.jwtService.createJwtToken<'refresh'>(
             { deviceId, userId },
             SETTINGS.JWT_REFRESH_TOKEN_EXPIRATION_IN_HOURS
         );
 
         return { accessToken, refreshToken };
-    },
-};
+    }
+}

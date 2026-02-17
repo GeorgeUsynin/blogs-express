@@ -2,8 +2,7 @@ import { add } from 'date-fns/add';
 import { HTTP_STATUS_CODES, ROUTES } from '../../core/constants';
 import { CreateLoginInputModel, RegistrationConfirmationInputModel } from '../../features/auth/api/models';
 import { CreateUserInputModel } from '../../features/users/api/models';
-import { usersRepository } from '../../features/users/repository';
-import { emailManager } from '../../shared/managers';
+import { EmailAdapter } from '../../shared/adapters';
 import { dbHelper, getAuthorization, request } from '../test-helpers';
 
 describe('auth registration-related endpoints', () => {
@@ -11,7 +10,7 @@ describe('auth registration-related endpoints', () => {
 
     beforeAll(async () => {
         await dbHelper.connectToDb();
-        sendConfirmationEmailSpy = jest.spyOn(emailManager, 'sendConfirmationEmail').mockImplementation(() => {});
+        sendConfirmationEmailSpy = jest.spyOn(EmailAdapter.prototype, 'sendEmail').mockImplementation(() => {});
     });
 
     afterEach(async () => {
@@ -31,6 +30,28 @@ describe('auth registration-related endpoints', () => {
         email: 'new-user@example.com',
     };
 
+    const findUserByEmail = async (email: string) => {
+        const { body } = await request
+            .get(ROUTES.USERS)
+            .set(getAuthorization())
+            .query({ searchTermEmail: email, searchEmailTerm: email })
+            .expect(HTTP_STATUS_CODES.OK_200);
+
+        const user = body.items.find((u: { email: string }) => u.email === email);
+        expect(user).toBeDefined();
+
+        return user;
+    };
+
+    const getLastConfirmationCode = (): string => {
+        const lastCall = sendConfirmationEmailSpy.mock.calls[sendConfirmationEmailSpy.mock.calls.length - 1];
+        const message = lastCall?.[2] as string | undefined;
+        const code = message?.match(/code=([^']+)/)?.[1];
+
+        expect(code).toBeDefined();
+        return code!;
+    };
+
     describe('POST /auth/registration', () => {
         it('creates an unconfirmed user and does not allow login before confirmation', async () => {
             await request
@@ -41,6 +62,7 @@ describe('auth registration-related endpoints', () => {
             expect(sendConfirmationEmailSpy).toHaveBeenCalledTimes(1);
             expect(sendConfirmationEmailSpy).toHaveBeenCalledWith(
                 registrationPayload.email,
+                'Email Confirmation',
                 expect.any(String)
             );
 
@@ -125,16 +147,15 @@ describe('auth registration-related endpoints', () => {
                 .send(registrationPayload)
                 .expect(HTTP_STATUS_CODES.NO_CONTENT_204);
 
-            const user = await usersRepository.findUserByEmail(registrationPayload.email);
-            expect(user).not.toBeNull();
-            return user!;
+            await findUserByEmail(registrationPayload.email);
+            return { code: getLastConfirmationCode() };
         };
 
         it('confirms registration and allows login', async () => {
             const createdUser = await createUnconfirmedUser();
 
             const payload: RegistrationConfirmationInputModel = {
-                code: createdUser.emailConfirmation.confirmationCode,
+                code: createdUser.code,
             };
 
             await request
@@ -171,7 +192,7 @@ describe('auth registration-related endpoints', () => {
         it('returns 400 when confirmation code is already applied', async () => {
             const createdUser = await createUnconfirmedUser();
             const payload: RegistrationConfirmationInputModel = {
-                code: createdUser.emailConfirmation.confirmationCode,
+                code: createdUser.code,
             };
 
             await request
@@ -197,18 +218,14 @@ describe('auth registration-related endpoints', () => {
 
         it('returns 400 when confirmation code is expired', async () => {
             const createdUser = await createUnconfirmedUser();
-            const expiredDate = add(new Date(), { minutes: -1 }).toISOString();
-
-            await usersRepository.updateEmailConfirmationAttributes(
-                createdUser._id.toString(),
-                createdUser.emailConfirmation.confirmationCode,
-                expiredDate
-            );
+            const dateNowSpy = jest.spyOn(Date, 'now').mockReturnValue(add(new Date(), { days: 10 }).getTime());
 
             const { body } = await request
                 .post(`${ROUTES.AUTH}/registration-confirmation`)
-                .send({ code: createdUser.emailConfirmation.confirmationCode })
+                .send({ code: createdUser.code })
                 .expect(HTTP_STATUS_CODES.BAD_REQUEST_400);
+
+            dateNowSpy.mockRestore();
 
             expect(body).toEqual({
                 errorsMessages: [
@@ -229,14 +246,13 @@ describe('auth registration-related endpoints', () => {
                 .send(registrationPayload)
                 .expect(HTTP_STATUS_CODES.NO_CONTENT_204);
 
-            const user = await usersRepository.findUserByEmail(registrationPayload.email);
-            expect(user).not.toBeNull();
-            return user!;
+            await findUserByEmail(registrationPayload.email);
+            return { code: getLastConfirmationCode() };
         };
 
         it('resends confirmation email, rotates code and invalidates previous code', async () => {
             const createdUser = await createUnconfirmedUser();
-            const oldCode = createdUser.emailConfirmation.confirmationCode;
+            const oldCode = createdUser.code;
 
             await request
                 .post(`${ROUTES.AUTH}/registration-email-resending`)
@@ -244,11 +260,14 @@ describe('auth registration-related endpoints', () => {
                 .expect(HTTP_STATUS_CODES.NO_CONTENT_204);
 
             expect(sendConfirmationEmailSpy).toHaveBeenCalledTimes(2);
-            expect(sendConfirmationEmailSpy).toHaveBeenLastCalledWith(registrationPayload.email, expect.any(String));
-
-            const updatedUser = await usersRepository.findUserByEmail(registrationPayload.email);
-            expect(updatedUser).not.toBeNull();
-            expect(updatedUser!.emailConfirmation.confirmationCode).not.toBe(oldCode);
+            expect(sendConfirmationEmailSpy).toHaveBeenLastCalledWith(
+                registrationPayload.email,
+                'Email Confirmation',
+                expect.any(String)
+            );
+            await findUserByEmail(registrationPayload.email);
+            const newCode = getLastConfirmationCode();
+            expect(newCode).not.toBe(oldCode);
 
             const { body: invalidOldCodeBody } = await request
                 .post(`${ROUTES.AUTH}/registration-confirmation`)

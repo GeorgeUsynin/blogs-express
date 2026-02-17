@@ -1,23 +1,34 @@
+import { inject, injectable } from 'inversify';
 import { BadRequestError } from '../../../core/errors';
-import { emailManager } from '../../../shared/managers/emailManager';
+import { EmailManager } from '../../../shared/managers/emailManager';
 import { CreateUserInputModel } from '../../users/api/models';
-import { usersService } from '../../users/application';
-import { usersRepository } from '../../users/repository';
+import { UsersService } from '../../users/application/service';
+import { UsersRepository } from '../../users/repository/repository';
 import { RegistrationConfirmationInputModel, RegistrationEmailResendingInputModel } from '../api/models';
 
-export const registrationService = {
+@injectable()
+export class RegistrationService {
+    constructor(
+        @inject(UsersService)
+        public usersService: UsersService,
+        @inject(UsersRepository)
+        public usersRepository: UsersRepository,
+        @inject(EmailManager)
+        public emailManager: EmailManager
+    ) {}
+
     async registerNewUser(userAttributes: CreateUserInputModel): Promise<void> {
-        const createdUserId = await usersService.create(userAttributes);
+        const createdUserId = await this.usersService.create(userAttributes);
 
-        const user = await usersRepository.findByIdOrFail(createdUserId);
+        const user = await this.usersRepository.findByIdOrFail(createdUserId);
 
-        emailManager.sendConfirmationEmail(user.email, user.emailConfirmation.confirmationCode);
+        this.emailManager.sendConfirmationEmail(user.email, user.emailConfirmation.confirmationCode);
 
         return;
-    },
+    }
 
     async confirmRegistration(confirmationAttributes: RegistrationConfirmationInputModel): Promise<void> {
-        const user = await usersRepository.findUserByConfirmationCode(confirmationAttributes.code);
+        const user = await this.usersRepository.findUserByConfirmationCode(confirmationAttributes.code);
 
         if (!user) {
             throw new BadRequestError('Invalid confirmation code', 'code');
@@ -33,15 +44,15 @@ export const registrationService = {
             throw new BadRequestError('Confirmation code is expired', 'code');
         }
 
-        await usersRepository.setEmailConfirmed(user._id.toString());
+        await this.usersRepository.setEmailConfirmed(user._id.toString());
 
         return;
-    },
+    }
 
     async resendEmailConfirmationCode(
         resendingConfirmationEmailAttributes: RegistrationEmailResendingInputModel
     ): Promise<void> {
-        const user = await usersRepository.findUserByEmail(resendingConfirmationEmailAttributes.email);
+        const user = await this.usersRepository.findUserByEmail(resendingConfirmationEmailAttributes.email);
 
         if (!user) {
             throw new BadRequestError('Invalid email', 'email');
@@ -51,10 +62,10 @@ export const registrationService = {
             throw new BadRequestError('Confirmation code already been applied', 'code');
         }
 
-        const confirmationCode = await usersService.createAndUpdateEmailConfirmationCode(user._id.toString());
+        const confirmationCode = await this.usersService.createAndUpdateEmailConfirmationCode(user._id.toString());
 
-        emailManager.sendConfirmationEmail(resendingConfirmationEmailAttributes.email, confirmationCode);
+        this.emailManager.sendConfirmationEmail(resendingConfirmationEmailAttributes.email, confirmationCode);
 
         return;
-    },
-};
+    }
+}

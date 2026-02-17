@@ -1,3 +1,1 @@
-import { devicesService } from './service';
-
-export { devicesService };
+export * from './service';

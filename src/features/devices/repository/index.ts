@@ -1,4 +1,2 @@
-import { devicesRepository } from './repository';
-import { devicesQueryRepository } from './queryRepository';
-
-export { devicesRepository, devicesQueryRepository };
+export * from './repository';
+export * from './queryRepository';

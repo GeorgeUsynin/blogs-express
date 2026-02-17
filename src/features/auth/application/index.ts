@@ -1,6 +1,4 @@
-import { passwordService } from './passwordService';
-import { authService } from './authService';
-import { jwtService } from './jwtService';
-import { registrationService } from './registrationService';
-
-export { authService, passwordService, jwtService, registrationService };
+export * from './passwordService';
+export * from './authService';
+export * from './jwtService';
+export * from './registrationService';

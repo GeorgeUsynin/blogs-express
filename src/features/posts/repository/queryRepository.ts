@@ -1,4 +1,5 @@
 import { ObjectId, WithId } from 'mongodb';
+import { injectable } from 'inversify';
 import { RepositoryNotFoundError } from '../../../core/errors';
 import { TPost } from '../domain';
 import { PostQueryInput } from '../api/models';
@@ -6,17 +7,18 @@ import { postsCollection } from '../../../db';
 
 type FindPostsFilter = Partial<Pick<TPost, 'blogId'>>;
 
-export const postsQueryRepository = {
+@injectable()
+export class PostsQueryRepository {
     async findMany(queryDto: PostQueryInput): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
         return this.findManyWithFilter(queryDto);
-    },
+    }
 
     async findManyByBlogId(
         blogId: string,
         queryDto: PostQueryInput
     ): Promise<{ items: WithId<TPost>[]; totalCount: number }> {
         return this.findManyWithFilter(queryDto, { blogId });
-    },
+    }
 
     async findManyWithFilter(
         queryDto: PostQueryInput,
@@ -36,7 +38,7 @@ export const postsQueryRepository = {
         const totalCount = await postsCollection.countDocuments(filter);
 
         return { items, totalCount };
-    },
+    }
 
     async findByIdOrFail(id: string): Promise<WithId<TPost>> {
         const res = await postsCollection.findOne({ _id: new ObjectId(id) });
@@ -45,5 +47,5 @@ export const postsQueryRepository = {
             throw new RepositoryNotFoundError("Post doesn't exist");
         }
         return res;
-    },
-};
+    }
+}

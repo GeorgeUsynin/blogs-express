@@ -1,10 +1,12 @@
 import { ObjectId, WithId } from 'mongodb';
+import { injectable } from 'inversify';
 import { UserQueryInput } from '../api/models';
 import { TUser } from '../domain';
 import { usersCollection } from '../../../db';
 import { RepositoryNotFoundError } from '../../../core/errors';
 
-export const usersQueryRepository = {
+@injectable()
+export class UsersQueryRepository {
     async findMany(queryDto: UserQueryInput): Promise<{ items: WithId<TUser>[]; totalCount: number }> {
         const { sortBy, sortDirection, pageNumber, pageSize, searchEmailTerm, searchLoginTerm } = queryDto;
 
@@ -39,14 +41,14 @@ export const usersQueryRepository = {
         const totalCount = await usersCollection.countDocuments(filter);
 
         return { items, totalCount };
-    },
+    }
 
     async findByIdOrFail(id: string): Promise<WithId<TUser>> {
         const res = await usersCollection.findOne({ _id: new ObjectId(id) });
 
         if (!res) {
-            throw new RepositoryNotFoundError("Blog doesn't exist");
+            throw new RepositoryNotFoundError("User doesn't exist");
         }
         return res;
-    },
-};
+    }
+}

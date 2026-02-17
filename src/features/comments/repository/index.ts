@@ -1,4 +1,2 @@
-import { commentsQueryRepository } from './queryRepository';
-import { commentsRepository } from './repository';
-
-export { commentsRepository, commentsQueryRepository };
+export * from './repository';
+export * from './queryRepository';

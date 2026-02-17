@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { HTTP_STATUS_CODES } from '../core/constants';
-import { jwtService } from '../features/auth/application';
-import { devicesRepository } from '../features/devices/repository';
+import { JwtService } from '../features/auth/application';
+import { DevicesRepository } from '../features/devices/repository';
+import { container } from '../compositionRoot';
+
+const jwtService: JwtService = container.get(JwtService);
+const devicesRepository: DevicesRepository = container.get(DevicesRepository);
 
 export const refreshAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken;
@@ -11,7 +15,6 @@ export const refreshAuthMiddleware = async (req: Request, res: Response, next: N
         return;
     }
 
-    // verifyToken also checking expiration date under the hood
     const { deviceId, userId, iat } = jwtService.verifyToken<'refresh'>(refreshToken);
     const device = await devicesRepository.findByDeviceId(deviceId);
 

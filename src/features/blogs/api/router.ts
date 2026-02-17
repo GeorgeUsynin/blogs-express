@@ -1,27 +1,24 @@
 import { Router } from 'express';
-import * as RequestHandlers from './requestHandlers';
 import * as Validators from './validation';
+import { BlogsController } from './controller';
+import { container } from '../../../compositionRoot';
 
 export const BlogsRouter = Router();
 
-const BlogsController = {
-    getAllBlogs: RequestHandlers.getAllBlogsHandler,
-    getBlogById: RequestHandlers.getBlogByIdHandler,
-    getPostsByBlogId: RequestHandlers.getPostsByBlogIdHandler,
-    createBlog: RequestHandlers.createBlogHandler,
-    createPostForBlogByBlogId: RequestHandlers.createPostForBlogByBlogIdHandler,
-    updateBlogById: RequestHandlers.updateBlogByIdHandler,
-    deleteBlogById: RequestHandlers.deleteBlogByIdHandler,
-};
+const blogsController: BlogsController = container.get(BlogsController);
 
-BlogsRouter.get('/', ...Validators.getValidators, BlogsController.getAllBlogs);
-BlogsRouter.get('/:id', ...Validators.getByIdValidators, BlogsController.getBlogById);
-BlogsRouter.get('/:id/posts', ...Validators.getPostsByBlogIdValidators, BlogsController.getPostsByBlogId);
-BlogsRouter.post('/', ...Validators.postValidators, BlogsController.createBlog);
+BlogsRouter.get('/', ...Validators.getValidators, blogsController.getAllBlogs.bind(blogsController));
+BlogsRouter.get('/:id', ...Validators.getByIdValidators, blogsController.getBlogById.bind(blogsController));
+BlogsRouter.get(
+    '/:id/posts',
+    ...Validators.getPostsByBlogIdValidators,
+    blogsController.getPostsByBlogId.bind(blogsController)
+);
+BlogsRouter.post('/', ...Validators.postValidators, blogsController.createBlog.bind(blogsController));
 BlogsRouter.post(
     '/:id/posts',
     ...Validators.createPostForBlogByBlogIdValidators,
-    BlogsController.createPostForBlogByBlogId
+    blogsController.createPostForBlogByBlogId.bind(blogsController)
 );
-BlogsRouter.put('/:id', ...Validators.updateValidators, BlogsController.updateBlogById);
-BlogsRouter.delete('/:id', ...Validators.deleteValidators, BlogsController.deleteBlogById);
+BlogsRouter.put('/:id', ...Validators.updateValidators, blogsController.updateBlogById.bind(blogsController));
+BlogsRouter.delete('/:id', ...Validators.deleteValidators, blogsController.deleteBlogById.bind(blogsController));

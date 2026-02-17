@@ -1,4 +1,5 @@
 import { ObjectId, WithId } from 'mongodb';
+import { injectable } from 'inversify';
 import { RepositoryNotFoundError } from '../../../core/errors';
 import { TComment } from '../domain';
 import { CommentQueryInput } from '../api/models';
@@ -6,17 +7,18 @@ import { commentsCollection } from '../../../db';
 
 type FindCommentsFilter = Partial<Pick<TComment, 'postId'>>;
 
-export const commentsQueryRepository = {
+@injectable()
+export class CommentsQueryRepository {
     async findMany(queryDto: CommentQueryInput): Promise<{ items: WithId<TComment>[]; totalCount: number }> {
         return this.findManyWithFilter(queryDto);
-    },
+    }
 
     async findManyByPostId(
         postId: string,
         queryDto: CommentQueryInput
     ): Promise<{ items: WithId<TComment>[]; totalCount: number }> {
         return this.findManyWithFilter(queryDto, { postId });
-    },
+    }
 
     async findManyWithFilter(
         queryDto: CommentQueryInput,
@@ -36,7 +38,7 @@ export const commentsQueryRepository = {
         const totalCount = await commentsCollection.countDocuments(filter);
 
         return { items, totalCount };
-    },
+    }
 
     async findByIdOrFail(id: string): Promise<WithId<TComment>> {
         const res = await commentsCollection.findOne({ _id: new ObjectId(id) });
@@ -45,5 +47,5 @@ export const commentsQueryRepository = {
             throw new RepositoryNotFoundError("Comment doesn't exist");
         }
         return res;
-    },
-};
+    }
+}

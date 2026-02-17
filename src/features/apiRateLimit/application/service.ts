@@ -1,12 +1,19 @@
+import { inject, injectable } from 'inversify';
 import { TRateLimit } from '../domain';
 import { RateLimitInputDto } from './dto';
-import { rateLimitsRepository } from '../repository';
 import { SETTINGS } from '../../../core/settings';
 import { RateLimitError } from '../../../core/errors';
+import { ApiRateLimitRepository } from '../repository/repository';
 
-export const apiRatesLimitService = {
+@injectable()
+export class ApiRateLimitService {
+    constructor(
+        @inject(ApiRateLimitRepository)
+        public rateLimitsRepository: ApiRateLimitRepository
+    ) {}
+
     async logApiRequest(dto: RateLimitInputDto): Promise<void> {
-        const totalCountOfFilteredApiRequests = await rateLimitsRepository.getTotalCountOfFilteredAPIRequests(dto);
+        const totalCountOfFilteredApiRequests = await this.rateLimitsRepository.getTotalCountOfFilteredAPIRequests(dto);
 
         if (totalCountOfFilteredApiRequests === SETTINGS.API_RATE_LIMIT_MAXIMUM_ATTEMPTS) {
             throw new RateLimitError(
@@ -20,8 +27,8 @@ export const apiRatesLimitService = {
             createdAt: dto.date,
         };
 
-        await rateLimitsRepository.create(rateLimit);
+        await this.rateLimitsRepository.create(rateLimit);
 
         return;
-    },
-};
+    }
+}

@@ -1,3 +1,4 @@
+import { injectable } from 'inversify';
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -8,7 +9,8 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const emailAdapter = {
+@injectable()
+export class EmailAdapter {
     sendEmail(email: string, subject: string, message: string) {
         transporter
             .sendMail({
@@ -21,5 +23,5 @@ export const emailAdapter = {
                 console.error(err);
                 throw new Error('Email adapter send error');
             });
-    },
-};
+    }
+}
