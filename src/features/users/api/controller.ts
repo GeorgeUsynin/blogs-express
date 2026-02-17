@@ -13,9 +13,9 @@ import { UsersQueryRepository } from '../repository/queryRepository';
 export class UsersController {
     constructor(
         @inject(UsersService)
-        public usersService: UsersService,
+        private usersService: UsersService,
         @inject(UsersQueryRepository)
-        public usersQueryRepository: UsersQueryRepository
+        private usersQueryRepository: UsersQueryRepository
     ) {}
 
     async getAllUsers(req: RequestWithQuery<Partial<UserQueryInput>>, res: Response<UserListPaginatedOutput>) {

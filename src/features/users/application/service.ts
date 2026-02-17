@@ -2,7 +2,7 @@ import { add } from 'date-fns/add';
 import { randomUUID } from 'node:crypto';
 import { inject, injectable } from 'inversify';
 import { BadRequestError } from '../../../core/errors';
-import { PasswordService } from '../../auth/application/passwordService';
+import { PasswordHasher } from '../../auth/application/passwordHasher';
 import { CreateUserInputModel } from '../api/models';
 import { TUser } from '../domain';
 import { UsersRepository } from '../repository/repository';
@@ -12,9 +12,9 @@ import { SETTINGS } from '../../../core/settings';
 export class UsersService {
     constructor(
         @inject(UsersRepository)
-        public usersRepository: UsersRepository,
-        @inject(PasswordService)
-        public passwordService: PasswordService
+        private usersRepository: UsersRepository,
+        @inject(PasswordHasher)
+        private passwordHasher: PasswordHasher
     ) {}
 
     async create(userAttributes: CreateUserInputModel, isConfirmed: boolean = false): Promise<string> {
@@ -30,16 +30,20 @@ export class UsersService {
             throw new BadRequestError('The email address is not unique', 'email');
         }
 
-        const passwordHash = await this.passwordService.hashPassword(password);
+        const passwordHash = await this.passwordHasher.hashPassword(password);
 
         const user: TUser = {
             email,
             login,
             passwordHash,
             emailConfirmation: {
-                confirmationCode: this._generateConfirmationCode(),
+                confirmationCode: this._generateUUIDCode(),
                 expirationDate: this._generateExpirationDate(),
                 isConfirmed,
+            },
+            passwordRecovery: {
+                recoveryCode: null,
+                expirationDate: null,
             },
             createdAt: new Date().toISOString(),
         };
@@ -54,7 +58,7 @@ export class UsersService {
     }
 
     async createAndUpdateEmailConfirmationCode(userId: string): Promise<string> {
-        const confirmationCode = this._generateConfirmationCode();
+        const confirmationCode = this._generateUUIDCode();
         const expirationDate = this._generateExpirationDate();
 
         await this.usersRepository.updateEmailConfirmationAttributes(userId, confirmationCode, expirationDate);
@@ -62,7 +66,16 @@ export class UsersService {
         return confirmationCode;
     }
 
-    _generateConfirmationCode(): string {
+    async createAndUpdatePasswordRecoveryCode(userId: string): Promise<string> {
+        const recoveryCode = this._generateUUIDCode();
+        const expirationDate = this._generateExpirationDate();
+
+        await this.usersRepository.updatePasswordRecoveryAttributes(userId, recoveryCode, expirationDate);
+
+        return recoveryCode;
+    }
+
+    _generateUUIDCode(): string {
         return randomUUID();
     }
 

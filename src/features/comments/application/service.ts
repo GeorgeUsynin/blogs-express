@@ -10,11 +10,11 @@ import { CommentsRepository } from '../repository/repository';
 export class CommentsService {
     constructor(
         @inject(CommentsRepository)
-        public commentsRepository: CommentsRepository,
+        private commentsRepository: CommentsRepository,
         @inject(PostsRepository)
-        public postsRepository: PostsRepository,
+        private postsRepository: PostsRepository,
         @inject(UsersRepository)
-        public usersRepository: UsersRepository
+        private usersRepository: UsersRepository
     ) {}
 
     async removeById(commentId: string, userId: string): Promise<void> {

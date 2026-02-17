@@ -1,7 +1,13 @@
 import 'reflect-metadata';
 import { Container } from 'inversify';
 import { AuthController } from './features/auth/api/controller';
-import { AuthService, JwtService, PasswordService, RegistrationService } from './features/auth/application';
+import {
+    AuthService,
+    JwtProvider,
+    PasswordHasher,
+    PasswordRecoveryService,
+    RegistrationService,
+} from './features/auth/application';
 import { BlogsController } from './features/blogs/api/controller';
 import { BlogsService } from './features/blogs/application';
 import { BlogsQueryRepository } from './features/blogs/repository/queryRepository';
@@ -31,9 +37,10 @@ export const container: Container = new Container();
 
 container.bind(AuthController).toSelf();
 container.bind(AuthService).toSelf();
-container.bind(JwtService).toSelf();
-container.bind(PasswordService).toSelf();
+container.bind(JwtProvider).toSelf();
+container.bind(PasswordHasher).toSelf();
 container.bind(RegistrationService).toSelf();
+container.bind(PasswordRecoveryService).toSelf();
 
 container.bind(BlogsController).toSelf();
 container.bind(BlogsService).toSelf();

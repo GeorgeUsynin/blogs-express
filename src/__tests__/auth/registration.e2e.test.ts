@@ -1,4 +1,5 @@
 import { add } from 'date-fns/add';
+import { randomUUID } from 'node:crypto';
 import { HTTP_STATUS_CODES, ROUTES } from '../../core/constants';
 import { CreateLoginInputModel, RegistrationConfirmationInputModel } from '../../features/auth/api/models';
 import { CreateUserInputModel } from '../../features/users/api/models';
@@ -173,9 +174,11 @@ describe('auth registration-related endpoints', () => {
         });
 
         it('returns 400 for invalid confirmation code', async () => {
+            const nonExistentCode = randomUUID();
+
             const { body } = await request
                 .post(`${ROUTES.AUTH}/registration-confirmation`)
-                .send({ code: 'unknown-code' })
+                .send({ code: nonExistentCode })
                 .expect(HTTP_STATUS_CODES.BAD_REQUEST_400);
 
             expect(body).toEqual({

@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { HTTP_STATUS_CODES } from '../core/constants';
-import { JwtService } from '../features/auth/application';
+import { JwtProvider } from '../features/auth/application';
 import { DevicesRepository } from '../features/devices/repository';
 import { container } from '../compositionRoot';
 
-const jwtService: JwtService = container.get(JwtService);
+const jwtProvider: JwtProvider = container.get(JwtProvider);
 const devicesRepository: DevicesRepository = container.get(DevicesRepository);
 
 export const refreshAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +15,7 @@ export const refreshAuthMiddleware = async (req: Request, res: Response, next: N
         return;
     }
 
-    const { deviceId, userId, iat } = jwtService.verifyToken<'refresh'>(refreshToken);
+    const { deviceId, userId, iat } = jwtProvider.verifyToken<'refresh'>(refreshToken);
     const device = await devicesRepository.findByDeviceId(deviceId);
 
     if (!device) {

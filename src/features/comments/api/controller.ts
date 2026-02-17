@@ -11,9 +11,9 @@ import { CommentsQueryRepository } from '../repository/queryRepository';
 export class CommentsController {
     constructor(
         @inject(CommentsService)
-        public commentsService: CommentsService,
+        private commentsService: CommentsService,
         @inject(CommentsQueryRepository)
-        public commentsQueryRepository: CommentsQueryRepository
+        private commentsQueryRepository: CommentsQueryRepository
     ) {}
 
     async getCommentById(req: Request<URIParamsCommentModel>, res: Response<CommentViewModel>) {

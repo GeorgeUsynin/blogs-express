@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { HTTP_STATUS_CODES } from '../core/constants';
-import { JwtService } from '../features/auth/application';
+import { JwtProvider } from '../features/auth/application';
 import { UsersRepository } from '../features/users/repository';
 import { container } from '../compositionRoot';
 
-const jwtService: JwtService = container.get(JwtService);
+const jwtProvider: JwtProvider = container.get(JwtProvider);
 const usersRepository: UsersRepository = container.get(UsersRepository);
 
 export const jwtAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -22,7 +22,7 @@ export const jwtAuthMiddleware = async (req: Request, res: Response, next: NextF
         return;
     }
 
-    const { userId } = jwtService.verifyToken<'access'>(token);
+    const { userId } = jwtProvider.verifyToken<'access'>(token);
 
     await usersRepository.findByIdOrFail(userId);
 

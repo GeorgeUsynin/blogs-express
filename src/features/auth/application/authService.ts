@@ -6,22 +6,22 @@ import { DevicesService } from '../../devices/application/service';
 import { DevicesRepository } from '../../devices/repository/repository';
 import { UsersRepository } from '../../users/repository/repository';
 import { CreateLoginDto } from './dto';
-import { JwtService } from './jwtService';
-import { PasswordService } from './passwordService';
+import { JwtProvider } from './jwtProvider';
+import { PasswordHasher } from './passwordHasher';
 
 @injectable()
 export class AuthService {
     constructor(
         @inject(UsersRepository)
-        public usersRepository: UsersRepository,
-        @inject(PasswordService)
-        public passwordService: PasswordService,
-        @inject(JwtService)
-        public jwtService: JwtService,
+        private usersRepository: UsersRepository,
+        @inject(PasswordHasher)
+        private passwordHasher: PasswordHasher,
+        @inject(JwtProvider)
+        private jwtProvider: JwtProvider,
         @inject(DevicesService)
-        public devicesService: DevicesService,
+        private devicesService: DevicesService,
         @inject(DevicesRepository)
-        public devicesRepository: DevicesRepository
+        private devicesRepository: DevicesRepository
     ) {}
 
     async login(loginAttributes: CreateLoginDto): Promise<{
@@ -36,7 +36,7 @@ export class AuthService {
             throw new UnauthorizedError();
         }
 
-        const isValidPassword = await this.passwordService.comparePassword(password, user.passwordHash);
+        const isValidPassword = await this.passwordHasher.comparePassword(password, user.passwordHash);
 
         if (!isValidPassword) {
             throw new UnauthorizedError();
@@ -50,7 +50,7 @@ export class AuthService {
 
         const { accessToken, refreshToken } = this._generateTokens(user._id.toString(), uniqueDeviceId);
 
-        const { iat, exp } = this.jwtService.verifyToken<'refresh'>(refreshToken);
+        const { iat, exp } = this.jwtProvider.verifyToken<'refresh'>(refreshToken);
         const issuedAt = new Date(iat! * 1000).toISOString();
         const expiresIn = new Date(exp! * 1000).toISOString();
 
@@ -81,7 +81,7 @@ export class AuthService {
     }> {
         const { accessToken, refreshToken } = this._generateTokens(userId, deviceId);
 
-        const { iat, exp } = this.jwtService.verifyToken<'refresh'>(refreshToken);
+        const { iat, exp } = this.jwtProvider.verifyToken<'refresh'>(refreshToken);
         const issuedAt = new Date(iat! * 1000).toISOString();
         const expiresIn = new Date(exp! * 1000).toISOString();
         const payload = { issuedAt, expiresIn };
@@ -92,12 +92,12 @@ export class AuthService {
     }
 
     _generateTokens(userId: string, deviceId: string) {
-        const accessToken = this.jwtService.createJwtToken<'access'>(
+        const accessToken = this.jwtProvider.createJwtToken<'access'>(
             { userId },
             SETTINGS.JWT_ACCESS_TOKEN_EXPIRATION_IN_HOURS
         );
 
-        const refreshToken = this.jwtService.createJwtToken<'refresh'>(
+        const refreshToken = this.jwtProvider.createJwtToken<'refresh'>(
             { deviceId, userId },
             SETTINGS.JWT_REFRESH_TOKEN_EXPIRATION_IN_HOURS
         );

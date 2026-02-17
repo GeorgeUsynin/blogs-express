@@ -8,22 +8,26 @@ import {
     CreateLoginInputModel,
     LoginOutputModel,
     MeOutputModel,
+    NewPasswordInputModel,
+    PasswordRecoveryInputModel,
     RegistrationConfirmationInputModel,
     RegistrationEmailResendingInputModel,
 } from './models';
 import { CreateUserInputModel } from '../../users/api/models';
-import { AuthService, RegistrationService } from '../application';
+import { AuthService, PasswordRecoveryService, RegistrationService } from '../application';
 import { UsersQueryRepository } from '../../users/repository/queryRepository';
 
 @injectable()
 export class AuthController {
     constructor(
         @inject(AuthService)
-        public authService: AuthService,
+        private authService: AuthService,
         @inject(RegistrationService)
-        public registrationService: RegistrationService,
+        private registrationService: RegistrationService,
+        @inject(PasswordRecoveryService)
+        private passwordRecoveryService: PasswordRecoveryService,
         @inject(UsersQueryRepository)
-        public usersQueryRepository: UsersQueryRepository
+        private usersQueryRepository: UsersQueryRepository
     ) {}
 
     async me(req: Request, res: Response<MeOutputModel>) {
@@ -41,7 +45,12 @@ export class AuthController {
         const { loginOrEmail, password } = req.body;
         const deviceName = parseUserAgent(req.headers['user-agent']);
 
-        const { accessToken, refreshToken } = await this.authService.login({ loginOrEmail, password, clientIp, deviceName });
+        const { accessToken, refreshToken } = await this.authService.login({
+            loginOrEmail,
+            password,
+            clientIp,
+            deviceName,
+        });
 
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
 
@@ -87,6 +96,22 @@ export class AuthController {
         const payload = req.body;
 
         await this.registrationService.resendEmailConfirmationCode(payload);
+
+        res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
+    }
+
+    async passwordRecovery(req: RequestWithBody<PasswordRecoveryInputModel>, res: Response) {
+        const payload = req.body;
+
+        await this.passwordRecoveryService.recoverPassword(payload);
+
+        res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
+    }
+
+    async newPassword(req: RequestWithBody<NewPasswordInputModel>, res: Response) {
+        const payload = req.body;
+
+        await this.passwordRecoveryService.updateNewPassword(payload);
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }

@@ -192,6 +192,60 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
 
+    /auth/password-recovery:
+        post:
+            summary: Start password recovery flow
+            tags: [Auth]
+            operationId: passwordRecovery
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PasswordRecoveryInputModel'
+            responses:
+                '204':
+                    description: Password recovery request accepted
+                '400':
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '429':
+                    description: Too many requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+    /auth/new-password:
+        post:
+            summary: Set new password using recovery code
+            tags: [Auth]
+            operationId: newPassword
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/NewPasswordInputModel'
+            responses:
+                '204':
+                    description: Password updated successfully
+                '400':
+                    description: Validation or business error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                '429':
+                    description: Too many requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
 components:
     securitySchemes:
         BearerAuth:
@@ -275,6 +329,31 @@ components:
                     type: string
                     format: email
                     example: john@example.com
+
+        PasswordRecoveryInputModel:
+            type: object
+            required:
+                - email
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
+
+        NewPasswordInputModel:
+            type: object
+            required:
+                - newPassword
+                - recoveryCode
+            properties:
+                newPassword:
+                    type: string
+                    minLength: 1
+                    example: newSecurePass123
+                recoveryCode:
+                    type: string
+                    format: uuid
+                    example: 8f6f6a72-4df5-4f25-a7a2-302f6df4e510
 
         LoginOutputModel:
             type: object

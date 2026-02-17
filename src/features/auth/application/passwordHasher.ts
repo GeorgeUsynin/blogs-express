@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { SETTINGS } from '../../../core/settings';
 
 @injectable()
-export class PasswordService {
+export class PasswordHasher {
     async hashPassword(password: string): Promise<string> {
         const salt = await bcrypt.genSalt(SETTINGS.SALT_ROUNDS);
 

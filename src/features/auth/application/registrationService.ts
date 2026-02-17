@@ -10,11 +10,11 @@ import { RegistrationConfirmationInputModel, RegistrationEmailResendingInputMode
 export class RegistrationService {
     constructor(
         @inject(UsersService)
-        public usersService: UsersService,
+        private usersService: UsersService,
         @inject(UsersRepository)
-        public usersRepository: UsersRepository,
+        private usersRepository: UsersRepository,
         @inject(EmailManager)
-        public emailManager: EmailManager
+        private emailManager: EmailManager
     ) {}
 
     async registerNewUser(userAttributes: CreateUserInputModel): Promise<void> {

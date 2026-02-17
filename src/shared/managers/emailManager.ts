@@ -5,7 +5,7 @@ import { EmailAdapter } from '../adapters';
 export class EmailManager {
     constructor(
         @inject(EmailAdapter)
-        public emailAdapter: EmailAdapter
+        private emailAdapter: EmailAdapter
     ) {}
 
     sendConfirmationEmail(email: string, code: string) {

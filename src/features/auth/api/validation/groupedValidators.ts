@@ -5,6 +5,8 @@ import { registrationConfirmationValidationSchema } from './registrationConfirma
 import { jwtAuthMiddleware, refreshAuthMiddleware } from '../../../../auth|middlewares';
 import { createUserValidationSchema } from '../../../users/api/validation';
 import { registrationEmailResendingValidationSchema } from './registrationEmailResendingValidationSchema';
+import { passwordRecoveryValidationSchema } from './passwordRecoveryValidationSchema';
+import { newPasswordValidationSchema } from './newPasswordValidationSchema';
 
 export const meValidators = [jwtAuthMiddleware];
 export const refreshTokenValidators = [refreshAuthMiddleware];
@@ -27,5 +29,17 @@ export const registrationConfirmationValidators = [
 export const registrationEmailResendingValidators = [
     apiRateLimitMiddleware,
     checkSchema(registrationEmailResendingValidationSchema, ['body']),
+    errorMiddleware,
+];
+
+export const passwordRecoveryValidators = [
+    apiRateLimitMiddleware,
+    checkSchema(passwordRecoveryValidationSchema, ['body']),
+    errorMiddleware,
+];
+
+export const newPasswordValidators = [
+    apiRateLimitMiddleware,
+    checkSchema(newPasswordValidationSchema, ['body']),
     errorMiddleware,
 ];

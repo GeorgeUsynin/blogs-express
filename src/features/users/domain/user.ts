@@ -7,5 +7,9 @@ export type TUser = {
         expirationDate: string;
         isConfirmed: boolean;
     };
+    passwordRecovery: {
+        recoveryCode: string | null;
+        expirationDate: string | null;
+    };
     createdAt: string;
 };

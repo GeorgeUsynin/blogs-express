@@ -9,7 +9,7 @@ import { ApiRateLimitRepository } from '../repository/repository';
 export class ApiRateLimitService {
     constructor(
         @inject(ApiRateLimitRepository)
-        public rateLimitsRepository: ApiRateLimitRepository
+        private rateLimitsRepository: ApiRateLimitRepository
     ) {}
 
     async logApiRequest(dto: RateLimitInputDto): Promise<void> {

@@ -7,7 +7,7 @@ import { BlogsRepository } from '../repository/repository';
 export class BlogsService {
     constructor(
         @inject(BlogsRepository)
-        public blogsRepository: BlogsRepository
+        private blogsRepository: BlogsRepository
     ) {}
 
     async removeById(id: string): Promise<void> {

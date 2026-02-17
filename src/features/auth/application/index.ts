@@ -1,4 +1,5 @@
-export * from './passwordService';
+export * from './passwordHasher';
 export * from './authService';
-export * from './jwtService';
+export * from './jwtProvider';
 export * from './registrationService';
+export * from './passwordRecoveryService';

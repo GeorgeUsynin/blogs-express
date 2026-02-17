@@ -33,13 +33,13 @@ import { PostsQueryRepository } from '../../posts/repository/queryRepository';
 export class BlogsController {
     constructor(
         @inject(BlogsQueryRepository)
-        public blogsQueryRepository: BlogsQueryRepository,
+        private blogsQueryRepository: BlogsQueryRepository,
         @inject(BlogsService)
-        public blogsService: BlogsService,
+        private blogsService: BlogsService,
         @inject(PostsService)
-        public postsService: PostsService,
+        private postsService: PostsService,
         @inject(PostsQueryRepository)
-        public postsQueryRepository: PostsQueryRepository
+        private postsQueryRepository: PostsQueryRepository
     ) {}
 
     async getAllBlogs(req: RequestWithQuery<Partial<BlogQueryInput>>, res: Response<BlogListPaginatedOutput>) {

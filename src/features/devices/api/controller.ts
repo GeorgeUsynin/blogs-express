@@ -10,9 +10,9 @@ import { DevicesQueryRepository } from '../repository/queryRepository';
 export class DevicesController {
     constructor(
         @inject(DevicesService)
-        public devicesService: DevicesService,
+        private devicesService: DevicesService,
         @inject(DevicesQueryRepository)
-        public devicesQueryRepository: DevicesQueryRepository
+        private devicesQueryRepository: DevicesQueryRepository
     ) {}
 
     async getAllDevices(req: Request, res: Response<DeviceViewModel[]>) {

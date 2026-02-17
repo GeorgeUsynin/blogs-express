@@ -22,13 +22,13 @@ import { CommentsQueryRepository } from '../../comments/repository/queryReposito
 export class PostsController {
     constructor(
         @inject(PostsService)
-        public postsService: PostsService,
+        private postsService: PostsService,
         @inject(PostsQueryRepository)
-        public postsQueryRepository: PostsQueryRepository,
+        private postsQueryRepository: PostsQueryRepository,
         @inject(CommentsService)
-        public commentsService: CommentsService,
+        private commentsService: CommentsService,
         @inject(CommentsQueryRepository)
-        public commentsQueryRepository: CommentsQueryRepository
+        private commentsQueryRepository: CommentsQueryRepository
     ) {}
 
     async getAllPosts(req: RequestWithQuery<Partial<PostQueryInput>>, res: Response<PostListPaginatedOutput>) {

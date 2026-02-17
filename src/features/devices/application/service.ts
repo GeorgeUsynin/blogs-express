@@ -8,7 +8,7 @@ import { CreateDeviceDto } from './dto';
 export class DevicesService {
     constructor(
         @inject(DevicesRepository)
-        public devicesRepository: DevicesRepository
+        private devicesRepository: DevicesRepository
     ) {}
 
     async create(dto: CreateDeviceDto): Promise<string> {

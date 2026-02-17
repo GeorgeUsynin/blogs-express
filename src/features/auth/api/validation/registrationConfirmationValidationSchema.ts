@@ -14,5 +14,8 @@ export const registrationConfirmationValidationSchema = makeStrictSchema<Registr
         notEmpty: {
             errorMessage: 'Code field should not be empty or contain only spaces',
         },
+        isUUID: {
+            errorMessage: 'Code should be in UUID format',
+        },
     },
 });

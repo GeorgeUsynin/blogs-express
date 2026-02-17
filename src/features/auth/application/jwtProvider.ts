@@ -18,7 +18,7 @@ type IJwtPayload<T extends JwtKind> = T extends 'access'
       : never;
 
 @injectable()
-export class JwtService {
+export class JwtProvider {
     createJwtToken<T extends JwtKind>(payload: TPayload<T>, expiresIn: SignOptions['expiresIn']) {
         const token = jwt.sign(payload, SETTINGS.JWT_SECRET!, {
             expiresIn,

@@ -59,4 +59,16 @@ describe('auth api rate limit', () => {
             HTTP_STATUS_CODES.BAD_REQUEST_400
         );
     });
+
+    it('returns 429 for POST /auth/password-recovery after 5 requests in 10 seconds', async () => {
+        await expectRateLimit(`${ROUTES.AUTH}/password-recovery`, { email: '   ' }, HTTP_STATUS_CODES.BAD_REQUEST_400);
+    });
+
+    it('returns 429 for POST /auth/new-password after 5 requests in 10 seconds', async () => {
+        await expectRateLimit(
+            `${ROUTES.AUTH}/new-password`,
+            { newPassword: '   ', recoveryCode: '   ' },
+            HTTP_STATUS_CODES.BAD_REQUEST_400
+        );
+    });
 });
