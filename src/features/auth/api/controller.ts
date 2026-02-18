@@ -84,34 +84,34 @@ export class AuthController {
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }
 
-    async registrationConfirmation(req: Request<RegistrationConfirmationInputModel>, res: Response) {
-        const payload = req.body;
+    async registrationConfirmation(req: RequestWithBody<RegistrationConfirmationInputModel>, res: Response) {
+        const { code } = req.body;
 
-        await this.registrationService.confirmRegistration(payload);
+        await this.registrationService.confirmRegistration(code);
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }
 
-    async registrationEmailResending(req: Request<RegistrationEmailResendingInputModel>, res: Response) {
-        const payload = req.body;
+    async registrationEmailResending(req: RequestWithBody<RegistrationEmailResendingInputModel>, res: Response) {
+        const { email } = req.body;
 
-        await this.registrationService.resendEmailConfirmationCode(payload);
+        await this.registrationService.resendEmailConfirmationCode(email);
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }
 
     async passwordRecovery(req: RequestWithBody<PasswordRecoveryInputModel>, res: Response) {
-        const payload = req.body;
+        const { email } = req.body;
 
-        await this.passwordRecoveryService.recoverPassword(payload);
+        await this.passwordRecoveryService.recoverPassword(email);
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }
 
     async newPassword(req: RequestWithBody<NewPasswordInputModel>, res: Response) {
-        const payload = req.body;
+        const { newPassword, recoveryCode } = req.body;
 
-        await this.passwordRecoveryService.updateNewPassword(payload);
+        await this.passwordRecoveryService.updateNewPassword(newPassword, recoveryCode);
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }

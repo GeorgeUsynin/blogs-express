@@ -214,6 +214,7 @@ describe('auth registration-related endpoints', () => {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
                         message: 'Confirmation code already been applied',
                         field: 'code',
+                        code: 'EMAIL_ALREADY_CONFIRMED',
                     },
                 ],
             });
@@ -236,6 +237,7 @@ describe('auth registration-related endpoints', () => {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
                         message: 'Confirmation code is expired',
                         field: 'code',
+                        code: 'EXPIRED_CODE',
                     },
                 ],
             });
@@ -323,6 +325,7 @@ describe('auth registration-related endpoints', () => {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
                         message: 'Confirmation code already been applied',
                         field: 'code',
+                        code: 'EMAIL_ALREADY_CONFIRMED',
                     },
                 ],
             });

@@ -1,12 +1,9 @@
-import { add } from 'date-fns/add';
-import { randomUUID } from 'node:crypto';
 import { inject, injectable } from 'inversify';
 import { BadRequestError } from '../../../core/errors';
 import { PasswordHasher } from '../../auth/application/passwordHasher';
 import { CreateUserInputModel } from '../api/models';
-import { TUser } from '../domain';
 import { UsersRepository } from '../repository/repository';
-import { SETTINGS } from '../../../core/settings';
+import { UserModel } from '../domain';
 
 @injectable()
 export class UsersService {
@@ -17,7 +14,7 @@ export class UsersService {
         private passwordHasher: PasswordHasher
     ) {}
 
-    async create(userAttributes: CreateUserInputModel, isConfirmed: boolean = false): Promise<string> {
+    async create(userAttributes: CreateUserInputModel, isConfirmed = false): Promise<string> {
         const { email, login, password } = userAttributes;
 
         const userWithExistedLogin = await this.usersRepository.findUserByLogin(login);
@@ -32,56 +29,22 @@ export class UsersService {
 
         const passwordHash = await this.passwordHasher.hashPassword(password);
 
-        const user: TUser = {
-            email,
-            login,
-            passwordHash,
-            emailConfirmation: {
-                confirmationCode: this._generateUUIDCode(),
-                expirationDate: this._generateExpirationDate(),
-                isConfirmed,
-            },
-            passwordRecovery: {
-                recoveryCode: null,
-                expirationDate: null,
-            },
-            createdAt: new Date().toISOString(),
-        };
+        let newUser;
 
-        return this.usersRepository.create(user);
+        if (isConfirmed) {
+            newUser = UserModel.createConfirmedUser({ email, login, passwordHash });
+        } else {
+            newUser = UserModel.createUnconfirmedUser({ email, login, passwordHash });
+        }
+
+        return this.usersRepository.save(newUser);
     }
 
     async removeById(id: string): Promise<void> {
-        await this.usersRepository.removeById(id);
+        const foundUser = await this.usersRepository.findByIdOrFail(id);
 
-        return;
-    }
+        foundUser.isDeleted = true;
 
-    async createAndUpdateEmailConfirmationCode(userId: string): Promise<string> {
-        const confirmationCode = this._generateUUIDCode();
-        const expirationDate = this._generateExpirationDate();
-
-        await this.usersRepository.updateEmailConfirmationAttributes(userId, confirmationCode, expirationDate);
-
-        return confirmationCode;
-    }
-
-    async createAndUpdatePasswordRecoveryCode(userId: string): Promise<string> {
-        const recoveryCode = this._generateUUIDCode();
-        const expirationDate = this._generateExpirationDate();
-
-        await this.usersRepository.updatePasswordRecoveryAttributes(userId, recoveryCode, expirationDate);
-
-        return recoveryCode;
-    }
-
-    _generateUUIDCode(): string {
-        return randomUUID();
-    }
-
-    _generateExpirationDate(): string {
-        return add(new Date(), {
-            hours: SETTINGS.EXPIRATION_DATES.REGISTRATION_CODE_HOURS,
-        }).toISOString();
+        await this.usersRepository.save(foundUser);
     }
 }

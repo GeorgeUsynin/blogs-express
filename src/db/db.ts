@@ -1,4 +1,5 @@
 import { Collection, Db, MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
 import { SETTINGS } from '../core/settings';
 import { type TBlog } from '../features/blogs/domain';
 import { type TPost } from '../features/posts/domain';
@@ -30,11 +31,13 @@ export async function runDB(url: string): Promise<void> {
     apiRateLimitCollection = db.collection<TRateLimit>(SETTINGS.COLLECTIONS.RATE_LIMIT);
 
     try {
+        await mongoose.connect(url, { dbName });
         await client.connect();
         await db.command({ ping: 1 });
         console.log('✅ Connected to the database');
     } catch (e) {
         await client.close();
+        await mongoose.disconnect();
         throw new Error(`❌ Database not connected: ${e}`);
     }
 }

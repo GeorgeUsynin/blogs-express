@@ -90,13 +90,13 @@ export function errorsHandler(error: unknown, res: Response): void {
     }
 
     if (error instanceof DomainError) {
-        const httpStatus = HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY_422;
+        const httpStatus = HTTP_STATUS_CODES.BAD_REQUEST_400;
 
         res.status(httpStatus).send(
             createErrorMessages([
                 {
                     status: httpStatus,
-                    field: error.field,
+                    field: error.field ?? '',
                     message: error.message,
                     code: error.code,
                 },

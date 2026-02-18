@@ -4,7 +4,6 @@ import { EmailManager } from '../../../shared/managers/emailManager';
 import { CreateUserInputModel } from '../../users/api/models';
 import { UsersService } from '../../users/application/service';
 import { UsersRepository } from '../../users/repository/repository';
-import { RegistrationConfirmationInputModel, RegistrationEmailResendingInputModel } from '../api/models';
 
 @injectable()
 export class RegistrationService {
@@ -27,44 +26,30 @@ export class RegistrationService {
         return;
     }
 
-    async confirmRegistration(confirmationAttributes: RegistrationConfirmationInputModel): Promise<void> {
-        const user = await this.usersRepository.findUserByConfirmationCode(confirmationAttributes.code);
+    async confirmRegistration(code: string): Promise<void> {
+        const user = await this.usersRepository.findUserByConfirmationCode(code);
 
         if (!user) {
             throw new BadRequestError('Invalid confirmation code', 'code');
         }
 
-        if (user.emailConfirmation.isConfirmed) {
-            throw new BadRequestError('Confirmation code already been applied', 'code');
-        }
-
-        const isConfirmationCodeExpired = Date.parse(user.emailConfirmation.expirationDate) < Date.now();
-
-        if (isConfirmationCodeExpired) {
-            throw new BadRequestError('Confirmation code is expired', 'code');
-        }
-
-        await this.usersRepository.setEmailConfirmed(user._id.toString());
+        user.confirmUserEmail(code);
+        await this.usersRepository.save(user);
 
         return;
     }
 
-    async resendEmailConfirmationCode(
-        resendingConfirmationEmailAttributes: RegistrationEmailResendingInputModel
-    ): Promise<void> {
-        const user = await this.usersRepository.findUserByEmail(resendingConfirmationEmailAttributes.email);
+    async resendEmailConfirmationCode(email: string): Promise<void> {
+        const user = await this.usersRepository.findUserByEmail(email);
 
         if (!user) {
             throw new BadRequestError('Invalid email', 'email');
         }
 
-        if (user.emailConfirmation.isConfirmed) {
-            throw new BadRequestError('Confirmation code already been applied', 'code');
-        }
+        const confirmationCode = user.regenerateEmailConfirmationCode();
+        await this.usersRepository.save(user);
 
-        const confirmationCode = await this.usersService.createAndUpdateEmailConfirmationCode(user._id.toString());
-
-        this.emailManager.sendConfirmationEmail(resendingConfirmationEmailAttributes.email, confirmationCode);
+        this.emailManager.sendConfirmationEmail(email, confirmationCode);
 
         return;
     }

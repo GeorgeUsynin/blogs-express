@@ -5,7 +5,13 @@ import { HTTP_STATUS_CODES } from '../../../core/constants';
 import { setDefaultSortAndPaginationIfNotExist } from '../../../core/helpers';
 import { RequestWithBody, RequestWithQuery } from '../../../core/types';
 import { mapToUserListPaginatedOutput, mapToUserViewModel } from './mappers';
-import { CreateUserInputModel, URIParamsUserModel, UserListPaginatedOutput, UserQueryInput, UserViewModel } from './models';
+import {
+    CreateUserInputModel,
+    URIParamsUserModel,
+    UserListPaginatedOutput,
+    UserQueryInput,
+    UserViewModel,
+} from './models';
 import { UsersService } from '../application/service';
 import { UsersQueryRepository } from '../repository/queryRepository';
 
@@ -39,8 +45,8 @@ export class UsersController {
 
     async createUser(req: RequestWithBody<CreateUserInputModel>, res: Response<UserViewModel>) {
         const payload = req.body;
-        const isConfirmed = true;
-        const createdUserId = await this.usersService.create(payload, isConfirmed);
+
+        const createdUserId = await this.usersService.create(payload, true);
 
         const createdUser = await this.usersQueryRepository.findByIdOrFail(createdUserId);
 

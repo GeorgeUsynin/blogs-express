@@ -121,10 +121,7 @@ describe('auth password recovery endpoints', () => {
                 password: newPassword,
             };
 
-            await request
-                .post(`${ROUTES.AUTH}/login`)
-                .send(loginWithNewPassword)
-                .expect(HTTP_STATUS_CODES.OK_200);
+            await request.post(`${ROUTES.AUTH}/login`).send(loginWithNewPassword).expect(HTTP_STATUS_CODES.OK_200);
         });
 
         it('returns 400 when recovery code does not exist', async () => {
@@ -177,6 +174,7 @@ describe('auth password recovery endpoints', () => {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
                         message: 'Password recovery code is expired',
                         field: 'recoveryCode',
+                        code: 'EXPIRED_CODE',
                     },
                 ],
             });

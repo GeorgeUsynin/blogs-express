@@ -6,6 +6,7 @@ import { SETTINGS } from '../core/settings';
 import { HTTP_STATUS_CODES, ROUTES } from '../core/constants';
 import { runDB, client, blogsCollection, postsCollection, commentsCollection, db } from '../db';
 import { TDataset } from './dataset';
+import mongoose from 'mongoose';
 
 const app = express();
 
@@ -201,6 +202,7 @@ export const dbHelper = {
     },
     closeConnection: async () => {
         await client.close();
+        await mongoose.disconnect();
     },
     resetCollections: async (collectionNames: (keyof TDataset)[]) => {
         if (collectionNames.includes('blogs')) {
