@@ -17,11 +17,12 @@ export class RegistrationService {
     ) {}
 
     async registerNewUser(userAttributes: CreateUserInputModel): Promise<void> {
-        const createdUserId = await this.usersService.create(userAttributes);
+        const {
+            email,
+            emailConfirmation: { confirmationCode },
+        } = await this.usersService.create(userAttributes);
 
-        const user = await this.usersRepository.findByIdOrFail(createdUserId);
-
-        this.emailManager.sendConfirmationEmail(user.email, user.emailConfirmation.confirmationCode);
+        this.emailManager.sendConfirmationEmail(email, confirmationCode);
 
         return;
     }

@@ -3,7 +3,8 @@ import { BadRequestError } from '../../../core/errors';
 import { PasswordHasher } from '../../auth/application/passwordHasher';
 import { CreateUserInputModel } from '../api/models';
 import { UsersRepository } from '../repository/repository';
-import { UserModel } from '../domain';
+import { TUser, UserModel } from '../domain';
+import { WithId } from 'mongodb';
 
 @injectable()
 export class UsersService {
@@ -14,7 +15,7 @@ export class UsersService {
         private passwordHasher: PasswordHasher
     ) {}
 
-    async create(userAttributes: CreateUserInputModel, isConfirmed = false): Promise<string> {
+    async create(userAttributes: CreateUserInputModel, isConfirmed = false): Promise<WithId<TUser>> {
         const { email, login, password } = userAttributes;
 
         const userWithExistedLogin = await this.usersRepository.findUserByLogin(login);

@@ -46,9 +46,7 @@ export class UsersController {
     async createUser(req: RequestWithBody<CreateUserInputModel>, res: Response<UserViewModel>) {
         const payload = req.body;
 
-        const createdUserId = await this.usersService.create(payload, true);
-
-        const createdUser = await this.usersQueryRepository.findByIdOrFail(createdUserId);
+        const createdUser = await this.usersService.create(payload, true);
 
         const mappedUser = mapToUserViewModel(createdUser);
 

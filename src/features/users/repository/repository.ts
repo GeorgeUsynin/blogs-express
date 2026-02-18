@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
 import { RepositoryNotFoundError } from '../../../core/errors';
-import { UserDocument, UserModel } from '../domain';
+import { TUser, UserDocument, UserModel } from '../domain';
+import { WithId } from 'mongodb';
 
 @injectable()
 export class UsersRepository {
@@ -34,9 +35,7 @@ export class UsersRepository {
         return res;
     }
 
-    async save(user: UserDocument): Promise<string> {
-        const { _id } = await user.save();
-
-        return _id.toString();
+    async save(user: UserDocument): Promise<WithId<TUser>> {
+        return user.save();
     }
 }
