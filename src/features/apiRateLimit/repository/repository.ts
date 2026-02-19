@@ -1,16 +1,15 @@
 import { injectable } from 'inversify';
 import { SETTINGS } from '../../../core/settings';
-import { apiRateLimitCollection } from '../../../db';
-import { RateLimitInputDto } from '../application/dto';
-import { TRateLimit } from '../domain';
+import { CreateRateLimitDto } from '../application/dto';
+import { RateLimitDocument, RateLimitModel } from '../domain';
 
 @injectable()
 export class ApiRateLimitRepository {
-    async getTotalCountOfFilteredAPIRequests(dto: RateLimitInputDto): Promise<number> {
-        const startDate = new Date(Date.parse(dto.date) - SETTINGS.API_RATE_LIMIT_TTL_IN_MS).toISOString();
-        const endDate = dto.date;
+    async getTotalCountOfFilteredAPIRequests(dto: CreateRateLimitDto): Promise<number> {
+        const startDate = new Date(Date.parse(dto.createdAt) - SETTINGS.API_RATE_LIMIT_TTL_IN_MS).toISOString();
+        const endDate = dto.createdAt;
 
-        const totalCount = await apiRateLimitCollection.countDocuments({
+        const totalCount = await RateLimitModel.countDocuments({
             url: dto.url,
             ip: dto.ip,
             createdAt: { $gte: startDate, $lt: endDate },
@@ -19,9 +18,7 @@ export class ApiRateLimitRepository {
         return totalCount;
     }
 
-    async create(rateLimit: TRateLimit): Promise<void> {
-        await apiRateLimitCollection.insertOne(rateLimit);
-
-        return;
+    async save(rateLimit: RateLimitDocument): Promise<void> {
+        await rateLimit.save();
     }
 }

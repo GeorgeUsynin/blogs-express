@@ -20,3 +20,9 @@ export const ROUTES = {
     SECURITY_DEVICES: '/security/devices',
     TESTING: '/testing/all-data',
 };
+
+export enum LikeStatus {
+    None = 'None',
+    Like = 'Like',
+    Unlike = 'Unlike',
+}

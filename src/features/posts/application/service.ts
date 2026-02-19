@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
+import { WithId } from 'mongodb';
 import { CreateUpdatePostInputModel } from '../api/models';
-import { TPost } from '../domain';
+import { PostModel, TPost } from '../domain';
 import { PostsRepository } from '../repository/repository';
 import { BlogsRepository } from '../../blogs/repository/repository';
 
@@ -13,29 +14,34 @@ export class PostsService {
         private blogsRepository: BlogsRepository
     ) {}
 
-    async removeById(id: string): Promise<void> {
-        await this.postsRepository.removeById(id);
-
-        return;
-    }
-
-    async create(postAttributes: CreateUpdatePostInputModel): Promise<string> {
+    async create(postAttributes: CreateUpdatePostInputModel): Promise<WithId<TPost>> {
         const { name: blogName } = await this.blogsRepository.findByIdOrFail(postAttributes.blogId);
 
-        const newPost: TPost = {
-            blogName,
-            createdAt: new Date().toISOString(),
-            ...postAttributes,
-        };
+        const newPost = PostModel.createPost({ blogName, ...postAttributes });
 
-        return this.postsRepository.create(newPost);
+        return this.postsRepository.save(newPost);
     }
 
     async updateById(id: string, postAttributes: CreateUpdatePostInputModel): Promise<void> {
+        const { title, shortDescription, content, blogId } = postAttributes;
+
         await this.blogsRepository.findByIdOrFail(postAttributes.blogId);
 
-        await this.postsRepository.updateById(id, postAttributes);
+        const foundPost = await this.postsRepository.findByIdOrFail(id);
 
-        return;
+        foundPost.title = title;
+        foundPost.shortDescription = shortDescription;
+        foundPost.content = content;
+        foundPost.blogId = blogId;
+
+        await this.postsRepository.save(foundPost);
+    }
+
+    async removeById(id: string): Promise<void> {
+        const foundPost = await this.postsRepository.findByIdOrFail(id);
+
+        foundPost.isDeleted = true;
+
+        await this.postsRepository.save(foundPost);
     }
 }

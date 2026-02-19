@@ -1,3 +1,4 @@
-import { TDevice } from './device';
+import { DeviceModel } from './deviceEntity';
 
-export { TDevice };
+export * from './types';
+export { DeviceModel };

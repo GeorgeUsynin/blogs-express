@@ -1,3 +1,3 @@
-import { RateLimitInputDto } from './RateLimitInputDto';
+import { CreateRateLimitDto } from './CreateRateLimitDto';
 
-export { RateLimitInputDto };
+export { CreateRateLimitDto };

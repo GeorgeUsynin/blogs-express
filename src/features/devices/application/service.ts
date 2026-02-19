@@ -1,6 +1,6 @@
+import { WithId } from 'mongodb';
 import { inject, injectable } from 'inversify';
-import { ForbiddenError } from '../../../core/errors';
-import { TDevice } from '../domain';
+import { DeviceModel, TDevice } from '../domain';
 import { DevicesRepository } from '../repository/repository';
 import { CreateDeviceDto } from './dto';
 
@@ -11,31 +11,25 @@ export class DevicesService {
         private devicesRepository: DevicesRepository
     ) {}
 
-    async create(dto: CreateDeviceDto): Promise<string> {
-        const newDevice: TDevice = {
+    async create(dto: CreateDeviceDto): Promise<WithId<TDevice>> {
+        const newDevice = DeviceModel.createDevice({
             userId: dto.userId,
             deviceId: dto.deviceId,
             clientIp: dto.clientIp,
             deviceName: dto.deviceName,
             issuedAt: dto.issuedAt,
             expiresIn: dto.expiresIn,
-        };
+        });
 
-        return this.devicesRepository.create(newDevice);
+        return this.devicesRepository.save(newDevice);
     }
 
     async terminateDeviceSessionByDeviceId(deviceId: string, userId: string): Promise<void> {
         const foundDevice = await this.devicesRepository.findByDeviceIdOrFail(deviceId);
 
-        const isUserDevice = foundDevice.userId === userId;
-
-        if (!isUserDevice) {
-            throw new ForbiddenError();
+        if (foundDevice.isDeviceOwner(userId)) {
+            await this.devicesRepository.removeByDeviceId(deviceId);
         }
-
-        await this.devicesRepository.removeByDeviceId(deviceId);
-
-        return;
     }
 
     async terminateAllDeviceSessionsExceptCurrent(deviceId: string, userId: string): Promise<void> {

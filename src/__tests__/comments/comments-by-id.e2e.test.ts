@@ -77,6 +77,7 @@ describe('comments by id endpoints', () => {
                 userLogin: user.login,
             },
             createdAt: new Date().toISOString(),
+            isDeleted: false,
         });
 
         const updatedContent = 'This comment has been updated by the owner successfully.';
@@ -116,6 +117,7 @@ describe('comments by id endpoints', () => {
                 userLogin: owner.login,
             },
             createdAt: new Date().toISOString(),
+            isDeleted: false,
         });
 
         await request
@@ -140,6 +142,7 @@ describe('comments by id endpoints', () => {
                 userLogin: user.login,
             },
             createdAt: new Date().toISOString(),
+            isDeleted: false,
         });
 
         const { body } = await request
@@ -174,6 +177,7 @@ describe('comments by id endpoints', () => {
                 userLogin: user.login,
             },
             createdAt: new Date().toISOString(),
+            isDeleted: false,
         });
 
         await request
@@ -208,6 +212,7 @@ describe('comments by id endpoints', () => {
                 userLogin: owner.login,
             },
             createdAt: new Date().toISOString(),
+            isDeleted: false,
         });
 
         await request

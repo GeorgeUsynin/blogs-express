@@ -1,1 +1,4 @@
-export * from './comment';
+import { CommentModel } from './commentEntity';
+
+export * from './types';
+export { CommentModel };

@@ -14,6 +14,7 @@ export class UsersQueryRepository {
         const loginRegex = searchLoginTerm ? new RegExp(searchLoginTerm, 'i') : null;
 
         const filter: Record<string, unknown> = {};
+
         if (emailRegex && loginRegex) {
             filter.$or = [{ email: emailRegex }, { login: loginRegex }];
         } else if (emailRegex) {

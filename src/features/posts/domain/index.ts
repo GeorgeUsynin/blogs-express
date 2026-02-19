@@ -1,1 +1,4 @@
-export * from './post';
+import { PostModel } from './postEntity';
+
+export * from './types';
+export { PostModel };

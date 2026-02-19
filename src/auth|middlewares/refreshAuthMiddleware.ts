@@ -23,15 +23,12 @@ export const refreshAuthMiddleware = async (req: Request, res: Response, next: N
         return;
     }
 
-    const isTokenOwner = device.userId === userId;
-    if (!isTokenOwner) {
+    if (!device.isDeviceOwner(userId)) {
         res.sendStatus(HTTP_STATUS_CODES.UNAUTHORIZED_401);
         return;
     }
 
-    const isRefreshTokenVersionValid = device.issuedAt === new Date(iat! * 1000).toISOString();
-
-    if (!isRefreshTokenVersionValid) {
+    if (!device.isIssuedAtMatch(new Date(iat! * 1000).toISOString())) {
         res.sendStatus(HTTP_STATUS_CODES.UNAUTHORIZED_401);
         return;
     }

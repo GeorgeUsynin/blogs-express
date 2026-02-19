@@ -1,7 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { CreateUpdateBlogInputModel } from '../api/models';
-import { TBlog } from '../domain';
+import { BlogModel, TBlog } from '../domain';
 import { BlogsRepository } from '../repository/repository';
+import { WithId } from 'mongodb';
 
 @injectable()
 export class BlogsService {
@@ -10,25 +11,29 @@ export class BlogsService {
         private blogsRepository: BlogsRepository
     ) {}
 
-    async removeById(id: string): Promise<void> {
-        await this.blogsRepository.removeById(id);
+    async create(blogAttributes: CreateUpdateBlogInputModel): Promise<WithId<TBlog>> {
+        const newBlog = BlogModel.createBlog(blogAttributes);
 
-        return;
-    }
-
-    async create(blogAttributes: CreateUpdateBlogInputModel): Promise<string> {
-        const newBlog: TBlog = {
-            isMembership: false,
-            createdAt: new Date().toISOString(),
-            ...blogAttributes,
-        };
-
-        return this.blogsRepository.create(newBlog);
+        return this.blogsRepository.save(newBlog);
     }
 
     async updateById(id: string, blogAttributes: CreateUpdateBlogInputModel): Promise<void> {
-        await this.blogsRepository.updateById(id, blogAttributes);
+        const { description, name, websiteUrl } = blogAttributes;
 
-        return;
+        const foundBlog = await this.blogsRepository.findByIdOrFail(id);
+
+        foundBlog.name = name;
+        foundBlog.description = description;
+        foundBlog.websiteUrl = websiteUrl;
+
+        await this.blogsRepository.save(foundBlog);
+    }
+
+    async removeById(id: string): Promise<void> {
+        const foundBlog = await this.blogsRepository.findByIdOrFail(id);
+
+        foundBlog.isDeleted = true;
+
+        await this.blogsRepository.save(foundBlog);
     }
 }

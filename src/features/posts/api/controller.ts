@@ -9,11 +9,22 @@ import {
     type RequestWithQuery,
 } from '../../../core/types';
 import { HTTP_STATUS_CODES } from '../../../core/constants';
-import { PostListPaginatedOutput, PostQueryInput, PostViewModel, URIParamsPostModel, CreateUpdatePostInputModel } from './models';
+import {
+    PostListPaginatedOutput,
+    PostQueryInput,
+    PostViewModel,
+    URIParamsPostModel,
+    CreateUpdatePostInputModel,
+} from './models';
 import { mapToPostListPaginatedOutput, mapToPostViewModel } from './mappers';
 import { PostsService } from '../application';
 import { PostsQueryRepository } from '../repository/queryRepository';
-import { CommentListPaginatedOutput, CommentQueryInput, CommentViewModel, CreateUpdateCommentInputModel } from '../../comments/api/models';
+import {
+    CommentListPaginatedOutput,
+    CommentQueryInput,
+    CommentViewModel,
+    CreateUpdateCommentInputModel,
+} from '../../comments/api/models';
 import { mapToCommentListPaginatedOutput, mapToCommentViewModel } from '../../comments/api/mappers';
 import { CommentsService } from '../../comments/application';
 import { CommentsQueryRepository } from '../../comments/repository/queryRepository';
@@ -94,9 +105,7 @@ export class PostsController {
         const userId = req.userId!;
         const payload = req.body;
 
-        const createdCommentId = await this.commentsService.create(postId, userId, payload);
-
-        const createdComment = await this.commentsQueryRepository.findByIdOrFail(createdCommentId);
+        const createdComment = await this.commentsService.create(postId, userId, payload);
 
         const mappedComment = mapToCommentViewModel(createdComment);
 
@@ -106,9 +115,7 @@ export class PostsController {
     async createPost(req: RequestWithBody<CreateUpdatePostInputModel>, res: Response<PostViewModel>) {
         const payload = req.body;
 
-        const createdPostId = await this.postsService.create(payload);
-
-        const createdPost = await this.postsQueryRepository.findByIdOrFail(createdPostId);
+        const createdPost = await this.postsService.create(payload);
 
         const mappedPost = mapToPostViewModel(createdPost);
 

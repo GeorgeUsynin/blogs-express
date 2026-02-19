@@ -23,6 +23,7 @@ export const blogs: WithId<TBlog>[] = [
         websiteUrl: 'https://ecolifestyle.com',
         isMembership: false,
         createdAt: new Date().toISOString(),
+        isDeleted: false,
     },
     {
         _id: blogsIds[1],
@@ -32,6 +33,7 @@ export const blogs: WithId<TBlog>[] = [
         websiteUrl: 'https://techtrends.io',
         isMembership: false,
         createdAt: new Date().toISOString(),
+        isDeleted: false,
     },
     {
         _id: blogsIds[2],
@@ -41,6 +43,7 @@ export const blogs: WithId<TBlog>[] = [
         websiteUrl: 'https://wellnesspath.org',
         isMembership: false,
         createdAt: new Date().toISOString(),
+        isDeleted: false,
     },
     {
         _id: blogsIds[3],
@@ -50,6 +53,7 @@ export const blogs: WithId<TBlog>[] = [
         websiteUrl: 'https://creativeminds.art',
         isMembership: false,
         createdAt: new Date().toISOString(),
+        isDeleted: false,
     },
 ];
 
@@ -119,6 +123,7 @@ export const posts: WithId<TPost>[] = postsByBlog.flatMap((blogPosts, blogIndex)
         blogId: blogsIds[blogIndex]!.toString(),
         blogName: blogs[blogIndex]!.name,
         createdAt: new Date().toISOString(),
+        isDeleted: false,
     }))
 );
 
@@ -132,6 +137,7 @@ export const comments: WithId<TComment>[] = posts.flatMap((post, index) => [
         },
         postId: post._id.toString(),
         createdAt: new Date().toISOString(),
+        isDeleted: false,
     },
     {
         _id: new ObjectId(),
@@ -142,6 +148,7 @@ export const comments: WithId<TComment>[] = posts.flatMap((post, index) => [
         },
         postId: post._id.toString(),
         createdAt: new Date().toISOString(),
+        isDeleted: false,
     },
 ]);
 

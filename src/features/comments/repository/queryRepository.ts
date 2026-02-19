@@ -1,9 +1,8 @@
-import { ObjectId, WithId } from 'mongodb';
+import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
 import { RepositoryNotFoundError } from '../../../core/errors';
-import { TComment } from '../domain';
+import { CommentModel, TComment } from '../domain';
 import { CommentQueryInput } from '../api/models';
-import { commentsCollection } from '../../../db';
 
 type FindCommentsFilter = Partial<Pick<TComment, 'postId'>>;
 
@@ -25,23 +24,23 @@ export class CommentsQueryRepository {
         filter: FindCommentsFilter = {}
     ): Promise<{ items: WithId<TComment>[]; totalCount: number }> {
         const { sortBy, sortDirection, pageNumber, pageSize } = queryDto;
-
         const skip = (pageNumber - 1) * pageSize;
 
-        const items = await commentsCollection
-            .find(filter)
-            .sort({ [sortBy]: sortDirection })
-            .skip(skip)
-            .limit(pageSize)
-            .toArray();
-
-        const totalCount = await commentsCollection.countDocuments(filter);
+        const [items, totalCount] = await Promise.all([
+            CommentModel.find(filter)
+                .sort({ [sortBy]: sortDirection })
+                .skip(skip)
+                .limit(pageSize)
+                .lean()
+                .exec(),
+            CommentModel.countDocuments(filter).exec(),
+        ]);
 
         return { items, totalCount };
     }
 
     async findByIdOrFail(id: string): Promise<WithId<TComment>> {
-        const res = await commentsCollection.findOne({ _id: new ObjectId(id) });
+        const res = await CommentModel.findById(id);
 
         if (!res) {
             throw new RepositoryNotFoundError("Comment doesn't exist");

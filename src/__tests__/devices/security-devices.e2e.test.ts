@@ -230,10 +230,10 @@ describe('security devices endpoints', () => {
 
         const idsBeforeRefresh = devicesBeforeRefreshTyped.map((device: DeviceViewModel) => device.deviceId).sort();
 
-            // Wait 1s before refresh to avoid flaky timing:
-            // if login and refresh happen within the same second, JWT iat can be identical,
-            // and issuedAt/lastActiveDate may not change, causing intermittent test failures.
-            await new Promise(resolve => setTimeout(resolve, 1000));
+        // Wait 1s before refresh to avoid flaky timing:
+        // if login and refresh happen within the same second, JWT iat can be identical,
+        // and issuedAt/lastActiveDate may not change, causing intermittent test failures.
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         const refreshResponse = await request
             .post(`${ROUTES.AUTH}/refresh-token`)

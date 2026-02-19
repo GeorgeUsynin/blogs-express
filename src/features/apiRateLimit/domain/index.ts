@@ -1,3 +1,4 @@
-import { TRateLimit } from './rateLimit';
+import { RateLimitModel } from './rateLimitEntity';
 
-export { TRateLimit };
+export * from './types';
+export { RateLimitModel };

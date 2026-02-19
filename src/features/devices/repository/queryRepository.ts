@@ -1,6 +1,6 @@
 import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
-import { TDevice } from '../domain';
+import { DeviceModel, TDevice } from '../domain';
 import { devicesCollection } from '../../../db';
 
 type FindDevicesFilter = Partial<Pick<TDevice, 'userId'>>;
@@ -12,7 +12,7 @@ export class DevicesQueryRepository {
     }
 
     async findManyWithFilter(filter: FindDevicesFilter = {}): Promise<WithId<TDevice>[]> {
-        const items = await devicesCollection.find(filter).toArray();
+        const items = await DeviceModel.find(filter);
 
         return items;
     }

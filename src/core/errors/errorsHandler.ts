@@ -90,12 +90,28 @@ export function errorsHandler(error: unknown, res: Response): void {
     }
 
     if (error instanceof DomainError) {
-        const httpStatus = HTTP_STATUS_CODES.BAD_REQUEST_400;
+        const BadRequestHttpStatus = HTTP_STATUS_CODES.BAD_REQUEST_400;
+        const ForbiddenHttpStatus = HTTP_STATUS_CODES.FORBIDDEN_403;
 
-        res.status(httpStatus).send(
+        if (error.code === 'NOT_AN_OWNER') {
+            res.status(ForbiddenHttpStatus).send(
+                createErrorMessages([
+                    {
+                        status: ForbiddenHttpStatus,
+                        field: error.field ?? '',
+                        message: error.message,
+                        code: error.code,
+                    },
+                ])
+            );
+
+            return;
+        }
+
+        res.status(BadRequestHttpStatus).send(
             createErrorMessages([
                 {
-                    status: httpStatus,
+                    status: BadRequestHttpStatus,
                     field: error.field ?? '',
                     message: error.message,
                     code: error.code,
@@ -106,6 +122,7 @@ export function errorsHandler(error: unknown, res: Response): void {
         return;
     }
 
-    res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR_500);
-    return;
+    console.error(error);
+
+    res.sendStatus(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR_500);
 }

@@ -5,27 +5,27 @@ import { WithId } from 'mongodb';
 
 @injectable()
 export class UsersRepository {
-    async findUserByLogin(login: string) {
+    async findUserByLogin(login: string): Promise<UserDocument | null> {
         return UserModel.findOne({ login });
     }
 
-    async findUserByEmail(email: string) {
+    async findUserByEmail(email: string): Promise<UserDocument | null> {
         return UserModel.findOne({ email });
     }
 
-    async findUserByConfirmationCode(code: string) {
+    async findUserByConfirmationCode(code: string): Promise<UserDocument | null> {
         return UserModel.findOne({ 'emailConfirmation.confirmationCode': code });
     }
 
-    async findUserByPasswordRecoveryCode(code: string) {
+    async findUserByPasswordRecoveryCode(code: string): Promise<UserDocument | null> {
         return UserModel.findOne({ 'passwordRecovery.recoveryCode': code });
     }
 
-    async findUserByLoginOrEmail(loginOrEmail: string) {
+    async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
         return UserModel.findOne({ $or: [{ email: loginOrEmail }, { login: loginOrEmail }] });
     }
 
-    async findByIdOrFail(id: string) {
+    async findByIdOrFail(id: string): Promise<UserDocument> {
         const res = await UserModel.findById(id);
 
         if (!res) {

@@ -100,9 +100,7 @@ export class BlogsController {
     async createBlog(req: RequestWithBody<CreateUpdateBlogInputModel>, res: Response<BlogViewModel>) {
         const payload = req.body;
 
-        const createdBlogId = await this.blogsService.create(payload);
-
-        const createdBlog = await this.blogsQueryRepository.findByIdOrFail(createdBlogId);
+        const createdBlog = await this.blogsService.create(payload);
 
         const mappedBlog = mapToBlogViewModel(createdBlog);
 
@@ -116,9 +114,7 @@ export class BlogsController {
         const id = req.params.id;
         const payload = req.body;
 
-        const createdPostId = await this.postsService.create({ ...payload, blogId: id });
-
-        const createdPost = await this.postsQueryRepository.findByIdOrFail(createdPostId);
+        const createdPost = await this.postsService.create({ ...payload, blogId: id });
 
         const mappedPost = mapToPostViewModel(createdPost);
 

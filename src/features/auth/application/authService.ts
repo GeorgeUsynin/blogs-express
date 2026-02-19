@@ -84,9 +84,13 @@ export class AuthService {
         const { iat, exp } = this.jwtProvider.verifyToken<'refresh'>(refreshToken);
         const issuedAt = new Date(iat! * 1000).toISOString();
         const expiresIn = new Date(exp! * 1000).toISOString();
-        const payload = { issuedAt, expiresIn };
 
-        await this.devicesRepository.updateByDeviceId(deviceId, payload);
+        const device = await this.devicesRepository.findByDeviceIdOrFail(deviceId);
+
+        device.issuedAt = issuedAt;
+        device.expiresIn = expiresIn;
+
+        await this.devicesRepository.save(device);
 
         return { accessToken, refreshToken };
     }

@@ -7,9 +7,9 @@ const apiRateLimitService: ApiRateLimitService = container.get(ApiRateLimitServi
 export const apiRateLimitMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const url = req.originalUrl;
     const ip = req.ip || '';
-    const date = new Date().toISOString();
+    const createdAt = new Date().toISOString();
 
-    await apiRateLimitService.logApiRequest({ url, ip, date });
+    await apiRateLimitService.logApiRequest({ url, ip, createdAt });
 
     next();
 };

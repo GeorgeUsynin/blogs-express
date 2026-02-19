@@ -1,9 +1,9 @@
+import { WithId } from 'mongodb';
 import { inject, injectable } from 'inversify';
-import { ForbiddenError } from '../../../core/errors';
 import { PostsRepository } from '../../posts/repository/repository';
 import { UsersRepository } from '../../users/repository/repository';
 import { CreateUpdateCommentInputModel } from '../api/models';
-import { TComment } from '../domain';
+import { CommentModel, TComment } from '../domain';
 import { CommentsRepository } from '../repository/repository';
 
 @injectable()
@@ -17,49 +17,50 @@ export class CommentsService {
         private usersRepository: UsersRepository
     ) {}
 
-    async removeById(commentId: string, userId: string): Promise<void> {
-        const foundComment = await this.commentsRepository.findByIdOrFail(commentId);
+    async create(
+        postId: string,
+        userId: string,
+        commentAttributes: CreateUpdateCommentInputModel
+    ): Promise<WithId<TComment>> {
+        const { content } = commentAttributes;
 
-        const isUserComment = foundComment.commentatorInfo.userId === userId;
-
-        if (!isUserComment) {
-            throw new ForbiddenError(`You can't delete someone else's comment.`);
-        }
-
-        await this.commentsRepository.removeById(commentId);
-
-        return;
-    }
-
-    async create(postId: string, userId: string, commentAttributes: CreateUpdateCommentInputModel): Promise<string> {
         await this.postsRepository.findByIdOrFail(postId);
 
         const { login } = await this.usersRepository.findByIdOrFail(userId);
 
-        const newComment: TComment = {
+        const newComment = CommentModel.createComment({
+            content,
             postId,
             commentatorInfo: {
                 userId,
                 userLogin: login,
             },
-            createdAt: new Date().toISOString(),
-            ...commentAttributes,
-        };
+        });
 
-        return this.commentsRepository.create(newComment);
+        return this.commentsRepository.save(newComment);
     }
 
-    async updateById(commentId: string, userId: string, commentAttributes: CreateUpdateCommentInputModel): Promise<void> {
+    async updateById(
+        commentId: string,
+        userId: string,
+        commentAttributes: CreateUpdateCommentInputModel
+    ): Promise<void> {
+        const { content } = commentAttributes;
         const foundComment = await this.commentsRepository.findByIdOrFail(commentId);
 
-        const isUserComment = foundComment.commentatorInfo.userId === userId;
-
-        if (!isUserComment) {
-            throw new ForbiddenError(`You can't update someone else's comment.`);
+        if (foundComment.isCommentOwner(userId)) {
+            foundComment.content = content;
+            await this.commentsRepository.save(foundComment);
         }
+    }
 
-        await this.commentsRepository.updateById(commentId, commentAttributes);
+    async removeById(commentId: string, userId: string): Promise<void> {
+        const foundComment = await this.commentsRepository.findByIdOrFail(commentId);
 
-        return;
+        if (foundComment.isCommentOwner(userId)) {
+            foundComment.isDeleted = true;
+
+            await this.commentsRepository.save(foundComment);
+        }
     }
 }

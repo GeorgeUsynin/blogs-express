@@ -1,13 +1,9 @@
+import mongoose from 'mongoose';
 import { type Request, type Response } from 'express';
 import { HTTP_STATUS_CODES } from '../../../../core/constants';
-import { db } from '../../../../db';
 
-export const deleteAllData = async (req: Request, res: Response) => {
-    const collections = await db.collections();
-
-    for (const collection of collections) {
-        await collection.deleteMany({});
-    }
+export const deleteAllData = async (_req: Request, res: Response) => {
+    await mongoose.connection.db?.dropDatabase();
 
     res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
 };
