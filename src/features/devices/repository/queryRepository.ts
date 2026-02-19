@@ -1,7 +1,6 @@
 import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
 import { DeviceModel, TDevice } from '../domain';
-import { devicesCollection } from '../../../db';
 
 type FindDevicesFilter = Partial<Pick<TDevice, 'userId'>>;
 

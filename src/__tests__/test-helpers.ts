@@ -4,9 +4,12 @@ import { agent } from 'supertest';
 import { capitalizeFirstLetter } from '../core/helpers';
 import { SETTINGS } from '../core/settings';
 import { HTTP_STATUS_CODES, ROUTES } from '../core/constants';
-import { runDB, client, blogsCollection, postsCollection, commentsCollection, db } from '../db';
+import { runDB } from '../db';
 import { TDataset } from './dataset';
 import mongoose from 'mongoose';
+import { BlogModel } from '../features/blogs/domain';
+import { PostModel } from '../features/posts/domain';
+import { CommentModel } from '../features/comments/domain';
 
 const app = express();
 
@@ -201,45 +204,44 @@ export const dbHelper = {
         await runDB(SETTINGS.MONGO_URL!);
     },
     closeConnection: async () => {
-        await client.close();
         await mongoose.disconnect();
     },
     resetCollections: async (collectionNames: (keyof TDataset)[]) => {
         if (collectionNames.includes('blogs')) {
-            await blogsCollection.deleteMany({});
+            await BlogModel.deleteMany({});
         }
         if (collectionNames.includes('posts')) {
-            await postsCollection.deleteMany({});
+            await PostModel.deleteMany({});
         }
         if (collectionNames.includes('comments')) {
-            await commentsCollection.deleteMany({});
+            await CommentModel.deleteMany({});
         }
     },
     setDb: async (dataset: TDataset) => {
         if (dataset.blogs?.length) {
-            await blogsCollection.insertMany(dataset.blogs);
+            await BlogModel.insertMany(dataset.blogs);
         }
 
         if (dataset.posts?.length) {
-            await postsCollection.insertMany(dataset.posts);
+            await PostModel.insertMany(dataset.posts);
         }
         if (dataset.comments?.length) {
-            await commentsCollection.insertMany(dataset.comments);
+            await CommentModel.insertMany(dataset.comments);
         }
     },
     dropDb: async () => {
-        await db.dropDatabase();
+        await mongoose.connection.db?.dropDatabase();
     },
     getBlog: async (arrayIndex: number) => {
-        const allBlogs = await blogsCollection.find({}).toArray();
+        const allBlogs = await BlogModel.find({}).lean();
         return allBlogs[arrayIndex];
     },
     getPost: async (arrayIndex: number) => {
-        const allPosts = await postsCollection.find({}).toArray();
+        const allPosts = await PostModel.find({}).lean();
         return allPosts[arrayIndex];
     },
     getComment: async (arrayIndex: number) => {
-        const allComments = await commentsCollection.find({}).toArray();
+        const allComments = await CommentModel.find({}).lean();
         return allComments[arrayIndex];
     },
 };
