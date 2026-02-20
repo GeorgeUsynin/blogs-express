@@ -139,8 +139,9 @@ describe('auth password recovery endpoints', () => {
                 errorsMessages: [
                     {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
-                        message: 'Invalid recovery code',
+                        message: 'Invalid password recovery code',
                         field: 'recoveryCode',
+                        code: 'INVALID_PASSWORD_RECOVERY_CODE',
                     },
                 ],
             });
@@ -172,9 +173,9 @@ describe('auth password recovery endpoints', () => {
                 errorsMessages: [
                     {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
-                        message: 'Password recovery code is expired',
+                        message: 'Password recovery code expired',
                         field: 'recoveryCode',
-                        code: 'EXPIRED_CODE',
+                        code: 'PASSWORD_RECOVERY_CODE_EXPIRED',
                     },
                 ],
             });

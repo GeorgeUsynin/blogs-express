@@ -105,6 +105,7 @@ describe('auth registration-related endpoints', () => {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
                         message: 'The login is not unique',
                         field: 'login',
+                        code: 'LOGIN_ALREADY_EXISTS',
                     },
                 ],
             });
@@ -187,6 +188,7 @@ describe('auth registration-related endpoints', () => {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
                         message: 'Invalid confirmation code',
                         field: 'code',
+                        code: 'INVALID_CONFIRMATION_CODE',
                     },
                 ],
             });
@@ -214,7 +216,7 @@ describe('auth registration-related endpoints', () => {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
                         message: 'Confirmation code already been applied',
                         field: 'code',
-                        code: 'EMAIL_ALREADY_CONFIRMED',
+                        code: 'EMAIL_ALREADY_CONFIRMED_BY_CODE',
                     },
                 ],
             });
@@ -235,9 +237,9 @@ describe('auth registration-related endpoints', () => {
                 errorsMessages: [
                     {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
-                        message: 'Confirmation code is expired',
+                        message: 'Confirmation code expired',
                         field: 'code',
-                        code: 'EXPIRED_CODE',
+                        code: 'CONFIRMATION_CODE_EXPIRED',
                     },
                 ],
             });
@@ -285,26 +287,17 @@ describe('auth registration-related endpoints', () => {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
                         message: 'Invalid confirmation code',
                         field: 'code',
+                        code: 'INVALID_CONFIRMATION_CODE',
                     },
                 ],
             });
         });
 
-        it('returns 400 when email does not exist', async () => {
-            const { body } = await request
+        it('returns 204 when email does not exist', async () => {
+            await request
                 .post(`${ROUTES.AUTH}/registration-email-resending`)
                 .send({ email: 'missing-user@example.com' })
-                .expect(HTTP_STATUS_CODES.BAD_REQUEST_400);
-
-            expect(body).toEqual({
-                errorsMessages: [
-                    {
-                        status: HTTP_STATUS_CODES.BAD_REQUEST_400,
-                        message: 'Invalid email',
-                        field: 'email',
-                    },
-                ],
-            });
+                .expect(HTTP_STATUS_CODES.NO_CONTENT_204);
         });
 
         it('returns 400 when user is already confirmed', async () => {
@@ -325,7 +318,7 @@ describe('auth registration-related endpoints', () => {
                         status: HTTP_STATUS_CODES.BAD_REQUEST_400,
                         message: 'Confirmation code already been applied',
                         field: 'code',
-                        code: 'EMAIL_ALREADY_CONFIRMED',
+                        code: 'EMAIL_ALREADY_CONFIRMED_BY_CODE',
                     },
                 ],
             });

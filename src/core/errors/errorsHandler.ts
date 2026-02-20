@@ -41,6 +41,7 @@ export function errorsHandler(error: unknown, res: Response): void {
 
         if (Object.keys(responseBody).length === 1) {
             res.sendStatus(httpStatus);
+            return;
         } else {
             res.status(httpStatus).send(createErrorMessages([responseBody]));
             return;

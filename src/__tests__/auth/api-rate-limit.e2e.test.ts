@@ -31,6 +31,7 @@ describe('auth api rate limit', () => {
                 {
                     status: HTTP_STATUS_CODES.TOO_MANY_REQUESTS_429,
                     message: expect.stringContaining('Too many requests!'),
+                    code: 'API_RATE_LIMIT',
                 },
             ],
         });
@@ -56,7 +57,7 @@ describe('auth api rate limit', () => {
         await expectRateLimit(
             `${ROUTES.AUTH}/registration-email-resending`,
             { email: 'missing-user@example.com' },
-            HTTP_STATUS_CODES.BAD_REQUEST_400
+            HTTP_STATUS_CODES.NO_CONTENT_204
         );
     });
 
