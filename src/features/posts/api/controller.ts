@@ -28,6 +28,7 @@ import {
 import { mapToCommentListPaginatedOutput, mapToCommentViewModel } from '../../comments/api/mappers';
 import { CommentsService } from '../../comments/application';
 import { CommentsQueryRepository } from '../../comments/repository/queryRepository';
+import { PostNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class PostsController {
@@ -64,7 +65,7 @@ export class PostsController {
     async getPostById(req: Request<URIParamsPostModel>, res: Response<PostViewModel>) {
         const id = req.params.id;
 
-        const foundPost = await this.postsQueryRepository.findByIdOrFail(id);
+        const foundPost = await this.findPostByIdOrThrowNotFound(id);
 
         const mappedPost = mapToPostViewModel(foundPost);
 
@@ -77,7 +78,7 @@ export class PostsController {
     ) {
         const postId = req.params.id;
 
-        await this.postsQueryRepository.findByIdOrFail(postId);
+        await this.findPostByIdOrThrowNotFound(postId);
 
         const sanitizedQuery = matchedData<CommentQueryInput>(req, {
             locations: ['query'],
@@ -140,5 +141,11 @@ export class PostsController {
         await this.postsService.removeById(id);
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
+    }
+
+    private async findPostByIdOrThrowNotFound(id: string) {
+        const post = await this.postsQueryRepository.findById(id);
+        if (!post) throw new PostNotFoundError();
+        return post;
     }
 }

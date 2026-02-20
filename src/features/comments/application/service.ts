@@ -5,6 +5,7 @@ import { UsersRepository } from '../../users/repository/repository';
 import { CreateUpdateCommentInputModel } from '../api/models';
 import { CommentModel, TComment } from '../domain';
 import { CommentsRepository } from '../repository/repository';
+import { CommentNotFoundError, PostNotFoundError, UserNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class CommentsService {
@@ -24,16 +25,23 @@ export class CommentsService {
     ): Promise<WithId<TComment>> {
         const { content } = commentAttributes;
 
-        await this.postsRepository.findByIdOrFail(postId);
+        const foundPost = await this.postsRepository.findById(postId);
+        if (!foundPost) {
+            throw new PostNotFoundError();
+        }
 
-        const { login } = await this.usersRepository.findByIdOrFail(userId);
+        const user = await this.usersRepository.findById(userId);
+
+        if (!user) {
+            throw new UserNotFoundError();
+        }
 
         const newComment = CommentModel.createComment({
             content,
             postId,
             commentatorInfo: {
                 userId,
-                userLogin: login,
+                userLogin: user.login,
             },
         });
 
@@ -46,21 +54,28 @@ export class CommentsService {
         commentAttributes: CreateUpdateCommentInputModel
     ): Promise<void> {
         const { content } = commentAttributes;
-        const foundComment = await this.commentsRepository.findByIdOrFail(commentId);
+        const foundComment = await this.commentsRepository.findById(commentId);
 
-        if (foundComment.isCommentOwner(userId)) {
-            foundComment.content = content;
-            await this.commentsRepository.save(foundComment);
+        if (!foundComment) {
+            throw new CommentNotFoundError();
         }
+
+        foundComment.ensureCommentOwner(userId);
+
+        foundComment.content = content;
+        await this.commentsRepository.save(foundComment);
     }
 
     async removeById(commentId: string, userId: string): Promise<void> {
-        const foundComment = await this.commentsRepository.findByIdOrFail(commentId);
+        const foundComment = await this.commentsRepository.findById(commentId);
 
-        if (foundComment.isCommentOwner(userId)) {
-            foundComment.isDeleted = true;
-
-            await this.commentsRepository.save(foundComment);
+        if (!foundComment) {
+            throw new CommentNotFoundError();
         }
+
+        foundComment.ensureCommentOwner(userId);
+
+        foundComment.isDeleted = true;
+        await this.commentsRepository.save(foundComment);
     }
 }

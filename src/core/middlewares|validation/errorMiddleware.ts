@@ -8,7 +8,7 @@ export const createErrorMessages = (errors: TValidationError[]): ErrorViewModel 
     return {
         errorsMessages: errors.map(error => ({
             status: error.status,
-            message: error.message,
+            ...(error.message !== undefined ? { message: error.message } : {}),
             ...(error.field !== undefined ? { field: error.field } : {}),
             ...(error.code !== undefined ? { code: error.code } : {}),
         })),

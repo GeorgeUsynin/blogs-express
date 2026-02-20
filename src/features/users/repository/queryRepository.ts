@@ -2,7 +2,6 @@ import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
 import { UserQueryInput } from '../api/models';
 import { TUser, UserModel } from '../domain';
-import { RepositoryNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class UsersQueryRepository {
@@ -36,12 +35,7 @@ export class UsersQueryRepository {
         return { items, totalCount };
     }
 
-    async findByIdOrFail(id: string): Promise<WithId<TUser>> {
-        const res = await UserModel.findById(id);
-
-        if (!res) {
-            throw new RepositoryNotFoundError("User doesn't exist");
-        }
-        return res;
+    async findById(id: string): Promise<WithId<TUser> | null> {
+        return UserModel.findById(id);
     }
 }

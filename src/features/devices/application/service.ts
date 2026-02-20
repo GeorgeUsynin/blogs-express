@@ -3,6 +3,7 @@ import { inject, injectable } from 'inversify';
 import { DeviceModel, TDevice } from '../domain';
 import { DevicesRepository } from '../repository/repository';
 import { CreateDeviceDto } from './dto';
+import { DeviceNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class DevicesService {
@@ -25,11 +26,15 @@ export class DevicesService {
     }
 
     async terminateDeviceSessionByDeviceId(deviceId: string, userId: string): Promise<void> {
-        const foundDevice = await this.devicesRepository.findByDeviceIdOrFail(deviceId);
+        const foundDevice = await this.devicesRepository.findByDeviceId(deviceId);
 
-        if (foundDevice.isDeviceOwner(userId)) {
-            await this.devicesRepository.removeByDeviceId(deviceId);
+        if (!foundDevice) {
+            throw new DeviceNotFoundError();
         }
+
+        foundDevice.ensureDeviceOwner(userId);
+
+        await this.devicesRepository.removeByDeviceId(deviceId);
     }
 
     async terminateAllDeviceSessionsExceptCurrent(deviceId: string, userId: string): Promise<void> {

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { BadRequestError } from '../../../core/errors';
+import { InvalidConfirmationCode } from '../../../core/errors';
 import { EmailManager } from '../../../shared/managers/emailManager';
 import { CreateUserInputModel } from '../../users/api/models';
 import { UsersService } from '../../users/application/service';
@@ -23,35 +23,27 @@ export class RegistrationService {
         } = await this.usersService.create(userAttributes);
 
         this.emailManager.sendConfirmationEmail(email, confirmationCode);
-
-        return;
     }
 
     async confirmRegistration(code: string): Promise<void> {
         const user = await this.usersRepository.findUserByConfirmationCode(code);
 
         if (!user) {
-            throw new BadRequestError('Invalid confirmation code', 'code');
+            throw new InvalidConfirmationCode();
         }
 
         user.confirmUserEmail(code);
         await this.usersRepository.save(user);
-
-        return;
     }
 
     async resendEmailConfirmationCode(email: string): Promise<void> {
         const user = await this.usersRepository.findUserByEmail(email);
 
-        if (!user) {
-            throw new BadRequestError('Invalid email', 'email');
+        if (user) {
+            const confirmationCode = user.regenerateEmailConfirmationCode();
+            await this.usersRepository.save(user);
+
+            this.emailManager.sendConfirmationEmail(email, confirmationCode);
         }
-
-        const confirmationCode = user.regenerateEmailConfirmationCode();
-        await this.usersRepository.save(user);
-
-        this.emailManager.sendConfirmationEmail(email, confirmationCode);
-
-        return;
     }
 }

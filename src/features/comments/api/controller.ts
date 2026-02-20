@@ -6,6 +6,7 @@ import { mapToCommentViewModel } from './mappers';
 import { CommentViewModel, CreateUpdateCommentInputModel, URIParamsCommentModel } from './models';
 import { CommentsService } from '../application';
 import { CommentsQueryRepository } from '../repository/queryRepository';
+import { CommentNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class CommentsController {
@@ -19,7 +20,11 @@ export class CommentsController {
     async getCommentById(req: Request<URIParamsCommentModel>, res: Response<CommentViewModel>) {
         const id = req.params.id;
 
-        const foundComment = await this.commentsQueryRepository.findByIdOrFail(id);
+        const foundComment = await this.commentsQueryRepository.findById(id);
+
+        if (!foundComment) {
+            throw new CommentNotFoundError();
+        }
 
         const mappedComment = mapToCommentViewModel(foundComment);
 

@@ -1,38 +1,22 @@
 import { Response } from 'express';
-import { RepositoryNotFoundError } from './RepositoryNotFoundError';
 import { HTTP_STATUS_CODES } from '../constants';
 import { createErrorMessages } from '../middlewares|validation';
-import { DomainError } from './domainError';
-import { BadRequestError } from './BadRequestError';
-import { UnauthorizedError } from './UnauthorizedError';
-import { ForbiddenError } from './ForbiddenError';
-import { RateLimitError } from './RateLimitError';
+import { BaseDomainError } from './domainErrors';
+import { UnauthorizedError } from './httpErrors/UnauthorizedError';
+import { APIRateLimitError } from './httpErrors/APIRateLimitError';
+import { ErrorCode, ErrorCodes } from './constants';
+import { TValidationError } from '../types';
 
 export function errorsHandler(error: unknown, res: Response): void {
-    if (error instanceof RepositoryNotFoundError) {
-        const httpStatus = HTTP_STATUS_CODES.NOT_FOUND_404;
-
-        res.status(httpStatus).send(
+    if (error instanceof BaseDomainError) {
+        const status = domainErrorToHttpStatus(error.code);
+        res.status(status).send(
             createErrorMessages([
                 {
-                    status: httpStatus,
-                    message: error.message,
-                },
-            ])
-        );
-
-        return;
-    }
-
-    if (error instanceof BadRequestError) {
-        const httpStatus = HTTP_STATUS_CODES.BAD_REQUEST_400;
-
-        res.status(httpStatus).send(
-            createErrorMessages([
-                {
-                    status: httpStatus,
+                    status,
                     message: error.message,
                     field: error.field,
+                    code: error.code,
                 },
             ])
         );
@@ -43,76 +27,33 @@ export function errorsHandler(error: unknown, res: Response): void {
     if (error instanceof UnauthorizedError) {
         const httpStatus = HTTP_STATUS_CODES.UNAUTHORIZED_401;
 
-        if (error.message || error.code) {
-            const responseBody = {
-                status: httpStatus,
-                message: error.message,
-                ...(error.code ? { code: error.code } : {}),
-            };
+        const responseBody: TValidationError = {
+            status: httpStatus,
+        };
 
+        if (error.message) {
+            responseBody.message = error.message;
+        }
+
+        if (error.code) {
+            responseBody.code = error.code;
+        }
+
+        if (Object.keys(responseBody).length === 1) {
+            res.sendStatus(httpStatus);
+        } else {
             res.status(httpStatus).send(createErrorMessages([responseBody]));
             return;
         }
-
-        res.sendStatus(httpStatus);
-
-        return;
     }
 
-    if (error instanceof ForbiddenError) {
-        const httpStatus = HTTP_STATUS_CODES.FORBIDDEN_403;
-
-        res.status(httpStatus).send(
-            createErrorMessages([
-                {
-                    status: httpStatus,
-                    message: error.message,
-                },
-            ])
-        );
-
-        return;
-    }
-
-    if (error instanceof RateLimitError) {
+    if (error instanceof APIRateLimitError) {
         const httpStatus = HTTP_STATUS_CODES.TOO_MANY_REQUESTS_429;
 
         res.status(httpStatus).send(
             createErrorMessages([
                 {
                     status: httpStatus,
-                    message: error.message,
-                },
-            ])
-        );
-
-        return;
-    }
-
-    if (error instanceof DomainError) {
-        const BadRequestHttpStatus = HTTP_STATUS_CODES.BAD_REQUEST_400;
-        const ForbiddenHttpStatus = HTTP_STATUS_CODES.FORBIDDEN_403;
-
-        if (error.code === 'NOT_AN_OWNER') {
-            res.status(ForbiddenHttpStatus).send(
-                createErrorMessages([
-                    {
-                        status: ForbiddenHttpStatus,
-                        field: error.field ?? '',
-                        message: error.message,
-                        code: error.code,
-                    },
-                ])
-            );
-
-            return;
-        }
-
-        res.status(BadRequestHttpStatus).send(
-            createErrorMessages([
-                {
-                    status: BadRequestHttpStatus,
-                    field: error.field ?? '',
                     message: error.message,
                     code: error.code,
                 },
@@ -125,4 +66,28 @@ export function errorsHandler(error: unknown, res: Response): void {
     console.error(error);
 
     res.sendStatus(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR_500);
+}
+
+function domainErrorToHttpStatus(code: ErrorCode) {
+    switch (code) {
+        case ErrorCodes.LOGIN_ALREADY_EXISTS:
+        case ErrorCodes.EMAIL_ALREADY_EXISTS:
+        case ErrorCodes.INVALID_CONFIRMATION_CODE:
+        case ErrorCodes.INVALID_PASSWORD_RECOVERY_CODE:
+        case ErrorCodes.CONFIRMATION_CODE_EXPIRED:
+        case ErrorCodes.PASSWORD_RECOVERY_CODE_EXPIRED:
+        case ErrorCodes.PASSWORD_RECOVERY_CODE_EXPIRED:
+            return HTTP_STATUS_CODES.BAD_REQUEST_400;
+        case ErrorCodes.USER_NOT_FOUND:
+        case ErrorCodes.BLOG_NOT_FOUND:
+        case ErrorCodes.POST_NOT_FOUND:
+        case ErrorCodes.COMMENT_NOT_FOUND:
+        case ErrorCodes.DEVICE_NOT_FOUND:
+            return HTTP_STATUS_CODES.NOT_FOUND_404;
+        case ErrorCodes.NOT_AN_OWNER_OF_THIS_DEVICE:
+        case ErrorCodes.NOT_AN_OWNER_OF_THIS_COMMENT:
+            return HTTP_STATUS_CODES.FORBIDDEN_403;
+        default:
+            return HTTP_STATUS_CODES.BAD_REQUEST_400;
+    }
 }

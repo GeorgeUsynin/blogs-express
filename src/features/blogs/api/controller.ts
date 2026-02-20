@@ -28,6 +28,7 @@ import { mapToPostListPaginatedOutput, mapToPostViewModel } from '../../posts/ap
 import { BlogsService } from '../application';
 import { PostsService } from '../../posts/application';
 import { PostsQueryRepository } from '../../posts/repository/queryRepository';
+import { BlogNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class BlogsController {
@@ -64,7 +65,7 @@ export class BlogsController {
     async getBlogById(req: Request<URIParamsBlogModel>, res: Response<BlogViewModel>) {
         const id = req.params.id;
 
-        const foundBlog = await this.blogsQueryRepository.findByIdOrFail(id);
+        const foundBlog = await this.findBlogByIdOrThrowNotFound(id);
 
         const mappedBlog = mapToBlogViewModel(foundBlog);
 
@@ -77,7 +78,7 @@ export class BlogsController {
     ) {
         const blogId = req.params.id;
 
-        await this.blogsQueryRepository.findByIdOrFail(blogId);
+        await this.findBlogByIdOrThrowNotFound(blogId);
 
         const sanitizedQuery = matchedData<PostQueryInput>(req, {
             locations: ['query'],
@@ -139,5 +140,11 @@ export class BlogsController {
         await this.blogsService.removeById(id);
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
+    }
+
+    private async findBlogByIdOrThrowNotFound(id: string) {
+        const blog = await this.blogsQueryRepository.findById(id);
+        if (!blog) throw new BlogNotFoundError();
+        return blog;
     }
 }

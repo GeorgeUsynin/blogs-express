@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { CommentDocument, TComment, TCommentModel } from './types';
 import { CreateCommentDto } from '../application/dto';
-import { DomainError } from '../../../core/errors';
+import { NotAnOwnerOfThisComment } from '../../../core/errors';
 
 const commentSchema = new Schema<TComment>({
     content: { type: String, minlength: 20, maxLength: 300, required: true },
@@ -24,11 +24,11 @@ export const commentStatics = {
 };
 
 export const commentMethods = {
-    isCommentOwner(userId: string) {
+    ensureCommentOwner(userId: string) {
         const that = this as CommentDocument;
 
         if (that.commentatorInfo.userId !== userId) {
-            throw new DomainError('You are not allowed to modify this comment', 'NOT_AN_OWNER', 'content');
+            throw new NotAnOwnerOfThisComment();
         }
 
         return true;

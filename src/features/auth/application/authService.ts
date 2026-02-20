@@ -85,7 +85,11 @@ export class AuthService {
         const issuedAt = new Date(iat! * 1000).toISOString();
         const expiresIn = new Date(exp! * 1000).toISOString();
 
-        const device = await this.devicesRepository.findByDeviceIdOrFail(deviceId);
+        const device = await this.devicesRepository.findByDeviceId(deviceId);
+
+        if (!device) {
+            throw new UnauthorizedError();
+        }
 
         device.issuedAt = issuedAt;
         device.expiresIn = expiresIn;

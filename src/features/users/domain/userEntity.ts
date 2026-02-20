@@ -4,7 +4,13 @@ import { randomUUID } from 'crypto';
 import { add } from 'date-fns/add';
 import { SETTINGS } from '../../../core/settings';
 import { CreateUserDto } from '../application/dto';
-import { DomainError } from '../../../core/errors';
+import {
+    ConfirmationCodeExpired,
+    EmailAlreadyConfirmedByCode,
+    InvalidConfirmationCode,
+    InvalidPasswordRecoveryCode,
+    PasswordRecoveryCodeExpired,
+} from '../../../core/errors';
 
 const loginPattern = '^[a-zA-Z0-9_-]*$';
 const emailPattern = '^[w-.]+@([w-]+.)+[w-]{2,4}$';
@@ -73,15 +79,15 @@ export const userMethods = {
         const that = this as UserDocument;
 
         if (that.emailConfirmation.isConfirmed) {
-            throw new DomainError('Confirmation code already been applied', 'EMAIL_ALREADY_CONFIRMED', 'code');
+            throw new EmailAlreadyConfirmedByCode();
         }
 
         if (that.emailConfirmation.confirmationCode !== code) {
-            throw new DomainError('Invalid code', 'INVALID_CODE', 'code');
+            throw new InvalidConfirmationCode();
         }
 
         if (Date.now() > Date.parse(that.emailConfirmation.expirationDate)) {
-            throw new DomainError('Confirmation code is expired', 'EXPIRED_CODE', 'code');
+            throw new ConfirmationCodeExpired();
         }
 
         that.emailConfirmation.isConfirmed = true;
@@ -91,7 +97,7 @@ export const userMethods = {
         const that = this as UserDocument;
 
         if (that.emailConfirmation.isConfirmed) {
-            throw new DomainError('Confirmation code already been applied', 'EMAIL_ALREADY_CONFIRMED', 'code');
+            throw new EmailAlreadyConfirmedByCode();
         }
 
         const confirmationCode = that.createEmailConfirmationCode();
@@ -103,11 +109,11 @@ export const userMethods = {
         const that = this as UserDocument;
 
         if (that.passwordRecovery.recoveryCode !== code) {
-            throw new DomainError('Invalid code', 'INVALID_CODE', 'recoveryCode');
+            throw new InvalidPasswordRecoveryCode();
         }
 
         if (Date.now() > Date.parse(that.passwordRecovery.expirationDate!)) {
-            throw new DomainError('Password recovery code is expired', 'EXPIRED_CODE', 'recoveryCode');
+            throw new PasswordRecoveryCodeExpired();
         }
 
         that.passwordHash = passwordHash;

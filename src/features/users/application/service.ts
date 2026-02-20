@@ -1,10 +1,10 @@
 import { inject, injectable } from 'inversify';
-import { BadRequestError } from '../../../core/errors';
 import { PasswordHasher } from '../../auth/application/passwordHasher';
 import { CreateUserInputModel } from '../api/models';
 import { UsersRepository } from '../repository/repository';
 import { TUser, UserModel } from '../domain';
 import { WithId } from 'mongodb';
+import { EmailAlreadyExistsError, LoginAlreadyExistsError, UserNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class UsersService {
@@ -20,12 +20,12 @@ export class UsersService {
 
         const userWithExistedLogin = await this.usersRepository.findUserByLogin(login);
         if (userWithExistedLogin) {
-            throw new BadRequestError('The login is not unique', 'login');
+            throw new LoginAlreadyExistsError();
         }
 
         const userWithExistedEmail = await this.usersRepository.findUserByEmail(email);
         if (userWithExistedEmail) {
-            throw new BadRequestError('The email address is not unique', 'email');
+            throw new EmailAlreadyExistsError();
         }
 
         const passwordHash = await this.passwordHasher.hashPassword(password);
@@ -42,7 +42,11 @@ export class UsersService {
     }
 
     async removeById(id: string): Promise<void> {
-        const foundUser = await this.usersRepository.findByIdOrFail(id);
+        const foundUser = await this.usersRepository.findById(id);
+
+        if (!foundUser) {
+            throw new UserNotFoundError();
+        }
 
         foundUser.isDeleted = true;
 

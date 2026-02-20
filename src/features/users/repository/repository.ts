@@ -1,5 +1,4 @@
 import { injectable } from 'inversify';
-import { RepositoryNotFoundError } from '../../../core/errors';
 import { TUser, UserDocument, UserModel } from '../domain';
 import { WithId } from 'mongodb';
 
@@ -25,14 +24,8 @@ export class UsersRepository {
         return UserModel.findOne({ $or: [{ email: loginOrEmail }, { login: loginOrEmail }] });
     }
 
-    async findByIdOrFail(id: string): Promise<UserDocument> {
-        const res = await UserModel.findById(id);
-
-        if (!res) {
-            throw new RepositoryNotFoundError("User doesn't exist");
-        }
-
-        return res;
+    async findById(id: string): Promise<UserDocument | null> {
+        return UserModel.findById(id);
     }
 
     async save(user: UserDocument): Promise<WithId<TUser>> {

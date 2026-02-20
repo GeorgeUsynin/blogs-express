@@ -16,6 +16,7 @@ import {
 import { CreateUserInputModel } from '../../users/api/models';
 import { AuthService, PasswordRecoveryService, RegistrationService } from '../application';
 import { UsersQueryRepository } from '../../users/repository/queryRepository';
+import { UserNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class AuthController {
@@ -33,7 +34,11 @@ export class AuthController {
     async me(req: Request, res: Response<MeOutputModel>) {
         const userId = req.userId!;
 
-        const user = await this.usersQueryRepository.findByIdOrFail(userId);
+        const user = await this.usersQueryRepository.findById(userId);
+
+        if (!user) {
+            throw new UserNotFoundError();
+        }
 
         const mappedMeUser = mapToMeViewModel(user);
 

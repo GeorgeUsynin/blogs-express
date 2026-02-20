@@ -2,7 +2,6 @@ import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
 import { BlogQueryInput } from '../api/models';
 import { BlogModel, TBlog } from '../domain';
-import { RepositoryNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class BlogsQueryRepository {
@@ -31,12 +30,7 @@ export class BlogsQueryRepository {
         return { items, totalCount };
     }
 
-    async findByIdOrFail(id: string): Promise<WithId<TBlog>> {
-        const res = await BlogModel.findById(id);
-
-        if (!res) {
-            throw new RepositoryNotFoundError("Blog doesn't exist");
-        }
-        return res;
+    async findById(id: string): Promise<WithId<TBlog> | null> {
+        return BlogModel.findById(id);
     }
 }

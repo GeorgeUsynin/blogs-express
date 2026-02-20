@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { EmailManager } from '../../../shared/managers/emailManager';
 import { UsersRepository } from '../../users/repository/repository';
-import { BadRequestError } from '../../../core/errors';
+import { InvalidPasswordRecoveryCode } from '../../../core/errors';
 import { PasswordHasher } from './passwordHasher';
 
 @injectable()
@@ -23,8 +23,6 @@ export class PasswordRecoveryService {
             await this.usersRepository.save(user);
 
             this.emailManager.sendPasswordRecoveryEmail(email, recoveryCode);
-
-            return;
         }
     }
 
@@ -32,14 +30,12 @@ export class PasswordRecoveryService {
         const user = await this.usersRepository.findUserByPasswordRecoveryCode(recoveryCode);
 
         if (!user) {
-            throw new BadRequestError('Invalid recovery code', 'recoveryCode');
+            throw new InvalidPasswordRecoveryCode();
         }
 
         const passwordHash = await this.passwordHasher.hashPassword(newPassword);
 
         user.updatePasswordByRecoveryCode(recoveryCode, passwordHash);
         await this.usersRepository.save(user);
-
-        return;
     }
 }

@@ -4,6 +4,7 @@ import { CreateUpdatePostInputModel } from '../api/models';
 import { PostModel, TPost } from '../domain';
 import { PostsRepository } from '../repository/repository';
 import { BlogsRepository } from '../../blogs/repository/repository';
+import { BlogNotFoundError, PostNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class PostsService {
@@ -15,7 +16,7 @@ export class PostsService {
     ) {}
 
     async create(postAttributes: CreateUpdatePostInputModel): Promise<WithId<TPost>> {
-        const { name: blogName } = await this.blogsRepository.findByIdOrFail(postAttributes.blogId);
+        const { name: blogName } = await this.findBlogByIdOrThrowNotFound(postAttributes.blogId);
 
         const newPost = PostModel.createPost({ blogName, ...postAttributes });
 
@@ -25,9 +26,9 @@ export class PostsService {
     async updateById(id: string, postAttributes: CreateUpdatePostInputModel): Promise<void> {
         const { title, shortDescription, content, blogId } = postAttributes;
 
-        await this.blogsRepository.findByIdOrFail(postAttributes.blogId);
+        await this.findBlogByIdOrThrowNotFound(blogId);
 
-        const foundPost = await this.postsRepository.findByIdOrFail(id);
+        const foundPost = await this.findPostByIdOrThrowNotFound(id);
 
         foundPost.title = title;
         foundPost.shortDescription = shortDescription;
@@ -38,10 +39,22 @@ export class PostsService {
     }
 
     async removeById(id: string): Promise<void> {
-        const foundPost = await this.postsRepository.findByIdOrFail(id);
+        const foundPost = await this.findPostByIdOrThrowNotFound(id);
 
         foundPost.isDeleted = true;
 
         await this.postsRepository.save(foundPost);
+    }
+
+    private async findBlogByIdOrThrowNotFound(id: string) {
+        const blog = await this.blogsRepository.findById(id);
+        if (!blog) throw new BlogNotFoundError();
+        return blog;
+    }
+
+    private async findPostByIdOrThrowNotFound(id: string) {
+        const post = await this.postsRepository.findById(id);
+        if (!post) throw new PostNotFoundError();
+        return post;
     }
 }

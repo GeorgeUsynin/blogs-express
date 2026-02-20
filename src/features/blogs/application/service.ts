@@ -1,8 +1,9 @@
 import { inject, injectable } from 'inversify';
 import { CreateUpdateBlogInputModel } from '../api/models';
 import { BlogModel, TBlog } from '../domain';
-import { BlogsRepository } from '../repository/repository';
+import { BlogsRepository } from '../repository';
 import { WithId } from 'mongodb';
+import { BlogNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class BlogsService {
@@ -20,7 +21,7 @@ export class BlogsService {
     async updateById(id: string, blogAttributes: CreateUpdateBlogInputModel): Promise<void> {
         const { description, name, websiteUrl } = blogAttributes;
 
-        const foundBlog = await this.blogsRepository.findByIdOrFail(id);
+        const foundBlog = await this.findBlogByIdOrThrowNotFound(id);
 
         foundBlog.name = name;
         foundBlog.description = description;
@@ -30,10 +31,16 @@ export class BlogsService {
     }
 
     async removeById(id: string): Promise<void> {
-        const foundBlog = await this.blogsRepository.findByIdOrFail(id);
+        const foundBlog = await this.findBlogByIdOrThrowNotFound(id);
 
         foundBlog.isDeleted = true;
 
         await this.blogsRepository.save(foundBlog);
+    }
+
+    private async findBlogByIdOrThrowNotFound(id: string) {
+        const blog = await this.blogsRepository.findById(id);
+        if (!blog) throw new BlogNotFoundError();
+        return blog;
     }
 }

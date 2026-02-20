@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { CreateRateLimitDto } from './dto';
 import { SETTINGS } from '../../../core/settings';
-import { RateLimitError } from '../../../core/errors';
+import { APIRateLimitError, ErrorCodes } from '../../../core/errors';
 import { ApiRateLimitRepository } from '../repository/repository';
 import { RateLimitModel } from '../domain';
 
@@ -16,9 +16,7 @@ export class ApiRateLimitService {
         const totalCountOfFilteredApiRequests = await this.rateLimitsRepository.getTotalCountOfFilteredAPIRequests(dto);
 
         if (totalCountOfFilteredApiRequests === SETTINGS.API_RATE_LIMIT_MAXIMUM_ATTEMPTS) {
-            throw new RateLimitError(
-                `Too many requests! Please wait for ${SETTINGS.API_RATE_LIMIT_TTL_IN_MS / 1000} seconds`
-            );
+            throw new APIRateLimitError(ErrorCodes.API_RATE_LIMIT);
         }
 
         const rateLimit = RateLimitModel.createRateLimit({

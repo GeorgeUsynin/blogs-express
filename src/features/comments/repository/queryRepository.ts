@@ -1,6 +1,5 @@
 import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
-import { RepositoryNotFoundError } from '../../../core/errors';
 import { CommentModel, TComment } from '../domain';
 import { CommentQueryInput } from '../api/models';
 
@@ -39,12 +38,7 @@ export class CommentsQueryRepository {
         return { items, totalCount };
     }
 
-    async findByIdOrFail(id: string): Promise<WithId<TComment>> {
-        const res = await CommentModel.findById(id);
-
-        if (!res) {
-            throw new RepositoryNotFoundError("Comment doesn't exist");
-        }
-        return res;
+    async findById(id: string): Promise<WithId<TComment> | null> {
+        return CommentModel.findById(id);
     }
 }

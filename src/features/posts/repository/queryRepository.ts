@@ -1,6 +1,5 @@
 import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
-import { RepositoryNotFoundError } from '../../../core/errors';
 import { PostModel, TPost } from '../domain';
 import { PostQueryInput } from '../api/models';
 
@@ -39,12 +38,7 @@ export class PostsQueryRepository {
         return { items, totalCount };
     }
 
-    async findByIdOrFail(id: string): Promise<WithId<TPost>> {
-        const res = await PostModel.findById(id);
-
-        if (!res) {
-            throw new RepositoryNotFoundError("Post doesn't exist");
-        }
-        return res;
+    async findById(id: string): Promise<WithId<TPost> | null> {
+        return PostModel.findById(id);
     }
 }
