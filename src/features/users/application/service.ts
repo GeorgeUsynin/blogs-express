@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { PasswordHasher } from '../../auth/application/passwordHasher';
+import { PasswordHasher } from '../../auth/application';
 import { CreateUserInputModel } from '../api/models';
 import { UsersRepository } from '../repository';
 import { UserModel } from '../domain';

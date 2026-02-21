@@ -18,7 +18,7 @@ import {
 } from './models';
 import { mapToPostListPaginatedOutput, mapToPostViewModel } from './mappers';
 import { PostsService } from '../application';
-import { PostsQueryRepository } from '../repository/queryRepository';
+import { PostsQueryRepository } from '../repository';
 import {
     CommentListPaginatedOutput,
     CommentQueryInput,
@@ -27,7 +27,7 @@ import {
 } from '../../comments/api/models';
 import { mapToCommentListPaginatedOutput, mapToCommentViewModel } from '../../comments/api/mappers';
 import { CommentsService } from '../../comments/application';
-import { CommentsQueryRepository } from '../../comments/repository/queryRepository';
+import { CommentsQueryRepository } from '../../comments/repository';
 import { CommentCreationFailedError, PostCreationFailedError, PostNotFoundError } from '../../../core/errors';
 
 @injectable()

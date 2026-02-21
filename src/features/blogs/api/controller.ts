@@ -15,7 +15,7 @@ import {
     type CreateUpdateBlogInputModel,
 } from './models';
 import { setDefaultSortAndPaginationIfNotExist } from '../../../core/helpers';
-import { BlogsQueryRepository } from '../repository/queryRepository';
+import { BlogsQueryRepository } from '../repository';
 import { mapToBlogListPaginatedOutput, mapToBlogViewModel } from './mappers';
 import { HTTP_STATUS_CODES } from '../../../core/constants';
 import {
@@ -27,7 +27,7 @@ import {
 import { mapToPostListPaginatedOutput, mapToPostViewModel } from '../../posts/api/mappers';
 import { BlogsService } from '../application';
 import { PostsService } from '../../posts/application';
-import { PostsQueryRepository } from '../../posts/repository/queryRepository';
+import { PostsQueryRepository } from '../../posts/repository';
 import { BlogCreationFailedError, BlogNotFoundError, PostCreationFailedError } from '../../../core/errors';
 
 @injectable()

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { EmailManager } from '../../../shared/managers/emailManager';
+import { EmailManager } from '../../../shared/managers';
 import { UsersRepository } from '../../users/repository';
 import { InvalidPasswordRecoveryCode } from '../../../core/errors';
 import { PasswordHasher } from './passwordHasher';

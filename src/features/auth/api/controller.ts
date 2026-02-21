@@ -3,7 +3,7 @@ import { type Request, type Response } from 'express';
 import { parseUserAgent } from '../../../core/helpers';
 import { HTTP_STATUS_CODES } from '../../../core/constants';
 import { RequestWithBody } from '../../../core/types';
-import { mapToMeViewModel } from './mappers/mapToMeViewModel';
+import { mapToMeViewModel } from './mappers';
 import {
     CreateLoginInputModel,
     LoginOutputModel,
@@ -15,7 +15,7 @@ import {
 } from './models';
 import { CreateUserInputModel } from '../../users/api/models';
 import { AuthService, PasswordRecoveryService, RegistrationService } from '../application';
-import { UsersQueryRepository } from '../../users/repository/queryRepository';
+import { UsersQueryRepository } from '../../users/repository';
 import { UserNotFoundError } from '../../../core/errors';
 
 @injectable()

@@ -5,7 +5,7 @@ import { RequestWithParamsAndBody } from '../../../core/types';
 import { mapToCommentViewModel } from './mappers';
 import { CommentViewModel, CreateUpdateCommentInputModel, URIParamsCommentModel } from './models';
 import { CommentsService } from '../application';
-import { CommentsQueryRepository } from '../repository/queryRepository';
+import { CommentsQueryRepository } from '../repository';
 import { CommentNotFoundError } from '../../../core/errors';
 import { CreateUpdateLikesStatusInputModel } from '../../likes/api/models';
 

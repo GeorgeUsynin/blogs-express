@@ -3,8 +3,8 @@ import { type Request, type Response } from 'express';
 import { HTTP_STATUS_CODES } from '../../../core/constants';
 import { mapToDeviceViewModel } from './mappers';
 import { DeviceViewModel, URIParamsDeviceModel } from './models';
-import { DevicesService } from '../application/service';
-import { DevicesQueryRepository } from '../repository/queryRepository';
+import { DevicesService } from '../application';
+import { DevicesQueryRepository } from '../repository';
 
 @injectable()
 export class DevicesController {

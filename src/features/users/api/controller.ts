@@ -12,8 +12,8 @@ import {
     UserQueryInput,
     UserViewModel,
 } from './models';
-import { UsersService } from '../application/service';
-import { UsersQueryRepository } from '../repository/queryRepository';
+import { UsersService } from '../application';
+import { UsersQueryRepository } from '../repository';
 import { UserCreationFailedError } from '../../../core/errors';
 
 @injectable()

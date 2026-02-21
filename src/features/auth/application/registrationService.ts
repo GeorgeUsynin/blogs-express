@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { InvalidConfirmationCode, UserCreationFailedError } from '../../../core/errors';
-import { EmailManager } from '../../../shared/managers/emailManager';
+import { EmailManager } from '../../../shared/managers';
 import { CreateUserInputModel } from '../../users/api/models';
-import { UsersService } from '../../users/application/service';
+import { UsersService } from '../../users/application';
 import { UsersRepository } from '../../users/repository';
 
 @injectable()

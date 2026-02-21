@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import { inject, injectable } from 'inversify';
 import { UnauthorizedError } from '../../../core/errors';
 import { SETTINGS } from '../../../core/settings';
-import { DevicesService } from '../../devices/application/service';
+import { DevicesService } from '../../devices/application';
 import { DevicesRepository } from '../../devices/repository';
 import { UsersRepository } from '../../users/repository';
 import { CreateLoginDto } from './dto';
