@@ -11,5 +11,5 @@ export const apiRateLimitMiddleware = async (req: Request, res: Response, next: 
 
     await apiRateLimitService.logApiRequest({ url, ip, createdAt });
 
-    next();
+    return next();
 };

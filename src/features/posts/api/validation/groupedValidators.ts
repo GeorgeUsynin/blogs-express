@@ -1,6 +1,10 @@
 import { checkSchema } from 'express-validator';
 import { createUpdatePostValidationSchema } from './createUpdatePostValidationSchema';
-import { errorMiddleware, objectIdValidation } from '../../../../core/middlewares|validation';
+import {
+    errorMiddleware,
+    getUserIdFromAccessTokenMiddleware,
+    objectIdValidation,
+} from '../../../../core/middlewares|validation';
 import { basicAuthMiddleware, jwtAuthMiddleware } from '../../../../auth|middlewares';
 import { postsQueryParamsValidationSchema } from './postsQueryParamsValidationSchema';
 import {
@@ -11,6 +15,7 @@ import {
 export const getValidators = [checkSchema(postsQueryParamsValidationSchema, ['query']), errorMiddleware];
 export const getByIdValidators = [objectIdValidation, errorMiddleware];
 export const getAllCommentsByPostIdValidator = [
+    getUserIdFromAccessTokenMiddleware,
     objectIdValidation,
     checkSchema(commentsQueryParamsValidationSchema, ['query']),
     errorMiddleware,

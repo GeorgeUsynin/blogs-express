@@ -27,5 +27,5 @@ export const basicAuthMiddleware = (req: Request, res: Response, next: NextFunct
         return;
     }
 
-    next();
+    return next();
 };

@@ -8,5 +8,18 @@ export const CommentsRouter = Router();
 const commentsController: CommentsController = container.get(CommentsController);
 
 CommentsRouter.get('/:id', ...Validators.getByIdValidators, commentsController.getCommentById.bind(commentsController));
-CommentsRouter.put('/:id', ...Validators.updateValidators, commentsController.updateCommentById.bind(commentsController));
-CommentsRouter.delete('/:id', ...Validators.deleteValidators, commentsController.deleteCommentById.bind(commentsController));
+CommentsRouter.put(
+    '/:id',
+    ...Validators.updateValidators,
+    commentsController.updateCommentById.bind(commentsController)
+);
+CommentsRouter.put(
+    '/:id/like-status',
+    ...Validators.createUpdateLikeStatusValidators,
+    commentsController.createUpdateCommentLikeStatusById.bind(commentsController)
+);
+CommentsRouter.delete(
+    '/:id',
+    ...Validators.deleteValidators,
+    commentsController.deleteCommentById.bind(commentsController)
+);

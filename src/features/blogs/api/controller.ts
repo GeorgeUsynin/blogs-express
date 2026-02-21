@@ -28,7 +28,7 @@ import { mapToPostListPaginatedOutput, mapToPostViewModel } from '../../posts/ap
 import { BlogsService } from '../application';
 import { PostsService } from '../../posts/application';
 import { PostsQueryRepository } from '../../posts/repository/queryRepository';
-import { BlogNotFoundError } from '../../../core/errors';
+import { BlogCreationFailedError, BlogNotFoundError, PostCreationFailedError } from '../../../core/errors';
 
 @injectable()
 export class BlogsController {
@@ -101,7 +101,13 @@ export class BlogsController {
     async createBlog(req: RequestWithBody<CreateUpdateBlogInputModel>, res: Response<BlogViewModel>) {
         const payload = req.body;
 
-        const createdBlog = await this.blogsService.create(payload);
+        const blogId = await this.blogsService.create(payload);
+
+        const createdBlog = await this.blogsQueryRepository.findById(blogId);
+
+        if (!createdBlog) {
+            throw new BlogCreationFailedError();
+        }
 
         const mappedBlog = mapToBlogViewModel(createdBlog);
 
@@ -115,7 +121,13 @@ export class BlogsController {
         const id = req.params.id;
         const payload = req.body;
 
-        const createdPost = await this.postsService.create({ ...payload, blogId: id });
+        const postId = await this.postsService.create({ ...payload, blogId: id });
+
+        const createdPost = await this.postsQueryRepository.findById(postId);
+
+        if (!createdPost) {
+            throw new PostCreationFailedError();
+        }
 
         const mappedPost = mapToPostViewModel(createdPost);
 

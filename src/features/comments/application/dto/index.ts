@@ -1,3 +1,3 @@
-import { CreateCommentDto } from './CreateCommentDto';
+import { CommentLikeStatusAttributes } from './CommentLikeStatusAttributes';
 
-export { CreateCommentDto };
+export { CommentLikeStatusAttributes };

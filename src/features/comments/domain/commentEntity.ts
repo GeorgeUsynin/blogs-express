@@ -1,14 +1,19 @@
 import { model, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { CommentDocument, TComment, TCommentModel } from './types';
-import { CreateCommentDto } from '../application/dto';
+import { CreateCommentDto } from './dto';
 import { NotAnOwnerOfThisComment } from '../../../core/errors';
+import { NonNoneLikeStatus } from '../../likes/domain';
 
 const commentSchema = new Schema<TComment>({
     content: { type: String, minlength: 20, maxLength: 300, required: true },
     commentatorInfo: {
         userId: { type: String, required: true },
         userLogin: { type: String, required: true },
+    },
+    likesInfo: {
+        dislikesCount: { type: Number, default: 0 },
+        likesCount: { type: Number, default: 0 },
     },
     postId: { type: String, required: true },
     createdAt: { type: String, default: () => new Date().toISOString() },

@@ -28,7 +28,7 @@ import {
 import { mapToCommentListPaginatedOutput, mapToCommentViewModel } from '../../comments/api/mappers';
 import { CommentsService } from '../../comments/application';
 import { CommentsQueryRepository } from '../../comments/repository/queryRepository';
-import { PostNotFoundError } from '../../../core/errors';
+import { CommentCreationFailedError, PostCreationFailedError, PostNotFoundError } from '../../../core/errors';
 
 @injectable()
 export class PostsController {
@@ -76,6 +76,7 @@ export class PostsController {
         req: RequestWithParamsAndQuery<URIParamsPostModel, Partial<CommentQueryInput>>,
         res: Response<CommentListPaginatedOutput>
     ) {
+        const userId = req.userId;
         const postId = req.params.id;
 
         await this.findPostByIdOrThrowNotFound(postId);
@@ -87,7 +88,7 @@ export class PostsController {
 
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const { items, totalCount } = await this.commentsQueryRepository.findManyByPostId(postId, queryInput);
+        const { items, totalCount } = await this.commentsQueryRepository.findManyByPostId(postId, queryInput, userId);
 
         const commentsListOutput = mapToCommentListPaginatedOutput(items, {
             pageNumber: queryInput.pageNumber,
@@ -106,7 +107,13 @@ export class PostsController {
         const userId = req.userId!;
         const payload = req.body;
 
-        const createdComment = await this.commentsService.create(postId, userId, payload);
+        const commentId = await this.commentsService.create(postId, userId, payload);
+
+        const createdComment = await this.commentsQueryRepository.findById(commentId);
+
+        if (!createdComment) {
+            throw new CommentCreationFailedError();
+        }
 
         const mappedComment = mapToCommentViewModel(createdComment);
 
@@ -116,7 +123,13 @@ export class PostsController {
     async createPost(req: RequestWithBody<CreateUpdatePostInputModel>, res: Response<PostViewModel>) {
         const payload = req.body;
 
-        const createdPost = await this.postsService.create(payload);
+        const postId = await this.postsService.create(payload);
+
+        const createdPost = await this.postsQueryRepository.findById(postId);
+
+        if (!createdPost) {
+            throw new PostCreationFailedError();
+        }
 
         const mappedPost = mapToPostViewModel(createdPost);
 

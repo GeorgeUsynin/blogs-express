@@ -7,6 +7,10 @@ export type TComment = {
         userId: string;
         userLogin: string;
     };
+    likesInfo: {
+        dislikesCount: number;
+        likesCount: number;
+    };
     postId: string;
     createdAt: string;
     isDeleted: boolean;

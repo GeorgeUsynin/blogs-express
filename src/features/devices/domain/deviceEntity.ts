@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { DeviceDocument, TDevice, TDeviceModel } from './types';
-import { CreateDeviceDto } from '../application/dto';
+import { CreateDeviceDto } from './dto';
 import { NotAnOwnerOfThisDevice } from '../../../core/errors';
 
 const deviceSchema = new Schema<TDevice>({

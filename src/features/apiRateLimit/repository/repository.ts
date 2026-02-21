@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { SETTINGS } from '../../../core/settings';
-import { CreateRateLimitDto } from '../application/dto';
+import { CreateRateLimitDto } from '../domain/dto';
 import { RateLimitDocument, RateLimitModel } from '../domain';
 
 @injectable()

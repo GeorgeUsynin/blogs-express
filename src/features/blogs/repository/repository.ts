@@ -8,7 +8,9 @@ export class BlogsRepository {
         return BlogModel.findById(id);
     }
 
-    async save(blog: BlogDocument): Promise<WithId<TBlog>> {
-        return blog.save();
+    async save(blog: BlogDocument): Promise<string> {
+        const newBlog = await blog.save();
+
+        return newBlog._id.toString();
     }
 }

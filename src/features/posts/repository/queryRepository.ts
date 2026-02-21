@@ -39,6 +39,6 @@ export class PostsQueryRepository {
     }
 
     async findById(id: string): Promise<WithId<TPost> | null> {
-        return PostModel.findById(id);
+        return PostModel.findById(id).lean();
     }
 }

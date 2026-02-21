@@ -33,5 +33,5 @@ export const jwtAuthMiddleware = async (req: Request, res: Response, next: NextF
 
     req.userId = userId;
 
-    next();
+    return next();
 };

@@ -1,10 +1,9 @@
-import { WithId } from 'mongodb';
-import { type TComment } from '../../domain';
 import { CommentListPaginatedOutput } from '../models';
 import { mapToCommentViewModel } from './mapToCommentViewModel';
+import { CommentReadModel } from '../../repository/models';
 
 export function mapToCommentListPaginatedOutput(
-    comments: WithId<TComment>[],
+    comments: CommentReadModel[],
     meta: { pageNumber: number; pageSize: number; totalCount: number }
 ): CommentListPaginatedOutput {
     return {

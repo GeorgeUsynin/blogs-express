@@ -8,17 +8,17 @@ export class DevicesRepository {
         return DeviceModel.findOne({ deviceId: id });
     }
 
-    async removeByDeviceId(id: string): Promise<boolean> {
-        const { deletedCount } = await DeviceModel.deleteOne({ deviceId: id });
-
-        return deletedCount === 1;
+    async removeByDeviceId(id: string): Promise<void> {
+        await DeviceModel.deleteOne({ deviceId: id });
     }
 
     async removeAllDevicesExceptCurrent(deviceId: string, userId: string): Promise<void> {
         await DeviceModel.deleteMany({ userId, deviceId: { $ne: deviceId } });
     }
 
-    async save(device: DeviceDocument): Promise<WithId<TDevice>> {
-        return device.save();
+    async save(device: DeviceDocument): Promise<string> {
+        const newDevice = await device.save();
+
+        return newDevice._id.toString();
     }
 }

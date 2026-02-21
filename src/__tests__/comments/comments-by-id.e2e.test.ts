@@ -54,6 +54,11 @@ describe('comments by id endpoints', () => {
                 userId: datasetComments[0].commentatorInfo.userId,
                 userLogin: datasetComments[0].commentatorInfo.userLogin,
             },
+            likesInfo: {
+                dislikesCount: 0,
+                likesCount: 0,
+                myStatus: 'None',
+            },
             createdAt: expect.any(String),
         });
     });
@@ -75,6 +80,10 @@ describe('comments by id endpoints', () => {
             commentatorInfo: {
                 userId: user.id,
                 userLogin: user.login,
+            },
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
             },
             createdAt: new Date().toISOString(),
             isDeleted: false,
@@ -116,6 +125,10 @@ describe('comments by id endpoints', () => {
                 userId: owner.id,
                 userLogin: owner.login,
             },
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+            },
             createdAt: new Date().toISOString(),
             isDeleted: false,
         });
@@ -140,6 +153,10 @@ describe('comments by id endpoints', () => {
             commentatorInfo: {
                 userId: user.id,
                 userLogin: user.login,
+            },
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
             },
             createdAt: new Date().toISOString(),
             isDeleted: false,
@@ -176,6 +193,10 @@ describe('comments by id endpoints', () => {
                 userId: user.id,
                 userLogin: user.login,
             },
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+            },
             createdAt: new Date().toISOString(),
             isDeleted: false,
         });
@@ -210,6 +231,10 @@ describe('comments by id endpoints', () => {
             commentatorInfo: {
                 userId: owner.id,
                 userLogin: owner.login,
+            },
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
             },
             createdAt: new Date().toISOString(),
             isDeleted: false,

@@ -48,7 +48,9 @@ describe('comments by post id endpoints', () => {
         const requestedPostId = posts[2]._id.toString();
         const expectedComments = comments.filter(comment => comment.postId === requestedPostId);
 
-        const { body } = await request.get(`${ROUTES.POSTS}/${requestedPostId}/comments`).expect(HTTP_STATUS_CODES.OK_200);
+        const { body } = await request
+            .get(`${ROUTES.POSTS}/${requestedPostId}/comments`)
+            .expect(HTTP_STATUS_CODES.OK_200);
 
         expect(body).toEqual({
             pagesCount: 1,
@@ -62,6 +64,11 @@ describe('comments by post id endpoints', () => {
                     commentatorInfo: {
                         userId: comment.commentatorInfo.userId,
                         userLogin: comment.commentatorInfo.userLogin,
+                    },
+                    likesInfo: {
+                        dislikesCount: 0,
+                        likesCount: 0,
+                        myStatus: 'None',
                     },
                     createdAt: comment.createdAt,
                 }))
@@ -140,6 +147,11 @@ describe('comments by post id endpoints', () => {
             commentatorInfo: {
                 userId: user.id,
                 userLogin: user.login,
+            },
+            likesInfo: {
+                dislikesCount: 0,
+                likesCount: 0,
+                myStatus: 'None',
             },
             createdAt: expect.any(String),
         });

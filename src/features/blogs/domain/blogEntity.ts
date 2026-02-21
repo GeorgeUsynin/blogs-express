@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
-import { CreateUpdateBlogDto } from '../application/dto';
+import { CreateUpdateBlogDto } from './dto';
 import { TBlog, TBlogModel } from './types';
 
 const pattern = '^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$';

@@ -36,5 +36,5 @@ export const refreshAuthMiddleware = async (req: Request, res: Response, next: N
     req.deviceId = deviceId;
     req.userId = userId;
 
-    next();
+    return next();
 };

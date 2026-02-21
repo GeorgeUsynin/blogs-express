@@ -68,8 +68,6 @@ export class AuthService {
 
     async logout(deviceId: string): Promise<void> {
         await this.devicesRepository.removeByDeviceId(deviceId);
-
-        return;
     }
 
     async updateTokens(

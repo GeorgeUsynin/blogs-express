@@ -15,7 +15,7 @@ export class PostsService {
         private blogsRepository: BlogsRepository
     ) {}
 
-    async create(postAttributes: CreateUpdatePostInputModel): Promise<WithId<TPost>> {
+    async create(postAttributes: CreateUpdatePostInputModel): Promise<string> {
         const { name: blogName } = await this.findBlogByIdOrThrowNotFound(postAttributes.blogId);
 
         const newPost = PostModel.createPost({ blogName, ...postAttributes });

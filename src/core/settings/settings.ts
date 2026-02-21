@@ -16,6 +16,7 @@ export const SETTINGS = {
         BLOGS: 'blogs',
         POSTS: 'posts',
         COMMENTS: 'comments',
+        LIKES: 'likes',
         USERS: 'users',
         DEVICES: 'devices',
         RATE_LIMIT: 'rateLimit',

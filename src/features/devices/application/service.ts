@@ -2,7 +2,7 @@ import { WithId } from 'mongodb';
 import { inject, injectable } from 'inversify';
 import { DeviceModel, TDevice } from '../domain';
 import { DevicesRepository } from '../repository/repository';
-import { CreateDeviceDto } from './dto';
+import { CreateDeviceDto } from '../domain/dto';
 import { DeviceNotFoundError } from '../../../core/errors';
 
 @injectable()
@@ -12,7 +12,7 @@ export class DevicesService {
         private devicesRepository: DevicesRepository
     ) {}
 
-    async create(dto: CreateDeviceDto): Promise<WithId<TDevice>> {
+    async create(dto: CreateDeviceDto): Promise<string> {
         const newDevice = DeviceModel.createDevice({
             userId: dto.userId,
             deviceId: dto.deviceId,

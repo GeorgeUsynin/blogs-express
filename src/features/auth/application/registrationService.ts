@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { InvalidConfirmationCode } from '../../../core/errors';
+import { InvalidConfirmationCode, UserCreationFailedError } from '../../../core/errors';
 import { EmailManager } from '../../../shared/managers/emailManager';
 import { CreateUserInputModel } from '../../users/api/models';
 import { UsersService } from '../../users/application/service';
@@ -17,12 +17,15 @@ export class RegistrationService {
     ) {}
 
     async registerNewUser(userAttributes: CreateUserInputModel): Promise<void> {
-        const {
-            email,
-            emailConfirmation: { confirmationCode },
-        } = await this.usersService.create(userAttributes);
+        const userId = await this.usersService.create(userAttributes);
 
-        this.emailManager.sendConfirmationEmail(email, confirmationCode);
+        const createdUser = await this.usersRepository.findById(userId);
+
+        if (!createdUser) {
+            throw new UserCreationFailedError();
+        }
+
+        this.emailManager.sendConfirmationEmail(createdUser.email, createdUser.emailConfirmation.confirmationCode);
     }
 
     async confirmRegistration(code: string): Promise<void> {

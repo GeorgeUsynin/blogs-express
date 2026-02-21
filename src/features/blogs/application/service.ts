@@ -12,7 +12,7 @@ export class BlogsService {
         private blogsRepository: BlogsRepository
     ) {}
 
-    async create(blogAttributes: CreateUpdateBlogInputModel): Promise<WithId<TBlog>> {
+    async create(blogAttributes: CreateUpdateBlogInputModel): Promise<string> {
         const newBlog = BlogModel.createBlog(blogAttributes);
 
         return this.blogsRepository.save(newBlog);

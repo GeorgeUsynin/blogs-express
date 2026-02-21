@@ -24,5 +24,7 @@ export const ROUTES = {
 export enum LikeStatus {
     None = 'None',
     Like = 'Like',
-    Unlike = 'Unlike',
+    Dislike = 'Dislike',
 }
+
+export const NON_NONE_LIKE_STATUSES = [LikeStatus.Like, LikeStatus.Dislike] as const;

@@ -14,6 +14,7 @@ import {
 } from './models';
 import { UsersService } from '../application/service';
 import { UsersQueryRepository } from '../repository/queryRepository';
+import { UserCreationFailedError } from '../../../core/errors';
 
 @injectable()
 export class UsersController {
@@ -46,7 +47,13 @@ export class UsersController {
     async createUser(req: RequestWithBody<CreateUserInputModel>, res: Response<UserViewModel>) {
         const payload = req.body;
 
-        const createdUser = await this.usersService.create(payload, true);
+        const userId = await this.usersService.create(payload, true);
+
+        const createdUser = await this.usersQueryRepository.findById(userId);
+
+        if (!createdUser) {
+            throw new UserCreationFailedError();
+        }
 
         const mappedUser = mapToUserViewModel(createdUser);
 

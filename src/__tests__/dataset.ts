@@ -135,6 +135,10 @@ export const comments: WithId<TComment>[] = posts.flatMap((post, index) => [
             userId: new ObjectId().toString(),
             userLogin: `user_${index * 2 + 1}`,
         },
+        likesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
+        },
         postId: post._id.toString(),
         createdAt: new Date().toISOString(),
         isDeleted: false,
@@ -145,6 +149,10 @@ export const comments: WithId<TComment>[] = posts.flatMap((post, index) => [
         commentatorInfo: {
             userId: new ObjectId().toString(),
             userLogin: `user_${index * 2 + 2}`,
+        },
+        likesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
         },
         postId: post._id.toString(),
         createdAt: new Date().toISOString(),

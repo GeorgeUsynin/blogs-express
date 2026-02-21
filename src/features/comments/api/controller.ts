@@ -7,6 +7,7 @@ import { CommentViewModel, CreateUpdateCommentInputModel, URIParamsCommentModel 
 import { CommentsService } from '../application';
 import { CommentsQueryRepository } from '../repository/queryRepository';
 import { CommentNotFoundError } from '../../../core/errors';
+import { CreateUpdateLikesStatusInputModel } from '../../likes/api/models';
 
 @injectable()
 export class CommentsController {
@@ -18,9 +19,10 @@ export class CommentsController {
     ) {}
 
     async getCommentById(req: Request<URIParamsCommentModel>, res: Response<CommentViewModel>) {
+        const userId = req.userId;
         const id = req.params.id;
 
-        const foundComment = await this.commentsQueryRepository.findById(id);
+        const foundComment = await this.commentsQueryRepository.findById(id, userId);
 
         if (!foundComment) {
             throw new CommentNotFoundError();
@@ -40,6 +42,21 @@ export class CommentsController {
         const payload = req.body;
 
         await this.commentsService.updateById(id, userId, payload);
+
+        res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
+    }
+
+    async createUpdateCommentLikeStatusById(
+        req: RequestWithParamsAndBody<URIParamsCommentModel, CreateUpdateLikesStatusInputModel>,
+        res: Response
+    ) {
+        const userId = req.userId!;
+        const commentId = req.params.id;
+        const { likeStatus } = req.body;
+
+        const commentLikeStatusAttributes = { commentId, userId, likeStatus };
+
+        await this.commentsService.setCommentLikeStatusById(commentLikeStatusAttributes);
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }

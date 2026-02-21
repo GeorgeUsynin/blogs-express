@@ -11,7 +11,7 @@ export class DevicesQueryRepository {
     }
 
     async findManyWithFilter(filter: FindDevicesFilter = {}): Promise<WithId<TDevice>[]> {
-        const items = await DeviceModel.find(filter);
+        const items = await DeviceModel.find(filter).lean().exec();
 
         return items;
     }

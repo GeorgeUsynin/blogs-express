@@ -88,6 +88,8 @@ function domainErrorToHttpStatus(code: ErrorCode) {
         case ErrorCodes.NOT_AN_OWNER_OF_THIS_DEVICE:
         case ErrorCodes.NOT_AN_OWNER_OF_THIS_COMMENT:
             return HTTP_STATUS_CODES.FORBIDDEN_403;
+        case ErrorCodes.USER_CREATION_FAILED:
+            return HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR_500;
         default:
             return HTTP_STATUS_CODES.BAD_REQUEST_400;
     }

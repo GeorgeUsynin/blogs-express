@@ -411,6 +411,7 @@ components:
                 - id
                 - content
                 - commentatorInfo
+                - likesInfo
                 - createdAt
             properties:
                 id:
@@ -421,10 +422,32 @@ components:
                     example: This is a meaningful comment with enough length.
                 commentatorInfo:
                     $ref: '#/components/schemas/CommentatorInfo'
+                likesInfo:
+                    $ref: '#/components/schemas/CommentLikesInfo'
                 createdAt:
                     type: string
                     format: date-time
                     example: '2026-02-09T10:15:30.000Z'
+
+        CommentLikesInfo:
+            type: object
+            required:
+                - likesCount
+                - dislikesCount
+                - myStatus
+            properties:
+                likesCount:
+                    type: integer
+                    minimum: 0
+                    example: 10
+                dislikesCount:
+                    type: integer
+                    minimum: 0
+                    example: 2
+                myStatus:
+                    type: string
+                    enum: [None, Like, Dislike]
+                    example: None
 
         CommentListPaginatedOutput:
             type: object

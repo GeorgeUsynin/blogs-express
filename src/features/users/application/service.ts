@@ -15,7 +15,7 @@ export class UsersService {
         private passwordHasher: PasswordHasher
     ) {}
 
-    async create(userAttributes: CreateUserInputModel, isConfirmed = false): Promise<WithId<TUser>> {
+    async create(userAttributes: CreateUserInputModel, isConfirmed = false): Promise<string> {
         const { email, login, password } = userAttributes;
 
         const userWithExistedLogin = await this.usersRepository.findUserByLogin(login);

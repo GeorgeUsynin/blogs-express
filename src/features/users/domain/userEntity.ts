@@ -3,7 +3,7 @@ import { TUser, TUserModel, UserDocument } from './types';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns/add';
 import { SETTINGS } from '../../../core/settings';
-import { CreateUserDto } from '../application/dto';
+import { CreateUserDto } from './dto';
 import {
     ConfirmationCodeExpired,
     EmailAlreadyConfirmedByCode,

@@ -36,6 +36,6 @@ export class UsersQueryRepository {
     }
 
     async findById(id: string): Promise<WithId<TUser> | null> {
-        return UserModel.findById(id);
+        return UserModel.findById(id).lean();
     }
 }

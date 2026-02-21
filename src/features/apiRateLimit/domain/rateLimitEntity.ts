@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { TRateLimit, TRateLimitModel } from './types';
-import { CreateRateLimitDto } from '../application/dto';
+import { CreateRateLimitDto } from './dto';
 
 const rateLimitSchema = new Schema<TRateLimit>({
     ip: { type: String, required: true },

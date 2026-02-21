@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { TPost, TPostModel } from './types';
-import { CreatePostDto } from '../application/dto';
+import { CreatePostDto } from './dto';
 
 const postSchema = new Schema<TPost>({
     title: { type: String, maxLength: 30, required: true },
