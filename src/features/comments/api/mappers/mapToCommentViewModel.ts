@@ -1,5 +1,4 @@
 import { CommentViewModel } from '../models';
-import { LikeStatus } from '../../../../core/constants';
 import { CommentReadModel } from '../../repository/models';
 
 export const mapToCommentViewModel = (comment: CommentReadModel): CommentViewModel => ({

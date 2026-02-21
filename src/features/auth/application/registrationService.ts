@@ -3,7 +3,7 @@ import { InvalidConfirmationCode, UserCreationFailedError } from '../../../core/
 import { EmailManager } from '../../../shared/managers/emailManager';
 import { CreateUserInputModel } from '../../users/api/models';
 import { UsersService } from '../../users/application/service';
-import { UsersRepository } from '../../users/repository/repository';
+import { UsersRepository } from '../../users/repository';
 
 @injectable()
 export class RegistrationService {

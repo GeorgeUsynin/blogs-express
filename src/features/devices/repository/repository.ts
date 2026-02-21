@@ -1,6 +1,5 @@
-import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
-import { DeviceDocument, DeviceModel, TDevice } from '../domain';
+import { DeviceDocument, DeviceModel } from '../domain';
 
 @injectable()
 export class DevicesRepository {

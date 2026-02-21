@@ -1,11 +1,10 @@
-import { WithId } from 'mongodb';
 import { inject, injectable } from 'inversify';
-import { PostsRepository } from '../../posts/repository/repository';
-import { UsersRepository } from '../../users/repository/repository';
+import { PostsRepository } from '../../posts/repository';
+import { UsersRepository } from '../../users/repository';
 import { CreateUpdateCommentInputModel } from '../api/models';
-import { CommentModel, TComment } from '../domain';
-import { CommentsRepository } from '../repository/repository';
-import { CommentNotFoundError, LikeNotFoundError, PostNotFoundError, UserNotFoundError } from '../../../core/errors';
+import { CommentModel } from '../domain';
+import { CommentsRepository } from '../repository';
+import { CommentNotFoundError, PostNotFoundError, UserNotFoundError } from '../../../core/errors';
 import { CommentLikeStatusAttributes } from './dto';
 import { LikesRepository } from '../../likes/repository';
 import { LikeModel, ParentType } from '../../likes/domain';
@@ -91,7 +90,7 @@ export class CommentsService {
             });
             await this.likesRepository.save(newLike);
         } else {
-            // if likeStatus is the same - exit
+            // if likeStatus is the same -> exit
             if (foundLike.isSameLikeStatus(likeStatus)) return;
 
             switch (likeStatus) {

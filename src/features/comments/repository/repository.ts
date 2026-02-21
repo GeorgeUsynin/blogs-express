@@ -1,6 +1,5 @@
-import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
-import { CommentDocument, CommentModel, type TComment } from '../domain';
+import { CommentDocument, CommentModel } from '../domain';
 
 @injectable()
 export class CommentsRepository {

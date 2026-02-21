@@ -1,9 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { PasswordHasher } from '../../auth/application/passwordHasher';
 import { CreateUserInputModel } from '../api/models';
-import { UsersRepository } from '../repository/repository';
-import { TUser, UserModel } from '../domain';
-import { WithId } from 'mongodb';
+import { UsersRepository } from '../repository';
+import { UserModel } from '../domain';
 import { EmailAlreadyExistsError, LoginAlreadyExistsError, UserNotFoundError } from '../../../core/errors';
 
 @injectable()

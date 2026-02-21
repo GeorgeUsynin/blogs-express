@@ -1,6 +1,5 @@
-import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
-import { LikeDocument, LikeModel, ParentType, TLike } from '../domain';
+import { LikeDocument, LikeModel, ParentType } from '../domain';
 import { LikeStatus } from '../../../core/constants';
 
 @injectable()

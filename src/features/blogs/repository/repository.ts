@@ -1,6 +1,5 @@
-import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
-import { BlogDocument, BlogModel, TBlog } from '../domain';
+import { BlogDocument, BlogModel } from '../domain';
 
 @injectable()
 export class BlogsRepository {

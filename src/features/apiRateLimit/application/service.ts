@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { CreateRateLimitDto } from '../domain/dto';
 import { SETTINGS } from '../../../core/settings';
 import { APIRateLimitError, ErrorCodes } from '../../../core/errors';
-import { ApiRateLimitRepository } from '../repository/repository';
+import { ApiRateLimitRepository } from '../repository';
 import { RateLimitModel } from '../domain';
 
 @injectable()

@@ -1,6 +1,5 @@
-import { WithId } from 'mongodb';
 import { injectable } from 'inversify';
-import { PostDocument, PostModel, type TPost } from '../domain';
+import { PostDocument, PostModel } from '../domain';
 
 @injectable()
 export class PostsRepository {

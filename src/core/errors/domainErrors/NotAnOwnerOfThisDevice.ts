@@ -1,4 +1,4 @@
-import { ErrorCodes, ErrorFields } from '../constants';
+import { ErrorCodes } from '../constants';
 import { BaseDomainError } from './BaseDomainError';
 
 export class NotAnOwnerOfThisDevice extends BaseDomainError {

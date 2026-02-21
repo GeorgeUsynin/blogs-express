@@ -1,7 +1,6 @@
-import { WithId } from 'mongodb';
 import { inject, injectable } from 'inversify';
-import { DeviceModel, TDevice } from '../domain';
-import { DevicesRepository } from '../repository/repository';
+import { DeviceModel } from '../domain';
+import { DevicesRepository } from '../repository';
 import { CreateDeviceDto } from '../domain/dto';
 import { DeviceNotFoundError } from '../../../core/errors';
 

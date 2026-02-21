@@ -3,7 +3,6 @@ import { SETTINGS } from '../../../core/settings';
 import { CommentDocument, TComment, TCommentModel } from './types';
 import { CreateCommentDto } from './dto';
 import { NotAnOwnerOfThisComment } from '../../../core/errors';
-import { NonNoneLikeStatus } from '../../likes/domain';
 
 const commentSchema = new Schema<TComment>({
     content: { type: String, minlength: 20, maxLength: 300, required: true },

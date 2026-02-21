@@ -1,4 +1,3 @@
-import { WithId } from 'mongodb';
 import { inject, injectable } from 'inversify';
 import { CommentModel, TComment } from '../domain';
 import { CommentQueryInput } from '../api/models';

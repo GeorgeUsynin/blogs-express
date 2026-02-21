@@ -1,8 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { CreateUpdateBlogInputModel } from '../api/models';
-import { BlogModel, TBlog } from '../domain';
+import { BlogModel } from '../domain';
 import { BlogsRepository } from '../repository';
-import { WithId } from 'mongodb';
 import { BlogNotFoundError } from '../../../core/errors';
 
 @injectable()

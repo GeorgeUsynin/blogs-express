@@ -1,9 +1,8 @@
 import { inject, injectable } from 'inversify';
-import { WithId } from 'mongodb';
 import { CreateUpdatePostInputModel } from '../api/models';
-import { PostModel, TPost } from '../domain';
-import { PostsRepository } from '../repository/repository';
-import { BlogsRepository } from '../../blogs/repository/repository';
+import { PostModel } from '../domain';
+import { PostsRepository } from '../repository';
+import { BlogsRepository } from '../../blogs/repository';
 import { BlogNotFoundError, PostNotFoundError } from '../../../core/errors';
 
 @injectable()
