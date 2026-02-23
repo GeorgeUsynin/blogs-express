@@ -146,6 +146,12 @@ export const userMethods = {
 
         return recoveryCode;
     },
+
+    softDelete() {
+        const that = this as UserDocument;
+
+        that.isDeleted = true;
+    },
 };
 
 userSchema.statics = userStatics;

@@ -21,7 +21,14 @@ const commentSchema = new Schema<TComment>({
 
 export const commentStatics = {
     createComment(dto: CreateCommentDto) {
-        const newComment = new CommentModel(dto);
+        const newComment = new CommentModel({
+            content: dto.content,
+            postId: dto.postId,
+            commentatorInfo: {
+                userId: dto.userId,
+                userLogin: dto.userLogin,
+            },
+        });
 
         return newComment;
     },
@@ -36,6 +43,25 @@ export const commentMethods = {
         }
 
         return true;
+    },
+
+    updateContent(content: string) {
+        const that = this as CommentDocument;
+
+        that.content = content;
+    },
+
+    updateLikesCounts(likesCount: number, dislikesCount: number) {
+        const that = this as CommentDocument;
+
+        that.likesInfo.likesCount = likesCount;
+        that.likesInfo.dislikesCount = dislikesCount;
+    },
+
+    softDelete() {
+        const that = this as CommentDocument;
+
+        that.isDeleted = true;
     },
 };
 

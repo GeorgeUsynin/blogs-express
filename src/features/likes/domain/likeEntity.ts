@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { CreateLikeDto } from './dto';
-import { TLikeModel, TLike, ParentType, LikeDocument } from './types';
+import { TLikeModel, TLike, ParentType, LikeDocument, NonNoneLikeStatus } from './types';
 import { LikeStatus, NON_NONE_LIKE_STATUSES } from '../../../core/constants';
 
 const likeSchema = new Schema<TLike>({
@@ -25,6 +25,12 @@ export const likeMethods = {
         const that = this as LikeDocument;
 
         return that.likeStatus === likeStatus;
+    },
+
+    updateLikeStatus(likeStatus: NonNoneLikeStatus) {
+        const that = this as LikeDocument;
+
+        that.likeStatus = likeStatus;
     },
 };
 

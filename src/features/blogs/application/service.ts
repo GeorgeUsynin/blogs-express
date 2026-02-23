@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
-import { CreateUpdateBlogInputModel } from '../api/models';
 import { BlogModel } from '../domain';
 import { BlogsRepository } from '../repository';
 import { BlogNotFoundError } from '../../../core/errors';
+import { CreateUpdateBlogDto } from '../domain/dto';
 
 @injectable()
 export class BlogsService {
@@ -11,20 +11,16 @@ export class BlogsService {
         private blogsRepository: BlogsRepository
     ) {}
 
-    async create(blogAttributes: CreateUpdateBlogInputModel): Promise<string> {
+    async create(blogAttributes: CreateUpdateBlogDto): Promise<string> {
         const newBlog = BlogModel.createBlog(blogAttributes);
 
         return this.blogsRepository.save(newBlog);
     }
 
-    async updateById(id: string, blogAttributes: CreateUpdateBlogInputModel): Promise<void> {
-        const { description, name, websiteUrl } = blogAttributes;
-
+    async updateById(id: string, blogAttributes: CreateUpdateBlogDto): Promise<void> {
         const foundBlog = await this.findBlogByIdOrThrowNotFound(id);
 
-        foundBlog.name = name;
-        foundBlog.description = description;
-        foundBlog.websiteUrl = websiteUrl;
+        foundBlog.updateAttributes(blogAttributes);
 
         await this.blogsRepository.save(foundBlog);
     }
@@ -32,7 +28,7 @@ export class BlogsService {
     async removeById(id: string): Promise<void> {
         const foundBlog = await this.findBlogByIdOrThrowNotFound(id);
 
-        foundBlog.isDeleted = true;
+        foundBlog.softDelete();
 
         await this.blogsRepository.save(foundBlog);
     }

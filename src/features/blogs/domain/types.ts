@@ -1,5 +1,5 @@
 import { HydratedDocument, Model } from 'mongoose';
-import { blogStatics } from './blogEntity';
+import { blogMethods, blogStatics } from './blogEntity';
 
 export type TBlog = {
     name: string;
@@ -10,8 +10,9 @@ export type TBlog = {
     isDeleted: boolean;
 };
 
-type BlogStatics = typeof blogStatics;
+type TBlogStatics = typeof blogStatics;
+type TBlogMethods = typeof blogMethods;
 
-export type TBlogModel = Model<TBlog, {}> & BlogStatics;
+export type TBlogModel = Model<TBlog, {}, TBlogMethods> & TBlogStatics;
 
-export type BlogDocument = HydratedDocument<TBlog>;
+export type BlogDocument = HydratedDocument<TBlog, TBlogMethods>;

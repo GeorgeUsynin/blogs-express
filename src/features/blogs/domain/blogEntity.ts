@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { CreateUpdateBlogDto } from './dto';
-import { TBlog, TBlogModel } from './types';
+import { BlogDocument, TBlog, TBlogModel } from './types';
 
 const pattern = '^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$';
 // Soft delete implementation
@@ -33,7 +33,24 @@ export const blogStatics = {
     },
 };
 
+export const blogMethods = {
+    updateAttributes(dto: CreateUpdateBlogDto) {
+        const that = this as BlogDocument;
+
+        that.name = dto.name;
+        that.description = dto.description;
+        that.websiteUrl = dto.websiteUrl;
+    },
+
+    softDelete() {
+        const that = this as BlogDocument;
+
+        that.isDeleted = true;
+    },
+};
+
 blogSchema.statics = blogStatics;
+blogSchema.methods = blogMethods;
 
 // Soft delete implementation
 blogSchema.pre('find', function () {

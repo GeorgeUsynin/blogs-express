@@ -47,7 +47,7 @@ export class UsersService {
             throw new UserNotFoundError();
         }
 
-        foundUser.isDeleted = true;
+        foundUser.softDelete();
 
         await this.usersRepository.save(foundUser);
     }

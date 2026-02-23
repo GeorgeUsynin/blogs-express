@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
-import { TPost, TPostModel } from './types';
-import { CreatePostDto } from './dto';
+import { PostDocument, TPost, TPostModel } from './types';
+import { CreatePostDto, UpdatePostDto } from './dto';
 
 const postSchema = new Schema<TPost>({
     title: { type: String, maxLength: 30, required: true },
@@ -21,7 +21,25 @@ export const postStatics = {
     },
 };
 
+export const postMethods = {
+    updateAttributes(dto: UpdatePostDto) {
+        const that = this as PostDocument;
+
+        that.title = dto.title;
+        that.shortDescription = dto.shortDescription;
+        that.content = dto.content;
+        that.blogId = dto.blogId;
+    },
+
+    softDelete() {
+        const that = this as PostDocument;
+
+        that.isDeleted = true;
+    },
+};
+
 postSchema.statics = postStatics;
+postSchema.methods = postMethods;
 
 // Soft delete implementation
 postSchema.pre('find', function () {

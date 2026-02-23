@@ -23,16 +23,11 @@ export class PostsService {
     }
 
     async updateById(id: string, postAttributes: CreateUpdatePostInputModel): Promise<void> {
-        const { title, shortDescription, content, blogId } = postAttributes;
-
-        await this.findBlogByIdOrThrowNotFound(blogId);
+        await this.findBlogByIdOrThrowNotFound(postAttributes.blogId);
 
         const foundPost = await this.findPostByIdOrThrowNotFound(id);
 
-        foundPost.title = title;
-        foundPost.shortDescription = shortDescription;
-        foundPost.content = content;
-        foundPost.blogId = blogId;
+        foundPost.updateAttributes(postAttributes);
 
         await this.postsRepository.save(foundPost);
     }
@@ -40,7 +35,7 @@ export class PostsService {
     async removeById(id: string): Promise<void> {
         const foundPost = await this.findPostByIdOrThrowNotFound(id);
 
-        foundPost.isDeleted = true;
+        foundPost.softDelete();
 
         await this.postsRepository.save(foundPost);
     }

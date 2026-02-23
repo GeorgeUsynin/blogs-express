@@ -43,6 +43,13 @@ export const deviceMethods = {
 
         return true;
     },
+
+    updateDeviceAttributes(issuedAt: string, expiresIn: string) {
+        const that = this as DeviceDocument;
+
+        that.issuedAt = issuedAt;
+        that.expiresIn = expiresIn;
+    },
 };
 
 deviceSchema.statics = deviceStatics;

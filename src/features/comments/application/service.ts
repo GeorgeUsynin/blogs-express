@@ -40,10 +40,8 @@ export class CommentsService {
         const newComment = CommentModel.createComment({
             content,
             postId,
-            commentatorInfo: {
-                userId,
-                userLogin: user.login,
-            },
+            userId,
+            userLogin: user.login,
         });
 
         return this.commentsRepository.save(newComment);
@@ -62,8 +60,8 @@ export class CommentsService {
         }
 
         foundComment.ensureCommentOwner(userId);
+        foundComment.updateContent(content);
 
-        foundComment.content = content;
         await this.commentsRepository.save(foundComment);
     }
 
@@ -99,7 +97,7 @@ export class CommentsService {
                     break;
                 case LikeStatus.Like:
                 case LikeStatus.Dislike:
-                    foundLike.likeStatus = likeStatus;
+                    foundLike.updateLikeStatus(likeStatus);
                     await this.likesRepository.save(foundLike);
                     break;
             }
@@ -111,8 +109,7 @@ export class CommentsService {
             this.likesRepository.countByParentAndStatus(commentId, ParentType.Comment, LikeStatus.Dislike),
         ]);
 
-        foundComment.likesInfo.likesCount = likesCount;
-        foundComment.likesInfo.dislikesCount = dislikesCount;
+        foundComment.updateLikesCounts(likesCount, dislikesCount);
 
         await this.commentsRepository.save(foundComment);
     }
@@ -125,8 +122,8 @@ export class CommentsService {
         }
 
         foundComment.ensureCommentOwner(userId);
+        foundComment.softDelete();
 
-        foundComment.isDeleted = true;
         await this.commentsRepository.save(foundComment);
     }
 }

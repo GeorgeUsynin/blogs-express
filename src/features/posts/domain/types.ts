@@ -1,5 +1,5 @@
 import { HydratedDocument, Model } from 'mongoose';
-import { postStatics } from './postEntity';
+import { postMethods, postStatics } from './postEntity';
 
 export type TPost = {
     title: string;
@@ -12,7 +12,8 @@ export type TPost = {
 };
 
 type TPostStatics = typeof postStatics;
+type TPostMethods = typeof postMethods;
 
-export type TPostModel = Model<TPost, {}> & TPostStatics;
+export type TPostModel = Model<TPost, {}, TPostMethods> & TPostStatics;
 
-export type PostDocument = HydratedDocument<TPost>;
+export type PostDocument = HydratedDocument<TPost, TPostMethods>;

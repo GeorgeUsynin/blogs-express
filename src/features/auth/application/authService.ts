@@ -89,9 +89,7 @@ export class AuthService {
             throw new UnauthorizedError();
         }
 
-        device.issuedAt = issuedAt;
-        device.expiresIn = expiresIn;
-
+        device.updateDeviceAttributes(issuedAt, expiresIn);
         await this.devicesRepository.save(device);
 
         return { accessToken, refreshToken };
