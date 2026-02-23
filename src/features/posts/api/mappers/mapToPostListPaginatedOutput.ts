@@ -1,10 +1,9 @@
-import { WithId } from 'mongodb';
-import { type TPost } from '../../domain';
 import { PostListPaginatedOutput } from '../models';
 import { mapToPostViewModel } from './mapToPostViewModel';
+import { PostReadModel } from '../../repository/models';
 
 export function mapToPostListPaginatedOutput(
-    posts: WithId<TPost>[],
+    posts: PostReadModel[],
     meta: { pageNumber: number; pageSize: number; totalCount: number }
 ): PostListPaginatedOutput {
     return {

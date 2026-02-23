@@ -29,6 +29,7 @@ import { mapToCommentListPaginatedOutput, mapToCommentViewModel } from '../../co
 import { CommentsService } from '../../comments/application';
 import { CommentsQueryRepository } from '../../comments/repository';
 import { CommentCreationFailedError, PostCreationFailedError, PostNotFoundError } from '../../../core/errors';
+import { CreateUpdateLikesStatusInputModel } from '../../likes/api/models';
 
 @injectable()
 export class PostsController {
@@ -44,6 +45,8 @@ export class PostsController {
     ) {}
 
     async getAllPosts(req: RequestWithQuery<Partial<PostQueryInput>>, res: Response<PostListPaginatedOutput>) {
+        const userId = req.userId;
+
         const sanitizedQuery = matchedData<PostQueryInput>(req, {
             locations: ['query'],
             includeOptionals: true,
@@ -51,7 +54,7 @@ export class PostsController {
 
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const { items, totalCount } = await this.postsQueryRepository.findMany(queryInput);
+        const { items, totalCount } = await this.postsQueryRepository.findMany(queryInput, userId);
 
         const postsListOutput = mapToPostListPaginatedOutput(items, {
             pageNumber: queryInput.pageNumber,
@@ -63,9 +66,11 @@ export class PostsController {
     }
 
     async getPostById(req: Request<URIParamsPostModel>, res: Response<PostViewModel>) {
+        const userId = req.userId;
         const id = req.params.id;
 
-        const foundPost = await this.findPostByIdOrThrowNotFound(id);
+        const foundPost = await this.postsQueryRepository.findById(id, userId);
+        if (!foundPost) throw new PostNotFoundError();
 
         const mappedPost = mapToPostViewModel(foundPost);
 
@@ -79,7 +84,8 @@ export class PostsController {
         const userId = req.userId;
         const postId = req.params.id;
 
-        await this.findPostByIdOrThrowNotFound(postId);
+        const foundPost = await this.postsQueryRepository.findById(postId);
+        if (!foundPost) throw new PostNotFoundError();
 
         const sanitizedQuery = matchedData<CommentQueryInput>(req, {
             locations: ['query'],
@@ -148,17 +154,26 @@ export class PostsController {
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
     }
 
+    async createUpdatePostLikeStatus(
+        req: RequestWithParamsAndBody<URIParamsPostModel, CreateUpdateLikesStatusInputModel>,
+        res: Response
+    ) {
+        const userId = req.userId!;
+        const postId = req.params.id;
+        const { likeStatus } = req.body;
+
+        const postLikeStatusAttributes = { postId, userId, likeStatus };
+
+        await this.postsService.setPostLikeStatusById(postLikeStatusAttributes);
+
+        res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
+    }
+
     async deletePostById(req: Request<URIParamsPostModel>, res: Response) {
         const id = req.params.id;
 
         await this.postsService.removeById(id);
 
         res.sendStatus(HTTP_STATUS_CODES.NO_CONTENT_204);
-    }
-
-    private async findPostByIdOrThrowNotFound(id: string) {
-        const post = await this.postsQueryRepository.findById(id);
-        if (!post) throw new PostNotFoundError();
-        return post;
     }
 }

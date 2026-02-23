@@ -11,9 +11,14 @@ import {
     commentsQueryParamsValidationSchema,
     createUpdateCommentValidationSchema,
 } from '../../../comments/api/validation';
+import { createUpdateLikeStatusValidationSchema } from '../../../likes/api/validation';
 
-export const getValidators = [checkSchema(postsQueryParamsValidationSchema, ['query']), errorMiddleware];
-export const getByIdValidators = [objectIdValidation, errorMiddleware];
+export const getValidators = [
+    getUserIdFromAccessTokenMiddleware,
+    checkSchema(postsQueryParamsValidationSchema, ['query']),
+    errorMiddleware,
+];
+export const getByIdValidators = [getUserIdFromAccessTokenMiddleware, objectIdValidation, errorMiddleware];
 export const getAllCommentsByPostIdValidator = [
     getUserIdFromAccessTokenMiddleware,
     objectIdValidation,
@@ -37,4 +42,12 @@ export const updateValidators = [
     checkSchema(createUpdatePostValidationSchema, ['body']),
     errorMiddleware,
 ];
+
+export const createUpdateLikeStatusValidators = [
+    jwtAuthMiddleware,
+    objectIdValidation,
+    checkSchema(createUpdateLikeStatusValidationSchema, ['body']),
+    errorMiddleware,
+];
+
 export const deleteValidators = [basicAuthMiddleware, objectIdValidation, errorMiddleware];

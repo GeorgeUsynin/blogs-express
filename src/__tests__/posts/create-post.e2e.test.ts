@@ -42,6 +42,12 @@ describe('create a post', () => {
             ...newPost,
             blogName: blogs[1].name,
             createdAt: expect.any(String),
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: 'None',
+                newestLikes: [],
+            },
         });
 
         //checking that the post was created

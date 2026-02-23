@@ -1,4 +1,4 @@
-import { WithId } from 'mongodb';
+import { ObjectId, WithId } from 'mongodb';
 import { injectable } from 'inversify';
 import { UserQueryInput } from '../api/models';
 import { TUser, UserModel } from '../domain';
@@ -35,7 +35,17 @@ export class UsersQueryRepository {
         return { items, totalCount };
     }
 
+    async findUsersByUserIds(userIds: string[]): Promise<WithId<TUser>[]> {
+        return UserModel.find({
+            _id: {
+                $in: userIds.map(id => new ObjectId(id)),
+            },
+        })
+            .lean()
+            .exec();
+    }
+
     async findById(id: string): Promise<WithId<TUser> | null> {
-        return UserModel.findById(id).lean();
+        return UserModel.findById(id).lean().exec();
     }
 }

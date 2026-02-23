@@ -21,4 +21,9 @@ PostsRouter.post(
 );
 PostsRouter.post('/', ...Validators.postValidators, postsController.createPost.bind(postsController));
 PostsRouter.put('/:id', ...Validators.updateValidators, postsController.updatePostById.bind(postsController));
+PostsRouter.put(
+    '/:id/like-status',
+    ...Validators.createUpdateLikeStatusValidators,
+    postsController.createUpdatePostLikeStatus.bind(postsController)
+);
 PostsRouter.delete('/:id', ...Validators.deleteValidators, postsController.deletePostById.bind(postsController));

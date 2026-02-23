@@ -7,6 +7,10 @@ export type TPost = {
     content: string;
     blogId: string;
     blogName: string;
+    likesInfo: {
+        dislikesCount: number;
+        likesCount: number;
+    };
     createdAt: string;
     isDeleted: boolean;
 };

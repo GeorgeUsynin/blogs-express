@@ -9,6 +9,10 @@ const postSchema = new Schema<TPost>({
     content: { type: String, maxLength: 1000, required: true },
     blogId: { type: String, required: true },
     blogName: { type: String, required: true },
+    likesInfo: {
+        dislikesCount: { type: Number, default: 0 },
+        likesCount: { type: Number, default: 0 },
+    },
     createdAt: { type: String, default: () => new Date().toISOString() },
     isDeleted: { type: Boolean, default: false },
 });
@@ -29,6 +33,13 @@ export const postMethods = {
         that.shortDescription = dto.shortDescription;
         that.content = dto.content;
         that.blogId = dto.blogId;
+    },
+
+    updateLikesCounts(likesCount: number, dislikesCount: number) {
+        const that = this as PostDocument;
+
+        that.likesInfo.likesCount = likesCount;
+        that.likesInfo.dislikesCount = dislikesCount;
     },
 
     softDelete() {

@@ -1,6 +1,7 @@
 import { checkSchema } from 'express-validator';
 import {
     errorMiddleware,
+    getUserIdFromAccessTokenMiddleware,
     objectIdValidation,
     queryPaginationAndSortParamsValidationSchema,
 } from '../../../../core/middlewares|validation';
@@ -13,6 +14,7 @@ import { createUpdateBlogValidationSchema } from './createUpdateBlogValidationSc
 export const getValidators = [checkSchema(blogsQueryParamsValidationSchema, ['query']), errorMiddleware];
 export const getByIdValidators = [objectIdValidation, errorMiddleware];
 export const getPostsByBlogIdValidators = [
+    getUserIdFromAccessTokenMiddleware,
     objectIdValidation,
     checkSchema(queryPaginationAndSortParamsValidationSchema(PostSortFields), ['query']),
     errorMiddleware,

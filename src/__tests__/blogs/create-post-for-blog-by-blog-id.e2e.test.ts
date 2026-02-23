@@ -41,6 +41,12 @@ describe('create post for blog by blog id', () => {
             blogId: requestedId,
             blogName: blogs[1].name,
             createdAt: expect.any(String),
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: 'None',
+                newestLikes: [],
+            },
         });
 
         const { body: postsForBlog } = await request

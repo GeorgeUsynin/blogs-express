@@ -25,6 +25,7 @@ import { UsersService } from './features/users/application';
 import { UsersRepository, UsersQueryRepository } from './features/users/repository';
 import { ApiRateLimitRepository } from './features/apiRateLimit/repository';
 import { ApiRateLimitService } from './features/apiRateLimit/application';
+import { LikesService } from './features/likes/application';
 import { LikesRepository, LikesQueryRepository } from './features/likes/repository';
 import { EmailAdapter } from './shared/adapters';
 import { EmailManager } from './shared/managers';
@@ -66,6 +67,7 @@ container.bind(UsersQueryRepository).toSelf();
 container.bind(ApiRateLimitRepository).toSelf();
 container.bind(ApiRateLimitService).toSelf();
 
+container.bind(LikesService).toSelf();
 container.bind(LikesRepository).toSelf();
 container.bind(LikesQueryRepository).toSelf();
 

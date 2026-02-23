@@ -361,6 +361,7 @@ components:
                 - blogId
                 - blogName
                 - createdAt
+                - extendedLikesInfo
             properties:
                 id:
                     type: string
@@ -387,6 +388,51 @@ components:
                     type: string
                     format: date-time
                     example: '2026-02-09T10:15:30.000Z'
+                extendedLikesInfo:
+                    $ref: '#/components/schemas/PostExtendedLikesInfo'
+
+        PostExtendedLikesInfo:
+            type: object
+            required:
+                - likesCount
+                - dislikesCount
+                - myStatus
+                - newestLikes
+            properties:
+                likesCount:
+                    type: integer
+                    minimum: 0
+                    example: 10
+                dislikesCount:
+                    type: integer
+                    minimum: 0
+                    example: 2
+                myStatus:
+                    type: string
+                    enum: [None, Like, Dislike]
+                    example: None
+                newestLikes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/NewestLike'
+
+        NewestLike:
+            type: object
+            required:
+                - addedAt
+                - userId
+                - login
+            properties:
+                addedAt:
+                    type: string
+                    format: date-time
+                    example: '2026-02-09T10:15:30.000Z'
+                userId:
+                    type: string
+                    example: 65be9b3cb8f09f3f6e9f41af
+                login:
+                    type: string
+                    example: johndoe
 
         CreateUpdateBlogInputModel:
             type: object

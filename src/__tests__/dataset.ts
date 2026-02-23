@@ -1,7 +1,8 @@
 import { ObjectId, WithId } from 'mongodb';
+import { LikeStatus } from '../core/constants';
 import { type TBlog } from '../features/blogs/domain';
-import { type TPost } from '../features/posts/domain';
 import { type TComment } from '../features/comments/domain';
+import { PostReadModel } from '../features/posts/repository/models';
 
 const createObjectIds = (count: number): ObjectId[] => Array.from({ length: count }, () => new ObjectId());
 
@@ -116,13 +117,19 @@ const postsByBlog = [
     ],
 ] as const;
 
-export const posts: WithId<TPost>[] = postsByBlog.flatMap((blogPosts, blogIndex) =>
+export const posts: PostReadModel[] = postsByBlog.flatMap((blogPosts, blogIndex) =>
     blogPosts.map((post, postIndex) => ({
         _id: postsIds[blogIndex * 2 + postIndex]!,
         ...post,
         blogId: blogsIds[blogIndex]!.toString(),
         blogName: blogs[blogIndex]!.name,
+        likesInfo: {
+            dislikesCount: 0,
+            likesCount: 0,
+        },
         createdAt: new Date().toISOString(),
+        myStatus: LikeStatus.None,
+        newestLikes: [],
         isDeleted: false,
     }))
 );

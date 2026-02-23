@@ -76,6 +76,7 @@ export class BlogsController {
         req: RequestWithParamsAndQuery<URIParamsBlogModel, Partial<PostQueryInput>>,
         res: Response<PostListPaginatedOutput>
     ) {
+        const userId = req.userId;
         const blogId = req.params.id;
 
         await this.findBlogByIdOrThrowNotFound(blogId);
@@ -87,7 +88,7 @@ export class BlogsController {
 
         const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
 
-        const { items, totalCount } = await this.postsQueryRepository.findManyByBlogId(blogId, queryInput);
+        const { items, totalCount } = await this.postsQueryRepository.findManyByBlogId(blogId, queryInput, userId);
 
         const blogsListOutput = mapToPostListPaginatedOutput(items, {
             pageNumber: queryInput.pageNumber,

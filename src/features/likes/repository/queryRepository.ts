@@ -22,4 +22,37 @@ export class LikesQueryRepository {
 
         return foundLike !== null ? foundLike.likeStatus : LikeStatus.None;
     }
+
+    async getNewestLikesPerParentId(
+        parentIds: string[],
+        parentType: ParentType,
+        limit: number
+    ): Promise<{ parentId: string; newestLikes: WithId<TLike>[] }[]> {
+        return LikeModel.aggregate()
+            .match({
+                parentId: {
+                    $in: parentIds,
+                },
+                parentType,
+                likeStatus: LikeStatus.Like,
+            })
+            .group({
+                _id: '$parentId',
+                newestLikes: {
+                    $topN: {
+                        output: {
+                            authorId: '$authorId',
+                            createdAt: '$createdAt',
+                        },
+                        sortBy: { createdAt: -1 },
+                        n: limit,
+                    },
+                },
+            })
+            .project({
+                parentId: '$_id',
+                _id: 0,
+                newestLikes: 1,
+            });
+    }
 }

@@ -4,6 +4,9 @@ import { PostModel } from '../domain';
 import { PostsRepository } from '../repository';
 import { BlogsRepository } from '../../blogs/repository';
 import { BlogNotFoundError, PostNotFoundError } from '../../../core/errors';
+import { PostLikeStatusAttributes } from './dto';
+import { ParentType } from '../../likes/domain';
+import { LikesService } from '../../likes/application';
 
 @injectable()
 export class PostsService {
@@ -11,7 +14,9 @@ export class PostsService {
         @inject(PostsRepository)
         private postsRepository: PostsRepository,
         @inject(BlogsRepository)
-        private blogsRepository: BlogsRepository
+        private blogsRepository: BlogsRepository,
+        @inject(LikesService)
+        private likesService: LikesService
     ) {}
 
     async create(postAttributes: CreateUpdatePostInputModel): Promise<string> {
@@ -28,6 +33,25 @@ export class PostsService {
         const foundPost = await this.findPostByIdOrThrowNotFound(id);
 
         foundPost.updateAttributes(postAttributes);
+
+        await this.postsRepository.save(foundPost);
+    }
+
+    async setPostLikeStatusById(postLikeStatusAttributes: PostLikeStatusAttributes): Promise<void> {
+        const { postId, userId, likeStatus } = postLikeStatusAttributes;
+
+        const foundPost = await this.findPostByIdOrThrowNotFound(postId);
+
+        await this.likesService.setLikeStatus({
+            authorId: userId,
+            parentId: postId,
+            parentType: ParentType.Post,
+            likeStatus,
+        });
+
+        // recalculate and update post likesCount info
+        const { likesCount, dislikesCount } = await this.likesService.getLikesCounts(postId, ParentType.Post);
+        foundPost.updateLikesCounts(likesCount, dislikesCount);
 
         await this.postsRepository.save(foundPost);
     }

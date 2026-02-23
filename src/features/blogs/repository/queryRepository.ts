@@ -31,6 +31,6 @@ export class BlogsQueryRepository {
     }
 
     async findById(id: string): Promise<WithId<TBlog> | null> {
-        return BlogModel.findById(id).lean();
+        return BlogModel.findById(id).lean().exec();
     }
 }

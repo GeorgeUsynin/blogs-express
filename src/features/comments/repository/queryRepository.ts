@@ -41,6 +41,10 @@ export class CommentsQueryRepository {
             CommentModel.countDocuments(filter).exec(),
         ]);
 
+        if (items.length === 0) {
+            return { items: [], totalCount };
+        }
+
         if (!userId) {
             const mappedItems = items.map(comment => ({ ...comment, myStatus: LikeStatus.None }));
             return { items: mappedItems, totalCount };
@@ -60,7 +64,7 @@ export class CommentsQueryRepository {
     }
 
     async findById(id: string, userId?: string): Promise<CommentReadModel | null> {
-        const comment = await CommentModel.findById(id).lean();
+        const comment = await CommentModel.findById(id).lean().exec();
 
         if (!comment) return null;
 

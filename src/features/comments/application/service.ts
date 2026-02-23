@@ -6,19 +6,18 @@ import { CommentModel } from '../domain';
 import { CommentsRepository } from '../repository';
 import { CommentNotFoundError, PostNotFoundError, UserNotFoundError } from '../../../core/errors';
 import { CommentLikeStatusAttributes } from './dto';
-import { LikesRepository } from '../../likes/repository';
-import { LikeModel, ParentType } from '../../likes/domain';
-import { LikeStatus } from '../../../core/constants';
+import { ParentType } from '../../likes/domain';
+import { LikesService } from '../../likes/application';
 
 @injectable()
 export class CommentsService {
     constructor(
+        @inject(LikesService)
+        private likesService: LikesService,
         @inject(CommentsRepository)
         private commentsRepository: CommentsRepository,
         @inject(PostsRepository)
         private postsRepository: PostsRepository,
-        @inject(LikesRepository)
-        private likesRepository: LikesRepository,
         @inject(UsersRepository)
         private usersRepository: UsersRepository
     ) {}
@@ -53,11 +52,7 @@ export class CommentsService {
         commentAttributes: CreateUpdateCommentInputModel
     ): Promise<void> {
         const { content } = commentAttributes;
-        const foundComment = await this.commentsRepository.findById(commentId);
-
-        if (!foundComment) {
-            throw new CommentNotFoundError();
-        }
+        const foundComment = await this.findCommentByIdOrThrowNotFound(commentId);
 
         foundComment.ensureCommentOwner(userId);
         foundComment.updateContent(content);
@@ -68,62 +63,34 @@ export class CommentsService {
     async setCommentLikeStatusById(commentLikeStatusAttributes: CommentLikeStatusAttributes): Promise<void> {
         const { commentId, userId, likeStatus } = commentLikeStatusAttributes;
 
-        const foundComment = await this.commentsRepository.findById(commentId);
+        const foundComment = await this.findCommentByIdOrThrowNotFound(commentId);
 
-        if (!foundComment) {
-            throw new CommentNotFoundError();
-        }
-
-        const foundLike = await this.likesRepository.findByParentAndAuthor(commentId, ParentType.Comment, userId);
-
-        if (!foundLike) {
-            // not allowing like creation with None status
-            if (likeStatus === LikeStatus.None) return;
-
-            const newLike = LikeModel.createLike({
-                authorId: userId,
-                parentId: commentId,
-                likeStatus,
-                parentType: ParentType.Comment,
-            });
-            await this.likesRepository.save(newLike);
-        } else {
-            // if likeStatus is the same -> exit
-            if (foundLike.isSameLikeStatus(likeStatus)) return;
-
-            switch (likeStatus) {
-                case LikeStatus.None:
-                    await this.likesRepository.removeById(foundLike._id.toString());
-                    break;
-                case LikeStatus.Like:
-                case LikeStatus.Dislike:
-                    foundLike.updateLikeStatus(likeStatus);
-                    await this.likesRepository.save(foundLike);
-                    break;
-            }
-        }
+        await this.likesService.setLikeStatus({
+            authorId: userId,
+            parentId: commentId,
+            parentType: ParentType.Comment,
+            likeStatus,
+        });
 
         // recalculate and update comment likesCount info
-        const [likesCount, dislikesCount] = await Promise.all([
-            this.likesRepository.countByParentAndStatus(commentId, ParentType.Comment, LikeStatus.Like),
-            this.likesRepository.countByParentAndStatus(commentId, ParentType.Comment, LikeStatus.Dislike),
-        ]);
-
+        const { likesCount, dislikesCount } = await this.likesService.getLikesCounts(commentId, ParentType.Comment);
         foundComment.updateLikesCounts(likesCount, dislikesCount);
 
         await this.commentsRepository.save(foundComment);
     }
 
     async removeById(commentId: string, userId: string): Promise<void> {
-        const foundComment = await this.commentsRepository.findById(commentId);
-
-        if (!foundComment) {
-            throw new CommentNotFoundError();
-        }
+        const foundComment = await this.findCommentByIdOrThrowNotFound(commentId);
 
         foundComment.ensureCommentOwner(userId);
         foundComment.softDelete();
 
         await this.commentsRepository.save(foundComment);
+    }
+
+    private async findCommentByIdOrThrowNotFound(id: string) {
+        const comment = await this.commentsRepository.findById(id);
+        if (!comment) throw new CommentNotFoundError();
+        return comment;
     }
 }
