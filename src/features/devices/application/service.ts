@@ -21,7 +21,9 @@ export class DevicesService {
             expiresIn: dto.expiresIn,
         });
 
-        return this.devicesRepository.save(newDevice);
+        await this.devicesRepository.save(newDevice);
+
+        return newDevice._id.toString();
     }
 
     async terminateDeviceSessionByDeviceId(deviceId: string, userId: string): Promise<void> {

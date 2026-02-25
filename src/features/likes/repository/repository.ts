@@ -24,9 +24,7 @@ export class LikesRepository {
         await LikeModel.findByIdAndDelete(id);
     }
 
-    async save(like: LikeDocument): Promise<string> {
-        const newLike = await like.save();
-
-        return newLike._id.toString();
+    async save(like: LikeDocument): Promise<void> {
+        await like.save();
     }
 }

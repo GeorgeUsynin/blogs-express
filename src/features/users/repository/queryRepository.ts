@@ -2,6 +2,7 @@ import { ObjectId, WithId } from 'mongodb';
 import { injectable } from 'inversify';
 import { UserQueryInput } from '../api/models';
 import { TUser, UserModel } from '../domain';
+import { QueryFilter } from 'mongoose';
 
 @injectable()
 export class UsersQueryRepository {
@@ -9,17 +10,20 @@ export class UsersQueryRepository {
         const { sortBy, sortDirection, pageNumber, pageSize, searchEmailTerm, searchLoginTerm } = queryDto;
         const skip = (pageNumber - 1) * pageSize;
 
-        const emailRegex = searchEmailTerm ? new RegExp(searchEmailTerm, 'i') : null;
-        const loginRegex = searchLoginTerm ? new RegExp(searchLoginTerm, 'i') : null;
+        const filter: QueryFilter<TUser> = {};
 
-        const filter: Record<string, unknown> = {};
+        if (searchLoginTerm) {
+            filter.$or = filter.$or || [];
+            filter.$or.push({
+                login: { $regex: searchLoginTerm, $options: 'i' },
+            });
+        }
 
-        if (emailRegex && loginRegex) {
-            filter.$or = [{ email: emailRegex }, { login: loginRegex }];
-        } else if (emailRegex) {
-            filter.email = emailRegex;
-        } else if (loginRegex) {
-            filter.login = loginRegex;
+        if (searchEmailTerm) {
+            filter.$or = filter.$or || [];
+            filter.$or.push({
+                email: { $regex: searchEmailTerm, $options: 'i' },
+            });
         }
 
         const [items, totalCount] = await Promise.all([

@@ -43,7 +43,9 @@ export class CommentsService {
             userLogin: user.login,
         });
 
-        return this.commentsRepository.save(newComment);
+        await this.commentsRepository.save(newComment);
+
+        return newComment._id.toString();
     }
 
     async updateById(

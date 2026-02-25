@@ -27,9 +27,7 @@ export class UsersRepository {
         return UserModel.findById(id);
     }
 
-    async save(user: UserDocument): Promise<string> {
-        const newUser = await user.save();
-
-        return newUser._id.toString();
+    async save(user: UserDocument): Promise<void> {
+        await user.save();
     }
 }

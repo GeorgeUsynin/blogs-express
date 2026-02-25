@@ -7,9 +7,7 @@ export class PostsRepository {
         return PostModel.findById(id);
     }
 
-    async save(post: PostDocument): Promise<string> {
-        const newPost = await post.save();
-
-        return newPost._id.toString();
+    async save(post: PostDocument): Promise<void> {
+        await post.save();
     }
 }

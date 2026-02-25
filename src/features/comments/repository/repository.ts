@@ -7,9 +7,7 @@ export class CommentsRepository {
         return CommentModel.findById(id);
     }
 
-    async save(comment: CommentDocument): Promise<string> {
-        const newComment = await comment.save();
-
-        return newComment._id.toString();
+    async save(comment: CommentDocument): Promise<void> {
+        await comment.save();
     }
 }

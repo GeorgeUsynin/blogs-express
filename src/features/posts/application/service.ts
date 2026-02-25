@@ -24,7 +24,9 @@ export class PostsService {
 
         const newPost = PostModel.createPost({ blogName, ...postAttributes });
 
-        return this.postsRepository.save(newPost);
+        await this.postsRepository.save(newPost);
+
+        return newPost._id.toString();
     }
 
     async updateById(id: string, postAttributes: CreateUpdatePostInputModel): Promise<void> {

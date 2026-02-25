@@ -37,7 +37,9 @@ export class UsersService {
             newUser = UserModel.createUnconfirmedUser({ email, login, passwordHash });
         }
 
-        return this.usersRepository.save(newUser);
+        await this.usersRepository.save(newUser);
+
+        return newUser._id.toString();
     }
 
     async removeById(id: string): Promise<void> {

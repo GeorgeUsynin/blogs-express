@@ -15,9 +15,7 @@ export class DevicesRepository {
         await DeviceModel.deleteMany({ userId, deviceId: { $ne: deviceId } });
     }
 
-    async save(device: DeviceDocument): Promise<string> {
-        const newDevice = await device.save();
-
-        return newDevice._id.toString();
+    async save(device: DeviceDocument): Promise<void> {
+        await device.save();
     }
 }
