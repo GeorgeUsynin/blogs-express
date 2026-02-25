@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Query, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { CommentDocument, TComment, TCommentModel } from './types';
 import { CreateCommentDto } from './dto';
@@ -69,11 +69,9 @@ commentSchema.statics = commentStatics;
 commentSchema.methods = commentMethods;
 
 // Soft delete implementation
-commentSchema.pre('find', function () {
-    this.where({ isDeleted: false });
-});
-commentSchema.pre('findOne', function () {
-    this.where({ isDeleted: false });
+commentSchema.pre(/^find/, function () {
+    const that = this as Query<unknown, CommentDocument>;
+    that.where({ isDeleted: false });
 });
 commentSchema.pre('countDocuments', function () {
     this.where({ isDeleted: false });

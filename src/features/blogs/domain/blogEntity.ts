@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Query, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { CreateUpdateBlogDto } from './dto';
 import { BlogDocument, TBlog, TBlogModel } from './types';
@@ -53,11 +53,9 @@ blogSchema.statics = blogStatics;
 blogSchema.methods = blogMethods;
 
 // Soft delete implementation
-blogSchema.pre('find', function () {
-    this.where({ isDeleted: false });
-});
-blogSchema.pre('findOne', function () {
-    this.where({ isDeleted: false });
+blogSchema.pre(/^find/, function () {
+    const that = this as Query<unknown, BlogDocument>;
+    that.where({ isDeleted: false });
 });
 blogSchema.pre('countDocuments', function () {
     this.where({ isDeleted: false });

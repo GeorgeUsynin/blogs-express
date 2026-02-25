@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Query, Schema } from 'mongoose';
 import { TUser, TUserModel, UserDocument } from './types';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns/add';
@@ -158,11 +158,9 @@ userSchema.statics = userStatics;
 userSchema.methods = userMethods;
 
 // Soft delete implementation
-userSchema.pre('find', function () {
-    this.where({ isDeleted: false });
-});
-userSchema.pre('findOne', function () {
-    this.where({ isDeleted: false });
+userSchema.pre(/^find/, function () {
+    const that = this as Query<unknown, UserDocument>;
+    that.where({ isDeleted: false });
 });
 userSchema.pre('countDocuments', function () {
     this.where({ isDeleted: false });

@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Query, Schema } from 'mongoose';
 import { SETTINGS } from '../../../core/settings';
 import { PostDocument, TPost, TPostModel } from './types';
 import { CreatePostDto, UpdatePostDto } from './dto';
@@ -53,11 +53,9 @@ postSchema.statics = postStatics;
 postSchema.methods = postMethods;
 
 // Soft delete implementation
-postSchema.pre('find', function () {
-    this.where({ isDeleted: false });
-});
-postSchema.pre('findOne', function () {
-    this.where({ isDeleted: false });
+postSchema.pre(/^find/, function () {
+    const that = this as Query<unknown, PostDocument>;
+    that.where({ isDeleted: false });
 });
 postSchema.pre('countDocuments', function () {
     this.where({ isDeleted: false });
