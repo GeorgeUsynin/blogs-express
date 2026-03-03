@@ -90,13 +90,13 @@ export class BlogsController {
 
         const { items, totalCount } = await this.postsQueryRepository.findManyByBlogId(blogId, queryInput, userId);
 
-        const blogsListOutput = mapToPostListPaginatedOutput(items, {
+        const postsListOutput = mapToPostListPaginatedOutput(items, {
             pageNumber: queryInput.pageNumber,
             pageSize: queryInput.pageSize,
             totalCount,
         });
 
-        res.status(HTTP_STATUS_CODES.OK_200).send(blogsListOutput);
+        res.status(HTTP_STATUS_CODES.OK_200).send(postsListOutput);
     }
 
     async createBlog(req: RequestWithBody<CreateUpdateBlogInputModel>, res: Response<BlogViewModel>) {
