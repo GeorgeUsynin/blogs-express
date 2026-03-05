@@ -14,9 +14,9 @@ const likeSchema = new Schema<TLike>({
 
 export const likeStatics = {
     createLike(dto: CreateLikeDto) {
-        const newBlog = new LikeModel(dto);
+        const newLike = new LikeModel(dto);
 
-        return newBlog;
+        return newLike;
     },
 };
 
